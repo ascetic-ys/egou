@@ -10,6 +10,11 @@
 			<text class="cell-tip">{{userInfo.userName}}</text>
 			<!-- <text class="cell-more yticon icon-you"></text> -->
 		</view>
+		<view class="list-cell b-b" hover-class="cell-hover" :hover-stay-time="50">
+			<text class="cell-tit">手机号</text>
+			<text class="cell-tip">{{userInfo.phoneNumber||''}}</text>
+			<!-- <text class="cell-more yticon icon-you"></text> -->
+		</view>
 		
 	<!-- 	<view class="list-cell m-t">
 			<text class="cell-tit">消息推送</text>
@@ -26,6 +31,31 @@
 		<view class="list-cell b-b" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">邮箱</text>
 			<text class="cell-tip">{{userInfo.email||''}}</text>
+			<!-- <text class="cell-more yticon icon-you"></text> -->
+		</view>
+		<view class="list-cell b-b" hover-class="cell-hover" :hover-stay-time="50">
+			<text class="cell-tit">公司名称</text>
+			<text class="cell-tip">{{userInfo.companyName||''}}</text>
+			<!-- <text class="cell-more yticon icon-you"></text> -->
+		</view>
+		<view class="list-cell b-b" hover-class="cell-hover" :hover-stay-time="50">
+			<text class="cell-tit">联系人</text>
+			<text class="cell-tip">{{userInfo.linkMan||''}}</text>
+			<!-- <text class="cell-more yticon icon-you"></text> -->
+		</view>
+		<view class="list-cell b-b" hover-class="cell-hover" :hover-stay-time="50">
+			<text class="cell-tit">办公电话</text>
+			<text class="cell-tip">{{userInfo.officePhone||''}}</text>
+			<!-- <text class="cell-more yticon icon-you"></text> -->
+		</view>
+		<view class="list-cell b-b" hover-class="cell-hover" :hover-stay-time="50">
+			<text class="cell-tit">公司地址</text>
+			<text class="cell-tip">{{userInfo.companyAddress||''}}</text>
+			<!-- <text class="cell-more yticon icon-you"></text> -->
+		</view>
+		<view class="list-cell b-b" hover-class="cell-hover" :hover-stay-time="50">
+			<text class="cell-tit">营业执照</text>
+			<view class="cell-img"><image :src="userInfo.filePath" mode=""></image></view>
 			<!-- <text class="cell-more yticon icon-you"></text> -->
 		</view>
 		
@@ -74,7 +104,7 @@
 			},
 			saveUser(){
 				uni.showLoading({title: '请求中...'})
-				this.$api.httpPost('order/userInfo/api/save',this.form).then(r=>{
+				this.$api.httpPost('userInfo/api/save',this.form).then(r=>{
 					if(r.code==0){
 						this.$api.msg(r.msg||'保存成功')
 					}else{

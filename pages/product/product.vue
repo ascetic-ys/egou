@@ -1,7 +1,7 @@
 <template>
 	<view class="container">
 		<view class="carousel">
-			<swiper indicator-dots circular=true duration="400">
+			<!-- <swiper indicator-dots circular=true duration="400">
 				<swiper-item class="swiper-item" v-for="(item,index) in imgList" :key="index">
 					<view class="image-wrapper">
 						<image
@@ -11,26 +11,33 @@
 						></image>
 					</view>
 				</swiper-item>
-			</swiper>
+			</swiper> -->
+			<view class="image-wrapper">
+				<image
+					:src="product.imgPath||`http://img5.imgtn.bdimg.com/it/u=1957887963,2553893514&fm=26&gp=0.jpg`" 
+					class="loaded" 
+					mode="aspectFill"
+				></image>
+			</view>
 		</view>
 		
 		<view class="introduce-section">
-			<text class="title">广东厂家塑木共挤防水耐磨室外方块地板阳台地板户外地板DIY</text>
+			<text class="title">{{product.productName}}</text>
 			<view class="price-box">
 				<text class="price-tip">¥</text>
-				<text class="price">341.6</text>
-				<text class="m-price">¥488</text>
-				<text class="coupon-tip">7折</text>
+				<text class="price">{{product.price}}</text>
+				<!-- <text class="m-price">¥488</text> -->
+				<!-- <text class="coupon-tip">7折</text> -->
 			</view>
-			<view class="bot-row">
+			<!-- <view class="bot-row">
 				<text>销量: 108</text>
 				<text>库存: 4690</text>
 				<text>浏览量: 768</text>
-			</view>
+			</view> -->
 		</view>
 		
 		<!--  分享 -->
-		<view class="share-section" @click="share">
+		<!-- <view class="share-section" @click="share">
 			<view class="share-icon">
 				<text class="yticon icon-xingxing"></text>
 				 返
@@ -42,7 +49,7 @@
 				<text class="yticon icon-you"></text>
 			</view>
 			
-		</view>
+		</view> -->
 		
 		<view class="c-list">
 			<view class="c-row b-b" @click="toggleSpec">
@@ -59,7 +66,7 @@
 				<text class="con t-r red">领取优惠券</text>
 				<text class="yticon icon-you"></text>
 			</view> -->
-			<view class="c-row b-b">
+			<!-- <view class="c-row b-b">
 				<text class="tit">促销活动</text>
 				<view class="con-list">
 					<text>新人首单送20元无门槛代金券</text>
@@ -67,14 +74,14 @@
 					<text>订单满100减30</text>
 					<text>单笔购买满两件免邮费</text>
 				</view>
-			</view>
-			<view class="c-row b-b">
+			</view> -->
+			<!-- <view class="c-row b-b">
 				<text class="tit">服务</text>
 				<view class="bz-list con">
 					<text>7天无理由退换货 ·</text>
 					<text>假一赔十 ·</text>
 				</view>
-			</view>
+			</view> -->
 		</view>
 		
 		<!-- 评价 -->
@@ -102,11 +109,13 @@
 			<view class="d-header">
 				<text>图文详情</text>
 			</view>
-			<rich-text :nodes="desc"></rich-text>
+			<!-- <rich-text :nodes="desc"></rich-text> -->
+			<rich-text :nodes="product.introductory"></rich-text>
+			<view class="d-bottom"></view>
 		</view>
 		
 		<!-- 底部操作菜单 -->
-		<view class="page-bottom">
+		<view class="page-bottom" v-if="userInfo.tag==1">
 			<navigator url="/pages/index/index" open-type="switchTab" class="p-b-btn">
 				<text class="yticon icon-xiatubiao--copy"></text>
 				<text>首页</text>
@@ -115,10 +124,10 @@
 				<text class="yticon icon-gouwuche"></text>
 				<text>购物车</text>
 			</navigator>
-			<view class="p-b-btn" :class="{active: favorite}" @click="toFavorite">
+			<!-- <view class="p-b-btn" :class="{active: favorite}" @click="toFavorite">
 				<text class="yticon icon-shoucang"></text>
 				<text>收藏</text>
-			</view>
+			</view> -->
 			
 			<view class="action-btn-group">
 				<button type="primary" class=" action-btn no-border buy-now-btn" @click="buy">立即购买</button>
@@ -138,10 +147,10 @@
 			<view class="mask"></view>
 			<view class="layer attr-content" @click.stop="stopPrevent">
 				<view class="a-t">
-					<image src="https://cbu01.alicdn.com/img/ibank/2017/204/302/4522203402_1844785635.220x220.jpg?_=2020"></image>
+					<image :src="product.imgPath||`https://cbu01.alicdn.com/img/ibank/2017/204/302/4522203402_1844785635.220x220.jpg?_=2020`"></image>
 					<view class="right">
-						<text class="price">¥328.00</text>
-						<text class="stock">库存：188件</text>
+						<text class="price">¥{{product.price}}</text>
+						<!-- <text class="stock">库存：188件</text> -->
 						<view class="selected">
 							已选：
 							<text class="selected-text" v-for="(sItem, sIndex) in specSelected" :key="sIndex">
@@ -150,17 +159,29 @@
 						</view>
 					</view>
 				</view>
-				<view v-for="(item,index) in specList" :key="index" class="attr-list">
-					<text>{{item.name}}</text>
+				<view class="attr-list">
+					<text>尺寸</text>
 					<view class="item-list">
 						<text 
-							v-for="(childItem, childIndex) in specChildList" 
-							v-if="childItem.pid === item.id"
-							:key="childIndex" class="tit"
-							:class="{selected: childItem.selected}"
-							@click="selectSpec(childIndex, childItem.pid)"
+							v-for="(item, index) in sizeList" 
+							:key="index" class="tit"
+							:class="{selected: item.selected}"
+							@click="selectSize(item)"
 						>
-							{{childItem.name}}
+							{{item.name}}
+						</text>
+					</view>
+				</view>
+				<view class="attr-list">
+					<text>颜色</text>
+					<view class="item-list">
+						<text 
+							v-for="(item, index) in colorList" 
+							:key="index" class="tit"
+							:class="{selected: item.selected}"
+							@click="selectColor(item)"
+						>
+							{{item.name}}
 						</text>
 					</view>
 				</view>
@@ -168,15 +189,16 @@
 			</view>
 		</view>
 		<!-- 分享 -->
-		<share 
+		<!-- <share 
 			ref="share" 
 			:contentHeight="580"
 			:shareList="shareList"
-		></share>
+		></share> -->
 	</view>
 </template>
 
 <script>
+	import {mapState} from 'vuex';
 	import share from '@/components/share';
 	export default{
 		components: {
@@ -184,9 +206,10 @@
 		},
 		data() {
 			return {
+				id:null,
 				specClass: 'none',
 				specSelected:[],
-				
+				product:{},
 				favorite: true,
 				shareList: [],
 				imgList: [
@@ -209,87 +232,44 @@
 						<img style="width:100%;display:block;" src="https://cbu01.alicdn.com/img/ibank/2018/495/677/9194776594_1324667211.220x220.jpg?_=2020" />
 					</div>
 				`,
-				specList: [
-					{
-						id: 1,
-						name: '尺寸',
-					},
-					{	
-						id: 2,
-						name: '颜色',
-					},
-				],
-				specChildList: [
-					{
-						id: 1,
-						pid: 1,
-						name: '20*40',
-					},
-					{
-						id: 2,
-						pid: 1,
-						name: '40*40',
-					},
-					{
-						id: 3,
-						pid: 1,
-						name: '80*80',
-					},
-					{
-						id: 4,
-						pid: 1,
-						name: '20*30',
-					},
-					{
-						id: 5,
-						pid: 1,
-						name: '30*30',
-					},
-					{
-						id: 6,
-						pid: 1,
-						name: '30*40',
-					},
-					{
-						id: 7,
-						pid: 2,
-						name: '白色',
-					},
-					{
-						id: 8,
-						pid: 2,
-						name: '褐色',
-					},
-					{
-						id: 9,
-						pid: 2,
-						name: '暗红',
-					},
-				]
+				sizeList:[],
+				colorList:[]
 			};
 		},
+		computed: {
+			...mapState(['hasLogin','userInfo','weChat'])
+		},
 		async onLoad(options){
-			
 			//接收传值,id里面放的是标题，因为测试数据并没写id 
-			let id = options.id;
-			if(id){
-				this.$api.msg(`点击了${id}`);
-			}
-			
-			
+			this.id = options.id;
+			this.initData()
+			this.sizeList = await this.$api.json('sizeList')
+			this.colorList = await this.$api.json('colorList')
 			//规格 默认选中第一条
-			this.specList.forEach(item=>{
-				for(let cItem of this.specChildList){
-					if(cItem.pid === item.id){
-						this.$set(cItem, 'selected', true);
-						this.specSelected.push(cItem);
-						break; //forEach不能使用break
-					}
-				}
-			})
-			this.shareList = await this.$api.json('shareList');
+			this.$set(this.sizeList[0], 'selected', true);
+			this.$set(this.colorList[0], 'selected', true);
+			this.specSelected.push(this.sizeList[0]);
+			this.specSelected.push(this.colorList[0]);
+			// this.shareList = await this.$api.json('shareList');
 		},
 		methods:{
+			initData(){
+				this.$api.loading('加载中...')
+				this.$api.httpPost('productInfo/api/detail',{id:this.id}).then(r=>{
+					console.log("请求结果：",r)
+					if(r.data){
+						this.product=r.data
+					}else{
+						this.$api.msg('未找到产品信息')
+						uni.navigateBack()
+					}
+					uni.hideLoading();
+				}).catch(e=>{
+					console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+					uni.hideLoading();
+				})
+			},
 			//规格弹窗开关
 			toggleSpec() {
 				if(this.specClass === 'show'){
@@ -301,29 +281,41 @@
 					this.specClass = 'show';
 				}
 			},
-			//选择规格
-			selectSpec(index, pid){
-				let list = this.specChildList;
-				list.forEach(item=>{
-					if(item.pid === pid){
-						this.$set(item, 'selected', false);
+			//选择尺寸
+			selectSize(item){
+				this.removeItemSpecSelected('size')
+				this.sizeList.forEach(e=>{
+					e.selected=false
+					if(e.id === item.id){
+						this.$set(e, 'selected', true);
+						this.specSelected.push(item); 
 					}
 				})
-
-				this.$set(list[index], 'selected', true);
-				//存储已选择
-				/**
-				 * 修复选择规格存储错误
-				 * 将这几行代码替换即可
-				 * 选择的规格存放在specSelected中
-				 */
-				this.specSelected = []; 
-				list.forEach(item=>{ 
-					if(item.selected === true){ 
+			},
+			//选择颜色
+			selectColor(item){
+				this.removeItemSpecSelected('color')
+				this.colorList.forEach(e=>{
+					e.selected=false
+					if(e.id === item.id){
+						this.$set(e, 'selected', true);
 						this.specSelected.push(item); 
+					}
+				})
+			},
+			removeItemSpecSelected(type){
+				this.specSelected.forEach(item=>{
+					if(item.type === type){ 
+						// this.specSelected.filter(i=>this.specSelected.indexOf(item)>-1)
+						this.delItem(item,this.specSelected)
 					} 
 				})
-				
+			},
+			delItem(item,list){
+				const index=list.indexOf(item)
+				if(index===-1){return}
+				list.splice(index,1)
+				return list
 			},
 			//分享
 			share(){
@@ -338,10 +330,28 @@
 					url: `/pages/order/createOrder`
 				})
 			},
+			//加入购物车
 			addCart(){
-				uni.switchTab({
-				  url: `/pages/cart/cart`
-				});
+				this.$api.loading('请求中...')
+				this.$api.httpPost('shoppingCart/api/add',{
+					userId:this.userInfo.id,
+					productId:this.product.id
+				}).then(r=>{
+					console.log('请求结果：',r)
+					if(r.code==0){
+						this.$api.msg(r.msg||'添加成功')
+						uni.switchTab({
+						  url: `/pages/cart/cart`
+						});
+					}else{
+						this.$api.msg(r.msg||'网络错误请重试')
+					}
+					uni.hideLoading()
+				}).catch(e=>{
+					console.log('请求错误：',e)
+					this.$api.msg(e.msg||'网络错误请重试')
+					uni.hideLoading()
+				})
 			},
 			stopPrevent(){}
 		},
@@ -618,6 +628,9 @@
 				border-bottom: 1px solid #ccc; 
 			}
 		}
+		.d-bottom{
+			height: 200rpx;
+		}
 	}
 	
 	/* 规格选择弹窗 */
@@ -778,7 +791,7 @@
 		bottom:30upx;
 		z-index: 95;
 		display: flex;
-		justify-content: center;
+		justify-content: space-around;
 		align-items: center;
 		width: 690upx;
 		height: 100upx;

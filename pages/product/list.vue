@@ -1,51 +1,97 @@
 <template>
 	<view class="content">
 		<view class="navbar" :style="{position:headerPosition,top:headerTop}">
-			<view class="nav-item" :class="{current: filterIndex === 0}" @click="tabClick(0)">
+			<view class="nav-item" :class="{current: params.orderByColumn === ''}" @click="tabClick('')">
 				综合排序
 			</view>
-			<view class="nav-item" :class="{current: filterIndex === 1}" @click="tabClick(1)">
+			<!-- <view class="nav-item" :class="{current: params.orderByColumn === 'sales'}" @click="tabClick('sales')">
 				销量优先
-			</view>
-			<view class="nav-item" :class="{current: filterIndex === 2}" @click="tabClick(2)">
+			</view> -->
+			<view class="nav-item" :class="{current: params.orderByColumn === 'price'}" @click="tabClick('price')">
 				<text>价格</text>
 				<view class="p-box">
-					<text :class="{active: priceOrder === 1 && filterIndex === 2}" class="yticon icon-shang"></text>
-					<text :class="{active: priceOrder === 2 && filterIndex === 2}" class="yticon icon-shang xia"></text>
+					<text :class="{active: params.isAsc === 'asc' && params.orderByColumn === 'price'}" class="yticon icon-shang" @click="tabClick('price','asc')"></text>
+					<text :class="{active: params.isAsc === 'desc' && params.orderByColumn === 'price'}" class="yticon icon-shang xia" @click="tabClick('price','desc')"></text>
 				</view>
 			</view>
 			<text class="cate-item yticon icon-fenlei1" @click="toggleCateMask('show')"></text>
 		</view>
-		<view class="goods-list">
-			<view 
-				v-for="(item, index) in goodsList" :key="index"
-				class="goods-item"
-				@click="navToDetailPage(item)"
-			>
-				<view class="image-wrapper">
-					<image :src="item.image" mode="aspectFill"></image>
-				</view>
-				<text class="title clamp">{{item.title}}</text>
-				<view class="price-box">
-					<text class="price">{{item.price}}</text>
-					<text>已售 {{item.sales}}</text>
+		<mescroll-body ref="mescrollRef" @init="mescrollInit" :down="downOption" @down="downCallback" @up="upCallback">
+			<view class="goods-list">
+				<view 
+					v-for="(item, index) in goodsList" :key="index"
+					class="goods-item"
+					@click="navToDetailPage(item)"
+				>
+					<view class="image-wrapper">
+						<image :src="item.imgPath||`http://img5.imgtn.bdimg.com/it/u=1957887963,2553893514&fm=26&gp=0.jpg`" mode="aspectFill"></image>
+					</view>
+					<text class="title clamp">{{item.productName}}</text>
+					<view class="price-box">
+						<text class="price">{{item.price}}</text>
+						<text>已售 {{item.sales||0}}</text>
+					</view>
 				</view>
 			</view>
-		</view>
-		<uni-load-more :status="loadingType"></uni-load-more>
+		</mescroll-body>
 		
 		<view class="cate-mask" :class="cateMaskState===0 ? 'none' : cateMaskState===1 ? 'show' : ''" @click="toggleCateMask">
 			<view class="cate-content" @click.stop.prevent="stopPrevent" @touchmove.stop.prevent="stopPrevent">
 				<scroll-view scroll-y class="cate-list">
-					<view v-for="item in cateList" :key="item.id">
-						<view class="cate-item b-b two">{{item.name}}</view>
-						<view 
-							v-for="tItem in item.child" :key="tItem.id" 
-							class="cate-item b-b" 
-							:class="{active: tItem.id==cateId}"
-							@click="changeCate(tItem)">
-							{{tItem.name}}
+					<!-- <view class="attr-list">
+						<text>尺寸</text>
+						<view class="item-list">
+							<text 
+								v-for="(item, index) in sizeList" 
+								:key="item.name" class="tit"
+								:class="{selected: item.name===params.size}"
+								@click="selectSize(item.name)"
+							>
+								{{item.name}}
+							</text>
 						</view>
+					</view> -->
+					<view class="attr-list">
+						<text>价格</text>
+						<view class="input-range">
+							<view class="input-info">
+								<input type="number" v-model="params.lowPrice" placeholder="最低价" @input="inputChangeLowPrice"/>
+							</view>
+							<view class="input-conc">-</view>
+							<view class="input-info">
+								<input type="number" v-model="params.highPrice" placeholder="最高价" @input="inputChangeHighPrice"/>
+							</view>
+						</view>
+					</view>
+					<view class="attr-list">
+						<text>颜色</text>
+						<view class="item-list">
+							<text 
+								v-for="(item, index) in colorList" 
+								:key="item.name" class="tit"
+								:class="{selected: item.name===params.color}"
+								@click="selectColor(item.name)"
+							>
+								{{item.name}}
+							</text>
+						</view>
+					</view>
+					<view class="attr-list" v-for="item in cateList" :key="item.id">
+						<text>{{item.largeCategory}}</text>
+						<view class="item-list">
+							<text 
+								v-for="(lt, index) in item.littleCategorylist" 
+								:key="lt.littleCategory" class="tit"
+								:class="{selected: lt.littleCategory===params.littleCategory}"
+								@click="changeCate(lt,item)"
+							>
+								{{lt.littleCategory}}
+							</text>
+						</view>
+					</view>
+					<view class="confirm-btn">
+						<button class="confirm" @tap="selectConfirm">确定</button>
+						<button class="reset" @tap="selectCancel">重置</button>
 					</view>
 				</scroll-view>
 			</view>
@@ -55,32 +101,40 @@
 </template>
 
 <script>
-	import uniLoadMore from '@/components/uni-load-more/uni-load-more.vue';
+	import MescrollMixin from "@/components/mescroll-uni/mescroll-mixins.js";
 	export default {
-		components: {
-			uniLoadMore	
-		},
+		mixins: [MescrollMixin], // 使用mixin (在main.js注册全局组件)
 		data() {
 			return {
+				upOption:{
+					auto:false,
+				},
+				downOption: {
+					auto: false //是否在初始化后,自动执行downCallback; 默认true
+				},
 				cateMaskState: 0, //分类面板展开状态
 				headerPosition:"fixed",
 				headerTop:"0px",
-				loadingType: 'more', //加载更多状态
-				filterIndex: 0, 
-				cateId: 0, //已选三级分类id
-				priceOrder: 0, //1 价格从低到高 2价格从高到低
 				cateList: [],
-				goodsList: []
+				goodsList: [],
+				params:{},
+				sizeList:[],
+				colorList:[]
 			};
 		},
 		
-		onLoad(options){
+		async onLoad(options){
+			this.initParams()
 			// #ifdef H5
 			this.headerTop = document.getElementsByTagName('uni-page-head')[0].offsetHeight+'px';
 			// #endif
-			this.cateId = options.tid;
-			this.loadCateList(options.fid,options.sid);
-			this.loadData();
+			this.params.largeCategory=options.largeCategory
+			this.params.littleCategory=options.littleCategory
+			
+			this.sizeList = await this.$api.json('sizeList')
+			this.colorList = await this.$api.json('colorList')
+			this.loadCateList()
+			this.loadData()
 		},
 		onPageScroll(e){
 			//兼容iOS端下拉时顶部漂移
@@ -90,86 +144,104 @@
 				this.headerPosition = "absolute";
 			}
 		},
-		//下拉刷新
-		onPullDownRefresh(){
-			this.loadData('refresh');
-		},
-		//加载更多
-		onReachBottom(){
-			this.loadData();
-		},
 		methods: {
-			//加载分类
-			async loadCateList(fid, sid){
-				let list = await this.$api.json('cateList');
-				let cateList = list.filter(item=>item.pid == fid);
-				
-				cateList.forEach(item=>{
-					let tempList = list.filter(val=>val.pid == item.id);
-					item.child = tempList;
+			initParams(){
+				this.params={
+					brand:'',
+					largeCategory:'',
+					littleCategory:'',
+					orderByColumn:'',
+					isAsc:'',
+					color:'',
+					size:'',
+					lowPrice:'',
+					highPrice:'',
+					pageSize:10,
+					pageNum:1
+				}
+			},
+			/*下拉刷新的回调 */
+			downCallback() {
+				//联网加载数据
+				this.loadData().then(data => {
+					//联网成功的回调,隐藏下拉刷新的状态
+					this.mescroll.endSuccess();
+				}).catch(()=>{
+					//联网失败的回调,隐藏下拉刷新的状态
+					this.mescroll.endErr();
 				})
-				this.cateList = cateList;
+			},
+			/*上拉加载的回调: 其中page.num:当前页 从1开始, page.size:每页数据条数,默认10 */
+			upCallback(page) {
+				//联网加载数据
+				let pageNum = page.num; // 页码, 默认从1开始
+				let pageSize = page.size; // 页长, 默认每页10条
+				this.loadData({pageNum,pageSize}).then(r=>{
+					//联网成功的回调,隐藏下拉刷新和上拉加载的状态;
+					//mescroll会根据传的参数,自动判断列表如果无任何数据,则提示空;列表无下一页数据,则提示无更多数据;
+								
+					//方法一(推荐): 后台接口有返回列表的总页数 totalPage
+					// this.mescroll.endByPage(r.length, t.total); //必传参数(当前页的数据个数, 总页数)
+								
+					//方法二(推荐): 后台接口有返回列表的总数据量 totalSize
+					this.mescroll.endBySize(r.length, t.total); //必传参数(当前页的数据个数, 总数据量)
+								
+					//方法三(推荐): 您有其他方式知道是否有下一页 hasNext
+					//this.mescroll.endSuccess(curPageData.length, hasNext); //必传参数(当前页的数据个数, 是否有下一页true/false)
+								
+					//方法四 (不推荐),会存在一个小问题:比如列表共有20条数据,每页加载10条,共2页.如果只根据当前页的数据个数判断,则需翻到第三页才会知道无更多数据
+					// this.mescroll.endSuccess(r.length)
+				}).catch(()=>{
+					this.mescroll.endErr()
+				})
 			},
 			//加载商品 ，带下拉刷新和上滑加载
-			async loadData(type='add', loading) {
-				//没有更多直接返回
-				if(type === 'add'){
-					if(this.loadingType === 'nomore'){
-						return;
-					}
-					this.loadingType = 'loading';
-				}else{
-					this.loadingType = 'more'
+			async loadData(data={}) {
+				const {pageNum=1,pageSize=10}=data
+				if(!this.params.isAsc){
+					delete this.params.isAsc
 				}
-				
-				let goodsList = await this.$api.json('goodsList');
-				if(type === 'refresh'){
-					this.goodsList = [];
+				if(this.params.orderByColumn=='sales'){
+					this.params.orderByColumn=''
 				}
-				//筛选，测试数据直接前端筛选了
-				if(this.filterIndex === 1){
-					goodsList.sort((a,b)=>b.sales - a.sales)
-				}
-				if(this.filterIndex === 2){
-					goodsList.sort((a,b)=>{
-						if(this.priceOrder == 1){
-							return a.price - b.price;
-						}
-						return b.price - a.price;
-					})
-				}
-				
-				this.goodsList = this.goodsList.concat(goodsList);
-				
-				//判断是否还有下一页，有是more  没有是nomore(测试数据判断大于20就没有了)
-				this.loadingType  = this.goodsList.length > 20 ? 'more' : 'nomore';
-				if(type === 'refresh'){
-					if(loading == 1){
-						uni.hideLoading()
+				delete this.params.size
+				this.$api.loading('加载中...')
+				this.$api.httpPost('productInfo/api/list',{pageNum,pageSize,...this.params}).then(r=>{
+					console.log("请求结果：",r)
+					if(pageNum===1){
+						this.goodsList=r.rows
 					}else{
-						uni.stopPullDownRefresh();
+						this.goodsList=this.goodsList.concat(r.rows)
 					}
-				}
+					uni.hideLoading();
+					return this.goodsList
+				}).catch(e=>{
+					console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+					uni.hideLoading();
+				})
 			},
-			//筛选点击
-			tabClick(index){
-				if(this.filterIndex === index && index !== 2){
-					return;
-				}
-				this.filterIndex = index;
-				if(index === 2){
-					this.priceOrder = this.priceOrder === 1 ? 2: 1;
-				}else{
-					this.priceOrder = 0;
-				}
-				uni.pageScrollTo({
-					duration: 300,
-					scrollTop: 0
+			//加载分类
+			async loadCateList(){
+				this.$api.httpGet('largeCategory/api/listAll').then(r=>{
+					console.log("请求结果：",r)
+					if(r.code==0){
+						this.cateList = r.data
+					}
+				}).catch(e=>{
+					console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
 				})
-				this.loadData('refresh', 1);
-				uni.showLoading({
-					title: '正在加载'
-				})
+			},
+			//排序点击
+			tabClick(orderByColumn,isAsc){
+				if(orderByColumn){
+					this.params.orderByColumn = orderByColumn;
+				}
+				if(isAsc){
+					this.params.isAsc = isAsc;
+				}
+				this.loadData();
 			},
 			//显示分类面板
 			toggleCateMask(type){
@@ -181,22 +253,43 @@
 				}, timer)
 			},
 			//分类点击
-			changeCate(item){
-				this.cateId = item.id;
+			changeCate(litem,item){
+				this.params.largeCategory=item.largeCategory
+				this.params.littleCategory=litem.littleCategory
+				// this.toggleCateMask();
+				// this.loadData();
+			},
+			//分类点击
+			selectSize(name){
+				this.params.size=name
+				// this.toggleCateMask();
+				// this.loadData();
+			},
+			//分类点击
+			selectColor(name){
+				this.params.color=name
+				// this.toggleCateMask();
+				// this.loadData();
+			},
+			//分类点击
+			selectConfirm(){
+				if(Number(this.params.lowPrice)>Number(this.params.highPrice)){
+					this.$api.msg('最低价要小于最高价')
+					return 
+				}
 				this.toggleCateMask();
-				uni.pageScrollTo({
-					duration: 300,
-					scrollTop: 0
-				})
-				this.loadData('refresh', 1);
-				uni.showLoading({
-					title: '正在加载'
-				})
+				this.loadData();
+			},
+			//分类点击
+			selectCancel(){
+				this.initParams()
+				this.toggleCateMask();
+				this.loadData();
 			},
 			//详情
 			navToDetailPage(item){
 				//测试数据没有写id，用title代替
-				let id = item.title;
+				let id = item.id;
 				uni.navigateTo({
 					url: `/pages/product/product?id=${id}`
 				})
@@ -323,6 +416,7 @@
 		display: flex;
 		flex-direction: column;
 		height: 100%;
+		padding: 20rpx;
 		.cate-item{
 			display: flex;
 			align-items: center;
@@ -340,6 +434,80 @@
 		}
 		.active{
 			color: $base-color;
+		}
+		.attr-list{
+			display: flex;
+			flex-direction: column;
+			font-size: $font-base + 2upx;
+			color: $font-color-base;
+			padding-top: 30upx;
+			padding-left: 10upx;
+			.input-range{
+				display: flex;
+				justify-content: center;
+				line-height: 70rpx;
+				view{
+					line-height: 70rpx;
+					.input-info{
+						flex: 3;
+					}
+					.input-conc{
+						padding: 0 10rpx;
+					}
+					input{
+						background: #F2F2F2;
+						border-radius: 50rpx;
+						text-indent: 30rpx;
+						padding: 5rpx 30rpx;
+						line-height: 70rpx;
+						height: 70rpx;
+						width: 250rpx;
+					}
+				}
+			}
+		}
+		.item-list{
+			padding: 20upx 0 0;
+			display: flex;
+			flex-wrap: wrap;
+			text{
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: #eee;
+				margin-right: 20upx;
+				margin-bottom: 20upx;
+				border-radius: 100upx;
+				min-width: 60upx;
+				height: 60upx;
+				padding: 0 20upx;
+				font-size: $font-base;
+				color: $font-color-dark;
+			}
+			.selected{
+				background: #fbebee;
+				color: $uni-color-primary;
+			}
+		}
+		.confirm-btn{
+			display: flex;
+			justify-content: space-between;
+			margin: 50rpx 0;
+			.confirm{
+				background: #fa436a;
+				color: #FFFFFF;
+			}
+			.reset{
+				background: #C0C4CC;
+			}
+			button{
+				width: 200rpx;
+				border-radius: 40rpx;
+				border: none;
+			}
+			button::after{
+				border: none;
+			}
 		}
 	}
 

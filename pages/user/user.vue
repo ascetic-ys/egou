@@ -52,7 +52,7 @@
 				</view>
 			</view> -->
 			<!-- 订单 -->
-			<view class="order-section">
+			<view class="order-section" v-if='!userInfo.tag||userInfo.tag==1'>
 				<view class="order-item" @click="navTo('/pages/order/order?state=0')" hover-class="common-hover"  :hover-stay-time="50">
 					<text class="yticon icon-shouye"></text>
 					<text>全部订单</text>
@@ -85,13 +85,13 @@
 					<image @click="navTo('/pages/product/product')" src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=191678693,2701202375&fm=26&gp=0.jpg" mode="aspectFill"></image>
 				</scroll-view> -->
 				<!-- <list-cell icon="icon-iconfontweixin" iconColor="#e07472" title="我的购物车" tips="您的购物车共有20件商品" @eventClick="navTo('/pages/cart/cart')"></list-cell> -->
-				<list-cell icon="icon-dizhi" iconColor="#5fcda2" title="地址管理" @eventClick="navTo('/pages/address/address')"></list-cell>
-				<list-cell icon="icon-share" iconColor="#9789f7" title="订单统计" tips="查看最近订单图表信息" @eventClick="navTo('/pages/orderTj/orderTj?state=0')"></list-cell>
-				<list-cell icon="icon-pinglun-copy" iconColor="#ee883b" title="待办事项" tips="有新的消息" @eventClick="navTo('/pages/notice/notice')"></list-cell>
+				<list-cell v-if='!userInfo.tag||userInfo.tag==1' icon="icon-dizhi" iconColor="#5fcda2" title="地址管理" @eventClick="navTo('/pages/address/address')"></list-cell>
+				<list-cell v-if='userInfo.tag==0' icon="icon-share" iconColor="#9789f7" title="订单统计" tips="查看最近订单图表信息" @eventClick="navTo('/pages/orderTj/orderTj?state=0')"></list-cell>
+				<list-cell v-if='userInfo.tag==0' icon="icon-pinglun-copy" iconColor="#ee883b" title="待办事项" tips="有新的消息" @eventClick="navTo('/pages/notice/notice')"></list-cell>
 				<!-- <list-cell icon="icon-shoucang_xuanzhongzhuangtai" iconColor="#54b4ef" title="我的收藏"></list-cell> -->
 				<list-cell icon="icon-shezhi1" iconColor="#e07472" title="设置" border="" @eventClick="navTo('/pages/set/set')"></list-cell>
-				<list-cell icon="icon-shoucang_xuanzhongzhuangtai" iconColor="#e07472" title="我的客户" border="" @eventClick="navTo('/pages/myUser/myUser?state=0')"></list-cell>
-				<list-cell icon="icon-iconfontweixin" iconColor="#e0ae70" title="我的业绩" border="" @eventClick="navTo('/pages/myAchievement/myAchievement?state=0')"></list-cell>
+				<list-cell v-if='userInfo.tag==3' icon="icon-shoucang_xuanzhongzhuangtai" iconColor="#e07472" title="我的客户" border="" @eventClick="navTo('/pages/myUser/myUser?state=0')"></list-cell>
+				<list-cell v-if='userInfo.tag==3' icon="icon-iconfontweixin" iconColor="#e0ae70" title="我的业绩" border="" @eventClick="navTo('/pages/myAchievement/myAchievement?state=0')"></list-cell>
 			</view>
 		</view>
 			<!-- 底部自定义tabbar -->
@@ -114,6 +114,10 @@
 			}
 		},
 		onLoad(){
+			this.initPageTitle()
+		},
+		onShow() {
+			this.initPageTitle()
 		},
 		// #ifndef MP
 		onNavigationBarButtonTap(e) {
@@ -139,11 +143,28 @@
 			...mapState(['hasLogin','userInfo','weChat'])
 		},
         methods: {
-					clickTab(item){
-						uni.navigateTo({
-							url:item.pagePath
-						})
-					},
+			clickTab(item){
+				uni.navigateTo({
+					url:item.pagePath
+				})
+			},
+			initPageTitle(){
+				if(this.userInfo&&[0,2].indexOf(this.userInfo.tag)>-1){
+					uni.setTabBarItem({
+					  index: 2,
+					  text: '订单',
+					  iconPath: "static/tab-order.png",
+					  selectedIconPath: "static/tab-order-current.png",
+					})
+				}else if(this.userInfo&&this.userInfo.tag==3){
+					uni.setTabBarItem({
+					  index: 2,
+					  text: '业绩',
+					  iconPath: "static/tab-achieve.png",
+					  selectedIconPath: "static/tab-achieve-current.png",
+					})
+				}
+			},
 			/**
 			 * 统一跳转接口,拦截未登录路由
 			 * navigator标签现在默认没有转场动画，所以用view

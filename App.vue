@@ -20,6 +20,21 @@
 						this.login(res.data);
 					}
 				});
+				if([0,2].indexOf(userInfo.tag)>-1){
+					uni.setTabBarItem({
+					  index: 2,
+					  text: '订单',
+					  iconPath: "static/tab-order.png",
+					  selectedIconPath: "static/tab-order-current.png",
+					})
+				}else if(userInfo.tag==3){
+					uni.setTabBarItem({
+					  index: 2,
+					  text: '业绩',
+					  iconPath: "static/tab-achieve.png",
+					  selectedIconPath: "static/tab-achieve-current.png",
+					})
+				}
 			}
 			if(weChat.language){
 				//更新微信授权状态
@@ -30,23 +45,24 @@
 					}
 				});
 			}
-			uni.getSystemInfo({
-				success:function(e){
-					Vue.prototype.statusBar = e.statusBarHeight
-					// #ifndef MP
-					if(e.platform == 'android') {Vue.prototype.customBar = e.statusBarHeight + 50
-					}else {Vue.prototype.customBar = e.statusBarHeight + 45
-					}
-					// #endif
-					// #ifdef MP-WEIXIN
-					let custom = wx.getMenuButtonBoundingClientRect()
-					Vue.prototype.customBar = custom.bottom + custom.top - e.statusBarHeight
-					// #endif
-					// #ifdef MP-ALIPAY
-					Vue.prototype.customBar = e.statusBarHeight + e.titleBarHeight
-					// #endif
-				}
-			})
+			
+			// uni.getSystemInfo({
+			// 	success:function(e){
+			// 		Vue.prototype.statusBar = e.statusBarHeight
+			// 		// #ifndef MP
+			// 		if(e.platform == 'android') {Vue.prototype.customBar = e.statusBarHeight + 50
+			// 		}else {Vue.prototype.customBar = e.statusBarHeight + 45
+			// 		}
+			// 		// #endif
+			// 		// #ifdef MP-WEIXIN
+			// 		let custom = wx.getMenuButtonBoundingClientRect()
+			// 		Vue.prototype.customBar = custom.bottom + custom.top - e.statusBarHeight
+			// 		// #endif
+			// 		// #ifdef MP-ALIPAY
+			// 		Vue.prototype.customBar = e.statusBarHeight + e.titleBarHeight
+			// 		// #endif
+			// 	}
+			// })
 			
 		},
 		onShow: function() {

@@ -2,16 +2,16 @@
 	<view class="content">
 		<scroll-view scroll-y class="left-aside">
 			<view v-for="item in flist" :key="item.id" class="f-item b-b" :class="{active: item.id === currentId}" @click="tabtap(item)">
-				{{item.name}}
+				{{item.largeCategory}}
 			</view>
 		</scroll-view>
 		<scroll-view scroll-with-animation scroll-y class="right-aside" @scroll="asideScroll" :scroll-top="tabScrollTop">
 			<view v-for="item in slist" :key="item.id" class="s-list" :id="'main-'+item.id">
-				<text class="s-item">{{item.name}}</text>
+				<text class="s-item">{{item.largeCategory}}</text>
 				<view class="t-list">
-					<view @click="navToList(item.id, titem.id)" v-if="titem.pid === item.id" class="t-item" v-for="titem in tlist" :key="titem.id">
-						<image :src="titem.picture"></image>
-						<text>{{titem.name}}</text>
+					<view @click="navToList(titem,item)" class="t-item" v-for="titem in item.littleCategorylist" :key="titem.id">
+						<image :src="titem.filePath||`/static/temp/Cate4.jpg`"></image>
+						<text>{{titem.littleCategory}}</text>
 					</view>
 				</view>
 			</view>
@@ -22,6 +22,7 @@
 </template>
 
 <script>
+	
 	export default {
 		data() {
 			return {
@@ -43,16 +44,34 @@
 				})
 			},
 			async loadData(){
-				let list = await this.$api.json('cateList');
-				list.forEach(item=>{
-					if(!item.pid){
-						this.flist.push(item);  //pid为父级id, 没有pid或者pid=0是一级分类
-					}else if(!item.picture){
-						this.slist.push(item); //没有图的是2级分类
-					}else{
-						this.tlist.push(item); //3级分类
+				this.$api.loading('加载中...')
+				this.$api.httpGet('largeCategory/api/list').then(r=>{
+					console.log("请求结果：",r)
+					if(r.code==0){
+						this.flist = r.data
 					}
-				}) 
+					uni.hideLoading();
+					return this.$api.httpGet('largeCategory/api/listAll')
+				}).then(r=>{
+					console.log("请求结果：",r)
+					if(r.code==0){
+						this.slist = r.data
+					}
+					uni.hideLoading();
+				}).catch(e=>{
+					console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+					uni.hideLoading();
+				})
+				// list.forEach(item=>{
+				// 	if(!item.pid){
+				// 		this.flist.push(item);  //pid为父级id, 没有pid或者pid=0是一级分类
+				// 	}else if(!item.picture){
+				// 		this.slist.push(item); //没有图的是2级分类
+				// 	}else{
+				// 		this.tlist.push(item); //3级分类
+				// 	}
+				// }) 
 			},
 			//一级分类点击
 			tabtap(item){
@@ -90,9 +109,9 @@
 				})
 				this.sizeCalcState = true;
 			},
-			navToList(sid, tid){
+			navToList(item,pitem){
 				uni.navigateTo({
-					url: `/pages/product/list?fid=${this.currentId}&sid=${sid}&tid=${tid}`
+					url: `/pages/product/list?largeCategory=${pitem.largeCategory}&littleCategory=${item.littleCategory}`
 				})
 			}
 		}

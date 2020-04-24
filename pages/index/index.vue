@@ -19,7 +19,7 @@
 			</view>
 		</view>
 		<!-- 分类 -->
-		<view class="cate-section" @tap="gotoCate">
+		<!-- <view class="cate-section" @tap="gotoCate">
 			<view class="cate-item">
 				<image src="/static/temp/Cate1.jpg"></image>
 				<text>地面材料</text>
@@ -39,6 +39,12 @@
 			<view class="cate-item">
 				<image src="/static/temp/Cate5.jpg"></image>
 				<text>办公家具</text>
+			</view>
+		</view> -->
+		<view class="cate-section" >
+			<view class="cate-item" v-for="(item,i) in naviCateList" :key='i' @tap="toProductList(item)">
+				<image :src="item.filePath||`/static/temp/Cate1.jpg`"></image>
+				<text>{{item.littleCategory}}</text>
 			</view>
 		</view>
 		
@@ -318,7 +324,9 @@
 				swiperCurrent: 0,
 				swiperLength: 0,
 				carouselList: [],
-				goodsList: []
+				goodsList: [],
+				cateList:[],//分类
+				naviCateList:[]//导航分类
 			};
 		},
 
@@ -326,9 +334,9 @@
 			this.loadData();
 		},
 		methods: {
-			gotoCate(){
+			toProductList(item){
 				uni.navigateTo({
-					url:'/pages/product/list?fid=1&sid=8&tid=37'
+					url: `/pages/product/list?largeCategory=${item.largeCategory}&littleCategory=${item.littleCategory}`
 				})
 			},
 			clickTab(item){
@@ -348,6 +356,33 @@
 				
 				let goodsList = await this.$api.json('goodsList');
 				this.goodsList = goodsList || [];
+				this.initCateList()
+			},
+			initCateList(){
+				this.$api.httpGet('largeCategory/api/listAll').then(r=>{
+					console.log("请求结果：",r)
+					if(r.code==0){
+						this.cateList = r.data
+						this.naviCateList=[]
+						this.cateList.forEach(e=>{
+							e.littleCategorylist.forEach(en=>{
+								if(this.naviCateList.length<5){
+									let item = {
+										"id": en.id,
+										"littleCategory": en.littleCategory,
+										"parentId": en.parentId,
+										"filePath": en.filePath,
+										"largeCategory": e.largeCategory,
+									}
+									this.naviCateList.push(item)
+								}
+							})
+						})
+					}
+				}).catch(e=>{
+					console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+				})
 			},
 			//轮播图切换修改背景色
 			swiperChange(e) {

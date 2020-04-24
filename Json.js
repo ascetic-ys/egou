@@ -36,10 +36,114 @@ const goodsList = [{
 		image: "http://img5.imgtn.bdimg.com/it/u=1957887963,2553893514&fm=26&gp=0.jpg",
 		image2: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554013048&di=a3dc9fd1406dd7bad7fbb97b5489ec04&imgtype=jpg&er=1&src=http%3A%2F%2Fimg009.hc360.cn%2Fhb%2FnKo44ac2656F831c684507E3Da0E3a26841.jpg",
 		image3: "http://img.zcool.cn/community/017a4e58b4eab6a801219c77084373.jpg",
-		title: "卫浴地砖",
+		title: "卫浴地砖2",
 		price: 78,
 		sales: 16,
 	},
+	{
+		image: "http://img5.imgtn.bdimg.com/it/u=1957887963,2553893514&fm=26&gp=0.jpg",
+		image2: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554013048&di=a3dc9fd1406dd7bad7fbb97b5489ec04&imgtype=jpg&er=1&src=http%3A%2F%2Fimg009.hc360.cn%2Fhb%2FnKo44ac2656F831c684507E3Da0E3a26841.jpg",
+		image3: "http://img.zcool.cn/community/017a4e58b4eab6a801219c77084373.jpg",
+		title: "卫浴地砖3",
+		price: 78,
+		sales: 16,
+	},
+	{
+		image: "http://img5.imgtn.bdimg.com/it/u=1957887963,2553893514&fm=26&gp=0.jpg",
+		image2: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554013048&di=a3dc9fd1406dd7bad7fbb97b5489ec04&imgtype=jpg&er=1&src=http%3A%2F%2Fimg009.hc360.cn%2Fhb%2FnKo44ac2656F831c684507E3Da0E3a26841.jpg",
+		image3: "http://img.zcool.cn/community/017a4e58b4eab6a801219c77084373.jpg",
+		title: "卫浴地砖4",
+		price: 78,
+		sales: 16,
+	},
+	{
+		image: "http://img5.imgtn.bdimg.com/it/u=1957887963,2553893514&fm=26&gp=0.jpg",
+		image2: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554013048&di=a3dc9fd1406dd7bad7fbb97b5489ec04&imgtype=jpg&er=1&src=http%3A%2F%2Fimg009.hc360.cn%2Fhb%2FnKo44ac2656F831c684507E3Da0E3a26841.jpg",
+		image3: "http://img.zcool.cn/community/017a4e58b4eab6a801219c77084373.jpg",
+		title: "卫浴地砖5",
+		price: 78,
+		sales: 16,
+	},
+	{
+		image: "http://img5.imgtn.bdimg.com/it/u=1957887963,2553893514&fm=26&gp=0.jpg",
+		image2: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554013048&di=a3dc9fd1406dd7bad7fbb97b5489ec04&imgtype=jpg&er=1&src=http%3A%2F%2Fimg009.hc360.cn%2Fhb%2FnKo44ac2656F831c684507E3Da0E3a26841.jpg",
+		image3: "http://img.zcool.cn/community/017a4e58b4eab6a801219c77084373.jpg",
+		title: "卫浴地砖6",
+		price: 78,
+		sales: 16,
+	},
+	{
+		image: "http://img5.imgtn.bdimg.com/it/u=1957887963,2553893514&fm=26&gp=0.jpg",
+		image2: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554013048&di=a3dc9fd1406dd7bad7fbb97b5489ec04&imgtype=jpg&er=1&src=http%3A%2F%2Fimg009.hc360.cn%2Fhb%2FnKo44ac2656F831c684507E3Da0E3a26841.jpg",
+		image3: "http://img.zcool.cn/community/017a4e58b4eab6a801219c77084373.jpg",
+		title: "卫浴地砖7",
+		price: 78,
+		sales: 16,
+	},
+	{
+		image: "http://img5.imgtn.bdimg.com/it/u=1957887963,2553893514&fm=26&gp=0.jpg",
+		image2: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554013048&di=a3dc9fd1406dd7bad7fbb97b5489ec04&imgtype=jpg&er=1&src=http%3A%2F%2Fimg009.hc360.cn%2Fhb%2FnKo44ac2656F831c684507E3Da0E3a26841.jpg",
+		image3: "http://img.zcool.cn/community/017a4e58b4eab6a801219c77084373.jpg",
+		title: "卫浴地砖8",
+		price: 78,
+		sales: 16,
+	},
+	{
+		image: "http://img5.imgtn.bdimg.com/it/u=1957887963,2553893514&fm=26&gp=0.jpg",
+		image2: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554013048&di=a3dc9fd1406dd7bad7fbb97b5489ec04&imgtype=jpg&er=1&src=http%3A%2F%2Fimg009.hc360.cn%2Fhb%2FnKo44ac2656F831c684507E3Da0E3a26841.jpg",
+		image3: "http://img.zcool.cn/community/017a4e58b4eab6a801219c77084373.jpg",
+		title: "卫浴地砖9",
+		price: 78,
+		sales: 16,
+	},
+	{
+		image: "http://img5.imgtn.bdimg.com/it/u=1957887963,2553893514&fm=26&gp=0.jpg",
+		image2: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554013048&di=a3dc9fd1406dd7bad7fbb97b5489ec04&imgtype=jpg&er=1&src=http%3A%2F%2Fimg009.hc360.cn%2Fhb%2FnKo44ac2656F831c684507E3Da0E3a26841.jpg",
+		image3: "http://img.zcool.cn/community/017a4e58b4eab6a801219c77084373.jpg",
+		title: "卫浴地砖10",
+		price: 78,
+		sales: 16,
+	},
+	{
+		image: "http://img5.imgtn.bdimg.com/it/u=1957887963,2553893514&fm=26&gp=0.jpg",
+		image2: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554013048&di=a3dc9fd1406dd7bad7fbb97b5489ec04&imgtype=jpg&er=1&src=http%3A%2F%2Fimg009.hc360.cn%2Fhb%2FnKo44ac2656F831c684507E3Da0E3a26841.jpg",
+		image3: "http://img.zcool.cn/community/017a4e58b4eab6a801219c77084373.jpg",
+		title: "卫浴地砖11",
+		price: 78,
+		sales: 16,
+	},
+	{
+		image: "http://img5.imgtn.bdimg.com/it/u=1957887963,2553893514&fm=26&gp=0.jpg",
+		image2: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554013048&di=a3dc9fd1406dd7bad7fbb97b5489ec04&imgtype=jpg&er=1&src=http%3A%2F%2Fimg009.hc360.cn%2Fhb%2FnKo44ac2656F831c684507E3Da0E3a26841.jpg",
+		image3: "http://img.zcool.cn/community/017a4e58b4eab6a801219c77084373.jpg",
+		title: "卫浴地砖12",
+		price: 78,
+		sales: 16,
+	},
+	{
+		image: "http://img5.imgtn.bdimg.com/it/u=1957887963,2553893514&fm=26&gp=0.jpg",
+		image2: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554013048&di=a3dc9fd1406dd7bad7fbb97b5489ec04&imgtype=jpg&er=1&src=http%3A%2F%2Fimg009.hc360.cn%2Fhb%2FnKo44ac2656F831c684507E3Da0E3a26841.jpg",
+		image3: "http://img.zcool.cn/community/017a4e58b4eab6a801219c77084373.jpg",
+		title: "卫浴地砖13",
+		price: 78,
+		sales: 16,
+	},
+	{
+		image: "http://img5.imgtn.bdimg.com/it/u=1957887963,2553893514&fm=26&gp=0.jpg",
+		image2: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554013048&di=a3dc9fd1406dd7bad7fbb97b5489ec04&imgtype=jpg&er=1&src=http%3A%2F%2Fimg009.hc360.cn%2Fhb%2FnKo44ac2656F831c684507E3Da0E3a26841.jpg",
+		image3: "http://img.zcool.cn/community/017a4e58b4eab6a801219c77084373.jpg",
+		title: "卫浴地砖14",
+		price: 78,
+		sales: 16,
+	},
+	{
+		image: "http://img5.imgtn.bdimg.com/it/u=1957887963,2553893514&fm=26&gp=0.jpg",
+		image2: "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1554013048&di=a3dc9fd1406dd7bad7fbb97b5489ec04&imgtype=jpg&er=1&src=http%3A%2F%2Fimg009.hc360.cn%2Fhb%2FnKo44ac2656F831c684507E3Da0E3a26841.jpg",
+		image3: "http://img.zcool.cn/community/017a4e58b4eab6a801219c77084373.jpg",
+		title: "卫浴地砖15",
+		price: 78,
+		sales: 16,
+	}
 	
 ]
 
@@ -571,6 +675,57 @@ const cateList = [{
 	}
 ]
 
+const sizeList= [
+	{
+		id: 1,
+		type:'size',
+		name: '20*40',
+	},
+	{
+		id: 2,
+		type:'size',
+		name: '40*40',
+	},
+	{
+		id: 3,
+		type:'size',
+		name: '80*80',
+	},
+	{
+		id: 4,
+		type:'size',
+		name: '20*30',
+	},
+	{
+		id: 5,
+		type:'size',
+		name: '30*30',
+	},
+	{
+		id: 6,
+		type:'size',
+		name: '30*40',
+	}
+]
+
+const colorList=[
+	{
+		id: 7,
+		type:'color',
+		name: '白色',
+	},
+	{
+		id: 8,
+		type:'color',
+		name: '褐色',
+	},
+	{
+		id: 9,
+		type:'color',
+		name: '暗红',
+	},
+]
+
 export default {
 	carouselList,
 	cartList,
@@ -581,5 +736,7 @@ export default {
 	goodsList,
 	orderList,
 	orderListTj,
-	cateList
+	cateList,
+	sizeList,
+	colorList
 }

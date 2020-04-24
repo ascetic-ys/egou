@@ -87,7 +87,7 @@
 				if(this.verifyForm()){
 					// this.$api.msg('提交')
 					this.$api.loading('请求中...')
-					this.$api.httpPost('order/userInfo/api/updatePassword',this.form).then(r=>{
+					this.$api.httpPost('userInfo/api/updatePassword',this.form).then(r=>{
 						console.log('请求响应：',r)
 						if(r.code==0){
 							this.$api.msg(r.msg||'修改成功')

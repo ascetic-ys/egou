@@ -4,6 +4,11 @@ import App from './App'
 import {RESOURCE } from '@/api/resource.js'
 
 
+// 注册全局组件
+import MescrollBody from "@/components/mescroll-uni/mescroll-body.vue"
+import MescrollUni from "@/components/mescroll-uni/mescroll-uni.vue"
+Vue.component('mescroll-body', MescrollBody)
+Vue.component('mescroll-uni', MescrollUni)
 
 import Json from './Json' //测试用数据
 /**

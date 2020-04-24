@@ -10,11 +10,11 @@
 				注册，请填写资料！
 			</view>
 			<view class="input-content">
-				<view class="list-cell m-t">
+				<!-- <view class="list-cell m-t">
 					<text class="cell-tit" :class="[form.tag==4?'':'typeDis']">普通用户</text>
 					<switch color="#fa436a" @change="switchTypeChange" />
 					<text class="cell-tit" :class="[form.tag==1?'':'typeDis']">企业用户</text>
-				</view>
+				</view> -->
 				<view class="input-item">
 					<text class="tit">用户名</text>
 					<input 
@@ -80,7 +80,7 @@
 						@input="inputChange"
 					/>
 				</view>
-				<view class="input-item" v-if="form.tag==1">
+				<view class="input-item">
 					<text class="tit">公司名称</text>
 					<input 
 						type="" 
@@ -91,7 +91,7 @@
 						@input="inputChange"
 					/>
 				</view>
-				<view class="input-item" v-if="form.tag==1">
+				<view class="input-item">
 					<text class="tit">联系人</text>
 					<input 
 						type="number" 
@@ -102,7 +102,7 @@
 						@input="inputChange"
 					/>
 				</view>
-				<view class="input-item" v-if="form.tag==1">
+				<view class="input-item">
 					<text class="tit">办公电话</text>
 					<input 
 						:value="form.officePhone" 
@@ -112,7 +112,7 @@
 						@input="inputChange"
 					/>
 				</view>
-				<view class="input-item" v-if="form.tag==1">
+				<view class="input-item">
 					<text class="tit">公司地址</text>
 					<input 
 						type="" 
@@ -123,12 +123,11 @@
 						@input="inputChange"
 					/>
 				</view>
-				<view class="input-item2" v-if="form.tag==1">
+				<view class="input-item2">
 					<text class="tit" @tap="uploadCert">上传营业执照</text>
 					<image :src="form.filePath" mode=""></image>
 				</view>
 			</view>
-			<!-- <button class="confirm-btn" @click="toLogin" :disabled="logining">注册</button> -->
 			<button class='confirm-btn' open-type="getUserInfo" withCredentials="true" lang="zh_CN" @getuserinfo="toRegister">注册</button>
 			<view class="forget-section">
 				<!-- 忘记密码? -->
@@ -155,7 +154,7 @@
 		data(){
 			return {
 				form:{
-					tag:4,//用户标识 （0：企业管理人员 1：企业客户 2：厂家 3：销售人员 4：普通客户）
+					tag:1,//用户标识 （0：企业管理人员 1：企业客户 2：厂家 3：销售人员 4：普通客户）
 					sex:0,//性别（0：男 1：女）
 					email:'',
 					userName:'',
@@ -183,23 +182,23 @@
 				const key = e.currentTarget.dataset.key;
 				this.form[key] = e.detail.value;
 			},
-			switchTypeChange(e){
-				console.log("switch:",e.detail.value)
-				if(e.detail.value){
-					//公司用户
-					this.form.tag=1
-				}else{
-					//普通用户
-					this.form.tag=4
-				}
-			},
+			// switchTypeChange(e){
+			// 	console.log("switch:",e.detail.value)
+			// 	if(e.detail.value){
+			// 		//公司用户
+			// 		this.form.tag=1
+			// 	}else{
+			// 		//普通用户
+			// 		this.form.tag=4
+			// 	}
+			// },
 			switchSexChange(e){
 				console.log("switch:",e.detail.value)
 				if(e.detail.value){
-					//
+					//女
 					this.form.sex=1
 				}else{
-					//普通用户
+					//男
 					this.form.sex=0
 				}
 			},
@@ -245,7 +244,7 @@
 						console.log('注册请求参数：',this.form)
 						this.setWeChat(userInfo.userInfo)
 						//2.将用户登录code传递到后台置换用户SessionKey、OpenId等信息 及 前端输入的注册信息
-						return this.$api.httpPost('order/userInfo/api/save',{
+						return this.$api.httpPost('userInfo/api/save',{
 									code: loginData.code,
 									rawData:userInfo.rawData,
 									signature:userInfo.signature,
@@ -253,9 +252,6 @@
 									iv:userInfo.iv,
 									...this.form
 								})
-						// return this.$api.httpPostParams('order/userInfo/api/save',{
-						// 			...this.form
-						// 		})
 					}).then(r=>{
 						console.log('注册请求响应：',r)
 						if(r.code==0){
@@ -285,6 +281,14 @@
 				// 	this.$api.msg('用户名不能超过20个字符')
 				// 	return false
 				// }
+				if(!this.form.phoneNumber){
+					this.$api.msg('请输入手机号码')
+					return 
+				}
+				if(!isMobile(this.form.phoneNumber)){
+					this.$api.msg('手机号码格式不正确')
+					return false
+				}
 				if(!this.form.userPassword){
 					this.$api.msg('请输入密码')
 					return false
@@ -301,47 +305,39 @@
 					this.$api.msg('两次密码不一致')
 					return 
 				}
-				if(!this.form.email && !isEmail(this.form.email)){
+				if(this.form.email && !isEmail(this.form.email)){
 					this.$api.msg('邮箱格式错误')
 					return 
 				}
-				if(this.form.tag==1&&!this.form.companyName){
+				if(!this.form.companyName){
 					this.$api.msg('请输入公司名称')
 					return false
 				}
-				if(this.form.tag==1&&this.form.companyName.length>50){
+				if(this.form.companyName.length>50){
 					this.$api.msg('公司名称不能超过50个字符')
 					return false
 				}
-				if(this.form.tag==1&&!this.form.linkMan){
+				if(!this.form.linkMan){
 					this.$api.msg('请输入联系人')
 					return false
 				}
-				if(!this.form.phoneNumber){
-					this.$api.msg('请输入手机号码')
-					return 
-				}
-				if(!isMobile(this.form.phoneNumber)){
-					this.$api.msg('手机号码格式不正确')
-					return false
-				}
-				if(this.form.tag==1&&!this.form.officePhone){
+				if(!this.form.officePhone){
 					this.$api.msg('请输入办公电话')
 					return 
 				}
-				if(this.form.tag==1&&!isPhone(this.form.officePhone)){
+				if(!isPhone(this.form.officePhone)){
 					this.$api.msg('办公电话格式不正确')
 					return false
 				}
-				if(this.form.tag==1&&!this.form.companyAddress){
+				if(!this.form.companyAddress){
 					this.$api.msg('请输入公司地址')
 					return false
 				}
-				if(this.form.tag==1&&this.form.companyAddress.length>100){
+				if(this.form.companyAddress.length>100){
 					this.$api.msg('公司地址不能超过100个字符')
 					return false
 				}
-				if(this.form.tag==1&&!this.form.filePath){
+				if(!this.form.filePath){
 					this.$api.msg('请上传营业执照')
 					return false
 				}

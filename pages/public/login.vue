@@ -90,10 +90,10 @@
 			},
 			//登录
 			toLogin(){
-				this.form={
-					phoneNumber:'13688888888',
-					userPassword:'aa222222'
-				}
+				// this.form={
+				// 	phoneNumber:'13688888888',
+				// 	userPassword:'aa222222'
+				// }
 				if(!this.verifyForm()){
 					return
 				}
@@ -104,14 +104,16 @@
 					console.log('注册请求参数：',this.form)
 					this.setWeChat(userInfo.userInfo)
 					//2.将用户登录code传递到后台置换用户SessionKey、OpenId等信息 及 前端输入的注册信息
-					return this.$api.httpPost('order/userInfo/api/login',this.form)
+					return this.$api.httpPost('userInfo/api/login',this.form)
 				}).then(r=>{
 					console.log('登录请求响应：',r)
 					if(r.code==0){
 						uni.hideLoading();
 						console.log("登录成功：",r)
+						r.data.tag=1
 						this.login(r.data)
 						this.$api.msg('登录成功')
+						this.changeTabBar(r.data.tag)
 						uni.switchTab({
 							url:'/pages/user/user'
 						})
@@ -124,6 +126,23 @@
 					this.$api.msg(e.msg||'网络异常请重试')
 					uni.hideLoading();
 				})
+			},
+			changeTabBar(tag){
+				if([0,2].indexOf(tag)>-1){
+					uni.setTabBarItem({
+					  index: 2,
+					  text: '订单',
+					  iconPath: "static/tab-order.png",
+					  selectedIconPath: "static/tab-order-current.png",
+					})
+				}else if(tag==3){
+					uni.setTabBarItem({
+					  index: 2,
+					  text: '业绩',
+					  iconPath: "static/tab-achieve.png",
+					  selectedIconPath: "static/tab-achieve-current.png",
+					})
+				}
 			},
 			//校验参数
 			verifyForm(){
