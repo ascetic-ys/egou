@@ -1,119 +1,157 @@
 <template>
 	<view class="app">
-		<view class="price-box">
-			<!-- <text>支付金额</text> -->
-			<text class="price">请上传支付凭证！</text>
+		<!-- <view class="order-state">
+			<text class="state" :style="{color: orderInfo.stateTipColor}">{{orderInfo.stateTip}}</text>
+		</view> -->
+		<view class="goods-box">
+			<scroll-view v-if="orderInfo.orderChildInfoList.length > 1" class="image-box" scroll-x>
+				<view
+					v-for="(goodsItem, goodsIndex) in orderInfo.orderChildInfoList" :key="goodsIndex"
+					class="goods-item"
+				>
+					<image class="goods-img" :src="goodsItem.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
+				</view>
+			</scroll-view>
+			<view class="goods-box-single"
+				v-if="orderInfo.orderChildInfoList.length === 1" 
+				v-for="(goodsItem, goodsIndex) in orderInfo.orderChildInfoList" :key="goodsIndex"
+			>
+				<image class="goods-img" :src="goodsItem.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
+				<view class="right">
+					<text class="title clamp">{{goodsItem.productName}}</text>
+					<text class="attr-box">{{goodsItem.color}}  x {{goodsItem.productNum}}</text>
+					<text class="price">{{goodsItem.totalPrice}}</text>
+				</view>
+			</view>
+			
+			<view class="order-info-box">
+				<view class="order-title">
+					<text class="title">订单编号：</text>
+					<text class="title">下单时间：</text>
+					<text class="title">支付状态：</text>
+				</view>
+				<view class="order-info">
+					<text class="info">{{orderInfo.orderNo||''}}</text>
+					<text class="info">{{orderInfo.orderDate||''}}</text>
+					<text class="info">{{orderInfo.stateTip}}</text>
+				</view>
+			</view>
+			
+			<view class="price-box">
+				共
+				<text class="num">{{orderInfo.productNum}}</text>
+				件商品 实付款
+				<text class="price">{{orderInfo.orderPrice}}</text>
+			</view>
 		</view>
-
-		<view class="pay-type-list">
-			<!-- <progress :percent="percent" strock-width="10" ></progress> -->
-			<view class="pzBox" v-if="flag==1">
-				<img :src="pzPic" alt="" >
-			</view>
-			<!-- <view class="type-item b-b" @click="changePayType(1)">
-				<text class="icon yticon icon-weixinzhifu"></text>
-				<view class="con">
-					<text class="tit">微信支付</text>
-					<text>推荐使用微信支付</text>
-				</view>
-				<label class="radio">
-					<radio value="" color="#fa436a" :checked='payType == 1' />
-					</radio>
-				</label>
-			</view>
-			<view class="type-item b-b" @click="changePayType(2)">
-				<text class="icon yticon icon-alipay"></text>
-				<view class="con">
-					<text class="tit">支付宝支付</text>
-				</view>
-				<label class="radio">
-					<radio value="" color="#fa436a" :checked='payType == 2' />
-					</radio>
-				</label>
-			</view>
-			<view class="type-item" @click="changePayType(3)">
-				<text class="icon yticon icon-erjiye-yucunkuan"></text>
-				<view class="con">
-					<text class="tit">预存款支付</text>
-					<text>可用余额 ¥198.5</text>
-				</view>
-				<label class="radio">
-					<radio value="" color="#fa436a" :checked='payType == 3' />
-					</radio>
-				</label>
-			</view>-->
-		</view> 
-		
-		<text class="mix-btn" v-if="flag===0" @tap="cI">点击上传支付凭证</text>
-		<text class="mix-btn" v-else @click="confirm">提交支付凭证</text>
+		<button class="mix-btn" :disabled='disabledPay' @click="paySubmit">立即支付</button>
 	</view>
 </template>
 
 <script>
- // 注册一个进度条
-    var _self;
+	import {mapState} from 'vuex';
 	export default {
 		data() {
 			return {
-				flag:0,
-				// pzPic:'/static/uplod.png',
-				pzPic:'',
-				percent:'0',
-				payType: 1,
-				orderInfo: {}
+				id:'',
+				orderInfo: {},
+				disabledPay:false
 			};
 		},
-		computed: {
-		
-		},
 		onLoad(options) {
-			 _self = this;
+			 console.log("options:",options)
+			 this.id=options.id
+			 this.initData()
 		},
-
+		computed: {
+			...mapState(['hasLogin','userInfo','weChat'])
+		},
 		methods: {
-			//选择支付方式
-			changePayType(type) {
-				this.payType = type;
+			initData(){
+				this.$api.httpPost('orderMainInfo/api/detail',{id:this.id}).then(r=>{
+					console.log("请求结果：",r)
+					this.orderInfo=r.data
+					//添加不同状态下订单的表现形式
+					this.orderInfo = Object.assign(this.orderInfo, this.orderExp(this.orderInfo));
+				}).catch(e=>{
+					console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+				})
 			},
-			cI(){
-			    uni.chooseImage({
-			        count: 1,
-			        sizeType:['copressed'],
-			        success(res) {
-			            //因为有一张图片， 输出下标[0]， 直接输出地址
-			            var imgFiles = res.tempFilePaths[0]
-									_self.pzPic =imgFiles
-			            console.log(imgFiles)
-										_self.flag = 1
-			            // 上传图片
-			            // 做成一个上传对象
-			            var uper = uni.uploadFile({
-			                // 需要上传的地址
-			                url:'http://demo.hcoder.net/index.php?c=uperTest',
-			                // filePath  需要上传的文件
-			                filePath: imgFiles,
-			                name: 'file',
-			                success(res1) {
-			                    // 显示上传信息
-			                    console.log(res1)
-												
-			                }
-			            });
-			            // onProgressUpdate 上传对象更新的方法
-			            uper.onProgressUpdate(function(res){
-			                // 进度条等于 上传到的进度
-			                _self.percent = res.progress
-			                console.log('上传进度' + res.progress)
-			                console.log('已经上传的数据长度' + res.totalBytesSent)
-			                console.log('预期需要上传的数据总长度' + res.totalBytesExpectedToSend)
-			            })
-			        }
-			    })
+			//订单支付状态文字和颜色
+			orderExp(item){
+				//支付状态(0：未支付、1：支付中、2：支付成功、3：支付失败、4：超时、
+				//5：申请退款、6：退款中、7：退款成功、8：退款失败、9：支付已关闭、10：退款已取消)
+				let stateTip = '',
+					stateTipColor = '#fa436a';
+				switch(+item.payState){
+					case 0:
+						stateTip = '未支付'; break;
+					case 1:
+						stateTip = '支付中'; break;
+					case 2:
+						stateTip = '支付成功'; break;
+					case 3:
+						stateTip = '支付失败'; break;
+					case 4:
+						stateTip = '超时'; break;
+					case 5:
+						stateTip = '申请退款'; break;
+					case 6:
+						stateTip = '退款中'; break;
+					case 7:
+						stateTip = '退款成功'; break;
+					case 8:
+						stateTip = '退款失败'; break;
+					case 9:
+						stateTip = '支付已关闭'; break;
+					case 10:
+						stateTip = '退款已取消'; 
+						stateTipColor = '#909399';
+						break;
+					default:
+						stateTip = '待付款';
+					//更多自定义
+				}
+				return {stateTip, stateTipColor};
 			},
 			//确认支付
-			confirm: async function() {
-				uni.redirectTo({
-					url: '/pages/money/paySuccess'
+			paySubmit: async function() {
+				this.disabledPay=true
+				this.$api.httpPost('orderMainInfo/api/pay',this.orderInfo).then(r=>{
+					console.log("支付结果：",r)
+					if(r.code==0){
+						let _this = this
+						uni.requestPayment({
+							provider: 'wxpay',
+							timeStamp: r.resp.timeStamp,
+							nonceStr: r.resp.nonceStr,
+							package: r.resp.package,
+							signType: r.resp.signType,
+							paySign: r.resp.sign,
+							success: function (res) {
+								console.log('success:' + JSON.stringify(res));
+								this.$api.msg(r.msg||'支付成功')
+								//跳转至支付结果
+								uni.redirectTo({
+									url: '/pages/money/paySuccess'
+								})
+							},
+							fail: function (err) {
+								console.log('fail:' + JSON.stringify(err));
+								this.$api.msg(err||'网络异常请重试')
+								this.disabledPay=false;
+							}
+						});
+					}else{
+						this.$api.msg(r.msg||'网络异常请重试')
+						this.disabledPay=false;
+					}
+					uni.hideLoading()
+				}).catch(e=>{
+					uni.hideLoading()
+					this.disabledPay=false;
+					this.$api.msg(e.msg||'网络异常请重试')
 				})
 			},
 		}
@@ -124,80 +162,120 @@
 	.app {
 		width: 100%;
 	}
+	.order-state{
+		margin: 100rpx;
+		text-align: center;
 
-	.price-box {
-		background-color: #fff;
-		height: 265upx;
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		font-size: 28upx;
-		color: #909399;
-
-		.price{
-			font-size: 50upx;
-			color: #303133;
-			margin-top: 12upx;
-			&:before{
-				/* content: '￥'; */
-				font-size: 40upx;
+	}
+	
+	/* 多条商品 */
+	.goods-box{
+		padding: 40rpx;
+		white-space: nowrap;
+		background: #F8F8F8;
+		margin: 40rpx;
+		border-radius: 40rpx;
+		box-shadow: 0 2rpx 10rpx #dcdcdc;
+		white-space: nowrap;
+		.goods-item{
+			width: 120upx;
+			height: 120upx;
+			display: inline-block;
+			margin-right: 24upx;
+		}
+		.goods-img{
+			display: block;
+			width: 100%;
+			height: 100%;
+		}
+		.order-info-box{
+			margin: 40rpx 0;
+			display: flex;
+			justify-content: space-between;
+			.order-title{
+				flex: 1;
+				display: flex;
+				justify-content: space-between;
+				flex-direction:column;
+				.title{
+					line-height: 50rpx;
+					font-size: 26rpx;
+					color: #606266;
+				}
+			}
+			.order-info{
+				flex: 2;
+				display: flex;
+				justify-content: space-between;
+				flex-direction:column;
+				.info{
+					line-height: 50rpx;
+					font-size: 26rpx;
+					color: #606266;
+				}
 			}
 		}
 	}
-
-	.pay-type-list {
-		margin-top: 20upx;
-		background-color: #fff;
-		/* padding-left: 60upx; */
-		.pzBox {
-			width: 100%;
-			height: 400upx;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			img {
-			 	width: 100%;
-				height: 100%; 
-			}
-		}
-		.type-item{
+	/* 单条商品 */
+	.goods-box-single{
+		display: flex;
+		padding: 20upx 0;
+		.goods-img{
+			display: block;
+			width: 120upx;
 			height: 120upx;
-			padding: 20upx 0;
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			padding-right: 60upx;
-			font-size: 30upx;
-			position:relative;
 		}
-		
-		.icon{
-			width: 100upx;
-			font-size: 52upx;
-		}
-		.icon-erjiye-yucunkuan {
-			color: #fe8e2e;
-		}
-		.icon-weixinzhifu {
-			color: #36cb59;
-		}
-		.icon-alipay {
-			color: #01aaef;
-		}
-		.tit{
-			font-size: $font-lg;
-			color: $font-color-dark;
-			margin-bottom: 4upx;
-		}
-		.con{
+		.right{
 			flex: 1;
 			display: flex;
 			flex-direction: column;
-			font-size: $font-sm;
-			color: $font-color-light;
+			padding: 0 30upx 0 24upx;
+			overflow: hidden;
+			.title{
+				font-size: $font-base + 2upx;
+				color: $font-color-dark;
+				line-height: 1;
+			}
+			.attr-box{
+				font-size: $font-sm + 2upx;
+				color: $font-color-light;
+				padding: 10upx 12upx;
+			}
+			.price{
+				font-size: $font-base + 2upx;
+				color: $font-color-dark;
+				&:before{
+					content: '￥';
+					font-size: $font-sm;
+					margin: 0 2upx 0 8upx;
+				}
+			}
 		}
 	}
+	
+	.price-box{
+		display: flex;
+		justify-content: flex-end;
+		align-items: baseline;
+		padding: 20upx 30upx;
+		font-size: $font-sm + 2upx;
+		color: $font-color-light;
+		.num{
+			margin: 0 8upx;
+			color: $font-color-dark;
+		}
+		.price{
+			font-size: $font-lg;
+			color: $font-color-dark;
+			&:before{
+				content: '￥';
+				font-size: $font-sm;
+				margin: 0 2upx 0 8upx;
+			}
+		}
+	}
+
+	
 	.mix-btn {
 		display: flex;
 		align-items: center;

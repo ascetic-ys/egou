@@ -10,174 +10,188 @@
 				{{item.text}}
 			</view>
 		</view>
-
-		<swiper :current="tabCurrentIndex" class="swiper-box" duration="300" @change="changeTab">
-			<swiper-item class="tab-content" v-for="(tabItem,tabIndex) in navList" :key="tabIndex">
-				<scroll-view 
-					class="list-scroll-content" 
-					scroll-y
-					@scrolltolower="loadData"
-				>
-					<!-- 空白页 -->
-					<empty v-if="tabItem.loaded === true && tabItem.orderList.length === 0"></empty>
-					<!-- 订单列表 -->
-					<view v-for="(item,index) in tabItem.orderList" :key="index" class="order-item">
-						<view class="i-top b-b">
-							<text class="time">{{item.time}}</text>
-							<text class="state" :style="{color: item.stateTipColor}">{{item.stateTip}}</text>
-							<text 
-								v-if="item.state===9" 
-								class="del-btn yticon icon-iconfontshanchu1"
-								@click="deleteOrder(index)"
-							></text>
-						</view>
-						
-						<scroll-view @tap="goOrderXQ" v-if="item.goodsList.length > 1" class="goods-box" scroll-x>
-							<view
-								v-for="(goodsItem, goodsIndex) in item.goodsList" :key="goodsIndex"
-								class="goods-item"
-							>
-								<image class="goods-img" :src="goodsItem.image" mode="aspectFill"></image>
-							</view>
-						</scroll-view>
-						<view @tap="goOrderXQ"
-							v-if="item.goodsList.length === 1" 
-							class="goods-box-single"
-							v-for="(goodsItem, goodsIndex) in item.goodsList" :key="goodsIndex"
+		
+		<!-- <scroll-view
+			class="list-scroll-content" 
+			scroll-y
+			@scrolltolower="loadData"
+		> -->
+		<view>
+			<!-- 空白页 -->
+			<!-- <empty v-if="tabItem.orderList.length === 0"></empty> -->
+			<mescroll-body :bottom='bottom' :up='upOption' @down="downCallback" @up="upCallback" @init="mescrollInit">
+				<!-- 订单列表 -->
+				<view v-for="(item,index) in list" :key="index" class="order-item">
+					<view class="i-top b-b">
+						<text class="time">{{item.orderDate||''}}</text>
+						<text class="state" :style="{color: item.stateTipColor}">{{item.stateTip}}</text>
+						<text 
+							v-if="item.payState===9" 
+							class="del-btn yticon icon-iconfontshanchu1"
+							@click="deleteOrder(index)"
+						></text>
+					</view>
+					
+					<scroll-view @tap="goOrderXQ" v-if="item.orderChildInfoList.length > 1" class="goods-box" scroll-x>
+						<view
+							v-for="(goodsItem, goodsIndex) in item.orderChildInfoList" :key="goodsIndex"
+							class="goods-item"
 						>
-							<image class="goods-img" :src="goodsItem.image" mode="aspectFill"></image>
-							<view class="right">
-								<text class="title clamp">{{goodsItem.title}}</text>
-								<text class="attr-box">{{goodsItem.attr}}  x {{goodsItem.number}}</text>
-								<text class="price">{{goodsItem.price}}</text>
-							</view>
+							<image class="goods-img" :src="goodsItem.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
 						</view>
-						
-						<view class="price-box">
-							共
-							<text class="num">7</text>
-							件商品 实付款
-							<text class="price">143.7</text>
-						</view>
-						<view class="action-box b-t" v-if="item.state != 9">
-							<button class="action-btn" @click="gototk(item)">申请退款</button>
-							<button class="action-btn" @click="gotowl(item)">查看物流</button>
-							<button class="action-btn" @click="cancelOrder(item)">取消订单</button>
-							<button class="action-btn recom">立即支付</button>
+					</scroll-view>
+					<view @tap="goOrderXQ"
+						v-if="item.orderChildInfoList.length === 1" 
+						class="goods-box-single"
+						v-for="(goodsItem, goodsIndex) in item.orderChildInfoList" :key="goodsIndex"
+					>
+						<image class="goods-img" :src="goodsItem.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
+						<view class="right">
+							<text class="title clamp">{{goodsItem.productName}}</text>
+							<text class="attr-box">{{goodsItem.color}}  x {{goodsItem.productNum}}</text>
+							<text class="price">{{goodsItem.totalPrice}}</text>
 						</view>
 					</view>
-					 
-					<uni-load-more :status="tabItem.loadingType"></uni-load-more>
 					
-				</scroll-view>
+					<view class="price-box">
+						共
+						<text class="num">{{item.productNum}}</text>
+						件商品 实付款
+						<text class="price">{{item.orderPrice}}</text>
+					</view>
+					<view class="action-box b-t" v-if="item.orderState != 9">
+						<button class="action-btn" @click="gototk(item)">申请退款</button>
+						<button class="action-btn" @click="gotowl(item)">查看物流</button>
+						<button class="action-btn" @click="cancelOrder(item)">取消订单</button>
+						<button class="action-btn recom" @click="toPay(item)">立即支付</button>
+					</view>
+				</view>
+			</mescroll-body>
+		</view>
+<!-- 		</scroll-view> -->
+
+		<!-- <swiper :current="tabCurrentIndex" class="swiper-box" duration="300" @change="changeTab">
+			<swiper-item class="tab-content" v-for="(tabItem,tabIndex) in navList" :key="tabIndex">
+				
 			</swiper-item>
-		</swiper>
+		</swiper> -->
 	</view>
 </template> 
 
 <script>
-	import uniLoadMore from '@/components/uni-load-more/uni-load-more.vue';
+	import MescrollMixin from "@/components/mescroll-uni/mescroll-mixins.js";
+	import {RESOURCE } from '@/api/resource.js'
+	import {mapState} from 'vuex';
 	import empty from "@/components/empty";
-	import Json from '@/Json';
+	
 	export default {
+		mixins: [MescrollMixin], // 使用mixin (在main.js注册全局组件)
 		components: {
-			uniLoadMore,
 			empty
 		},
 		data() {
 			return {
+				bottom:120,
+				upOption:{
+					auto:false,
+				},
 				tabCurrentIndex: 0,
-				navList: [{
-						state: 0,
-						text: '全部',
-						loadingType: 'more',
-						orderList: []
-					},
-					{
-						state: 1,
-						text: '待付款',
-						loadingType: 'more',
-						orderList: []
-					},
-					{
-						state: 2,
-						text: '待收货',
-						loadingType: 'more',
-						orderList: []
-					},
-					{
-						state: 3,
-						text: '待评价',
-						loadingType: 'more',
-						orderList: []
-					},
-					{
-						state: 4,
-						text: '售后',
-						loadingType: 'more',
-						orderList: []
-					}
+				list: [],
+				navList: [
+					{state: 0,text: '全部'},
+					{state: 1,text: '待付款'},
+					{state: 2,text: '待发货'},
+					{state: 3,text: '待收货'},
+					{state: 4,text: '已完成'}
 				],
+				params:{}
 			};
 		},
 		
-		onLoad(options){
-			/**
-			 * 修复app端点击除全部订单外的按钮进入时不加载数据的问题
-			 * 替换onLoad下代码即可
-			 */
-			this.tabCurrentIndex = +options.state;
-			// #ifndef MP
+		async onLoad(options){
+			this.tabCurrentIndex = options.state||0;
+			this.initParams()
 			this.loadData()
-			// #endif
-			// #ifdef MP
-			if(options.state == 0){
-				this.loadData()
-			}
-			// #endif
-			
 		},
-		 
+		computed: {
+			...mapState(['hasLogin','userInfo','weChat'])
+		},
 		methods: {
-			//获取订单列表
-			loadData(source){
-				//这里是将订单挂载到tab列表下
-				let index = this.tabCurrentIndex;
-				let navItem = this.navList[index];
-				let state = navItem.state;
-				
-				if(source === 'tabChange' && navItem.loaded === true){
-					//tab切换只有第一次需要加载数据
-					return;
+			initParams(){
+				this.params={
+					orderByColumn:"",
+					isAsc:"",
+					userId:this.userInfo.id
 				}
-				if(navItem.loadingType === 'loading'){
-					//防止重复加载
-					return;
+			},
+			/*下拉刷新的回调 */
+			downCallback() {
+				//联网加载数据
+				this.loadData().then(r => {
+					//联网成功的回调,隐藏下拉刷新的状态
+					this.mescroll.endSuccess();
+				}).catch(()=>{
+					//联网失败的回调,隐藏下拉刷新的状态
+					this.mescroll.endErr();
+				})
+			},
+			/*上拉加载的回调: 其中page.num:当前页 从1开始, page.size:每页数据条数,默认10 */
+			upCallback(mescroll) {
+				console.log('page',mescroll)
+				console.log('this.mescroll',this.mescroll)
+				//联网加载数据
+				let pageNum = mescroll.num; // 页码, 默认从1开始
+				let pageSize = mescroll.size; // 页长, 默认每页10条
+				this.loadData({pageNum,pageSize}).then(r=>{
+					//联网成功的回调,隐藏下拉刷新和上拉加载的状态;
+					//mescroll会根据传的参数,自动判断列表如果无任何数据,则提示空;列表无下一页数据,则提示无更多数据;
+								
+					//方法一(推荐): 后台接口有返回列表的总页数 totalPage
+					// this.mescroll.endByPage(r.length, r.total); //必传参数(当前页的数据个数, 总页数)
+								
+					//方法二(推荐): 后台接口有返回列表的总数据量 totalSize
+					this.mescroll.endBySize(this.list.length, r.total); //必传参数(当前页的数据个数, 总数据量)
+								
+					//方法三(推荐): 您有其他方式知道是否有下一页 hasNext
+					//this.mescroll.endSuccess(curPageData.length, hasNext); //必传参数(当前页的数据个数, 是否有下一页true/false)
+								
+					//方法四 (不推荐),会存在一个小问题:比如列表共有20条数据,每页加载10条,共2页.如果只根据当前页的数据个数判断,则需翻到第三页才会知道无更多数据
+					// mescroll.endSuccess(r.length)
+				}).catch(()=>{
+					this.mescroll.endErr()
+				})
+			},
+			//加载商品 ，带下拉刷新和上滑加载
+			async loadData(data={}) {
+				const {pageNum=1,pageSize=10}=data
+				this.params.userId=this.userInfo.id
+				if(!this.params.orderByColumn){
+					delete this.params.orderByColumn
+					delete this.params.isAsc
 				}
-				
-				navItem.loadingType = 'loading';
-				
-				setTimeout(()=>{
-					let orderList = Json.orderList.filter(item=>{
-						//添加不同状态下订单的表现形式
-						item = Object.assign(item, this.orderStateExp(item.state));
-						//演示数据所以自己进行状态筛选
-						if(state === 0){
-							//0为全部订单
-							return item;
-						}
-						return item.state === state
-					});
+				return this.$api.httpPost('orderMainInfo/api/list',{
+					pageNum,
+					pageSize,
+					...this.params
+				}).then(r=>{
+					console.log("请求结果：",r)
+					let orderList = r.rows
 					orderList.forEach(item=>{
-						navItem.orderList.push(item);
+						//添加不同状态下订单的表现形式
+						item = Object.assign(item, this.orderExp(item));
 					})
-					//loaded新字段用于表示数据加载完毕，如果为空可以显示空白页
-					this.$set(navItem, 'loaded', true);
-					
-					//判断是否还有数据， 有改为 more， 没有改为noMore 
-					navItem.loadingType = 'more';
-				}, 600);	
-			}, 
+					console.log('orderList',orderList)
+					if(pageNum===1){
+						this.list=orderList
+					}else{
+						this.list=this.list.concat(orderList)
+					}
+					return r
+				}).catch(e=>{
+					console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+				})
+			},
 			// 跳转详情
 			goOrderXQ(){
 				uni.navigateTo({
@@ -187,11 +201,26 @@
 			//swiper 切换
 			changeTab(e){
 				this.tabCurrentIndex = e.target.current;
-				this.loadData('tabChange');
+				this.setParams(index)
 			},
 			//顶部tab点击
 			tabClick(index){
 				this.tabCurrentIndex = index;
+				this.setParams(index)
+			},
+			setParams(index){
+				//1：待付款、2待发货、3：待收货、4：已完成
+				if(index==0){
+					this.params.orderState=''
+				}else if(index==1){
+					this.params.orderState=1
+				}else if(index==2){
+					this.params.orderState=2
+				}else if(index==3){
+					this.params.orderState=3
+				}else if(index==4){
+					this.params.orderState=4
+				}
 			},
 			//删除订单
 			deleteOrder(index){
@@ -222,7 +251,7 @@
 					title: '请稍后'
 				})
 				setTimeout(()=>{
-					let {stateTip, stateTipColor} = this.orderStateExp(9);
+					let {stateTip, stateTipColor} = this.orderExp(item);
 					item = Object.assign(item, {
 						state: 9,
 						stateTip, 
@@ -237,21 +266,32 @@
 					uni.hideLoading();
 				}, 600)
 			},
+			//去支付页面
+			toPay(item){
+				uni.navigateTo({
+					url: `/pages/money/pay?id=${item.id}`
+				})
+			},
 
 			//订单状态文字和颜色
-			orderStateExp(state){
+			orderExp(item){
 				let stateTip = '',
 					stateTipColor = '#fa436a';
-				switch(+state){
+				switch(+item.orderState){
 					case 1:
 						stateTip = '待付款'; break;
 					case 2:
 						stateTip = '待发货'; break;
+					case 3:
+						stateTip = '待收货'; break;
+					case 4:
+						stateTip = '已完成'; break;
 					case 9:
 						stateTip = '订单已关闭'; 
 						stateTipColor = '#909399';
 						break;
-						
+					default:
+						stateTip = '待付款';
 					//更多自定义
 				}
 				return {stateTip, stateTipColor};

@@ -1,15 +1,20 @@
 <template>
-	<view>
+	<scroll-view class="container">
 		<!-- 地址 -->
 		<navigator url="/pages/address/address?source=1" class="address-section">
 			<view class="order-content">
 				<text class="yticon icon-shouhuodizhi"></text>
-				<view class="cen">
+				<view class="cen" v-if="addressData&&addressData.phoneNumber">
 					<view class="top">
-						<text class="name">{{addressData.name}}</text>
-						<text class="mobile">{{addressData.mobile}}</text>
+						<text class="name">{{addressData.linkMan}}</text>
+						<text class="mobile">{{addressData.phoneNumber}}</text>
 					</view>
-					<text class="address">{{addressData.address}} {{addressData.area}}</text>
+					<text class="address">{{addressData.receiverAddress}}</text>
+				</view>
+				<view class="cen" v-else>
+					<view class="top">
+						<text class="name">请选择收货地址</text>
+					</view>
 				</view>
 				<text class="yticon icon-you"></text>
 			</view>
@@ -19,36 +24,36 @@
 
 		<view class="goods-section">
 			<view class="g-header b-b">
-				<image class="logo" src="http://duoduo.qibukj.cn/./Upload/Images/20190321/201903211727515.png"></image>
-				<text class="name">西城小店铺</text>
+				<!-- <image class="logo" src="http://duoduo.qibukj.cn/./Upload/Images/20190321/201903211727515.png"></image> -->
+				<text class="name">所选商品</text>
 			</view>
 			<!-- 商品列表 -->
-			<view class="g-item">
-				<image src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=756705744,3505936868&fm=11&gp=0.jpg"></image>
-				<view class="right">
-					<text class="title clamp">古黛妃 短袖t恤女夏装2019新款</text>
-					<text class="spec">春装款 L</text>
-					<view class="price-box">
-						<text class="price">￥17.8</text>
-						<text class="number">x 1</text>
+			<block v-for="(item,index) in goodsList" :key='index'>
+				<view class="g-item">
+					<image :src="item.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`"></image>
+					<view class="right">
+						<text class="title clamp">{{item.brand}}{{item.productName}}</text>
+						<text class="spec">{{item.color}}</text>
+						<view class="price-box">
+							<text class="price">￥{{item.price}}</text>
+							<text class="number">x {{item.productNum}}</text>
+						</view>
 					</view>
 				</view>
-			</view>
-			<view class="g-item">
-				<image src="https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg"></image>
-				<view class="right">
-					<text class="title clamp">韩版于是洞洞拖鞋 夏季浴室防滑简约居家【新人专享，限选意见】</text>
-					<text class="spec">春装款 L</text>
-					<view class="price-box">
-						<text class="price">￥17.8</text>
-						<text class="number">x 1</text>
-					</view>
-				</view>
-			</view>
+			</block>
 		</view>
-
+		
+		<!-- 发票 -->
+		<navigator url="/pages/invoice/invoice?source=1" class="invoice-section yt-list">
+			<view class="yt-list-cell b-b">
+				<text class="cell-tit clamp">发票</text>
+				<text class="cell-tip">{{invoice.companyName||'否'}}</text>
+				<text class="yticon icon-you"></text>
+			</view>
+		</navigator>
+		
 		<!-- 优惠明细 -->
-		<view class="yt-list">
+		<!-- <view class="yt-list">
 			<view class="yt-list-cell b-b" @click="toggleMask('show')">
 				<view class="cell-icon">
 					券
@@ -66,24 +71,32 @@
 				<text class="cell-tit clamp">商家促销</text>
 				<text class="cell-tip disabled">暂无可用优惠</text>
 			</view>
-		</view>
+		</view> -->
 		<!-- 金额明细 -->
 		<view class="yt-list">
 			<view class="yt-list-cell b-b">
-				<text class="cell-tit clamp">商品金额</text>
-				<text class="cell-tip">￥179.88</text>
+				<text class="cell-tit clamp">订单金额</text>
+				<text class="cell-tip">￥{{totalMoney}}</text>
 			</view>
-			<view class="yt-list-cell b-b">
+			<!-- <view class="yt-list-cell b-b">
 				<text class="cell-tit clamp">优惠金额</text>
 				<text class="cell-tip red">-￥35</text>
 			</view>
 			<view class="yt-list-cell b-b">
 				<text class="cell-tit clamp">运费</text>
 				<text class="cell-tip">免运费</text>
-			</view>
+			</view> -->
 			<view class="yt-list-cell desc-cell">
 				<text class="cell-tit clamp">备注</text>
-				<input class="desc" type="text" v-model="desc" placeholder="请填写备注信息" placeholder-class="placeholder" />
+				<input class="desc" type="text" v-model="desc" maxlength="20" placeholder="请填写备注信息" placeholder-class="placeholder" />
+			</view>
+		</view>
+		
+		<!-- 行驶证 -->
+		<view class="yt-list-file">
+			<view class="input-item2">
+				<text class="tit" @tap="uploadCert">上传行驶证</text>
+				<image :src="showImg" mode=""></image>
 			</view>
 		</view>
 		
@@ -92,16 +105,16 @@
 			<view class="price-content">
 				<text>实付款</text>
 				<text class="price-tip">￥</text>
-				<text class="price">475</text>
+				<text class="price">{{totalMoney}}</text>
 			</view>
 			<text class="submit" @click="submit">提交订单</text>
 		</view>
 		
 		<!-- 优惠券面板 -->
-		<view class="mask" :class="maskState===0 ? 'none' : maskState===1 ? 'show' : ''" @click="toggleMask">
-			<view class="mask-content" @click.stop.prevent="stopPrevent">
+		<!-- <view class="mask" :class="maskState===0 ? 'none' : maskState===1 ? 'show' : ''" @click="toggleMask"> -->
+			<!-- <view class="mask-content" @click.stop.prevent="stopPrevent"> -->
 				<!-- 优惠券页面，仿mt -->
-				<view class="coupon-item" v-for="(item,index) in couponList" :key="index">
+				<!-- <view class="coupon-item" v-for="(item,index) in couponList" :key="index">
 					<view class="con">
 						<view class="left">
 							<text class="title">{{item.title}}</text>
@@ -116,50 +129,83 @@
 						<view class="circle r"></view>
 					</view>
 					<text class="tips">限新用户使用</text>
-				</view>
-			</view>
-		</view>
+				</view> -->
+			<!-- </view> -->
+		<!-- </view> -->
 
-	</view>
+	</scroll-view>
 </template>
 
 <script>
+	import {mapState} from 'vuex';
+	import {RESOURCE } from '@/api/resource.js'
 	export default {
 		data() {
 			return {
 				maskState: 0, //优惠券面板显示状态
 				desc: '', //备注
 				payType: 1, //1微信 2支付宝
-				couponList: [
-					{
-						title: '新用户专享优惠券',
-						price: 5,
-					},
-					{
-						title: '庆五一发一波优惠券',
-						price: 10,
-					},
-					{
-						title: '优惠券优惠券优惠券优惠券',
-						price: 15,
-					}
-				],
-				addressData: {
-					name: '许小星',
-					mobile: '13853989563',
-					addressName: '金九大道',
-					address: '山东省济南市历城区',
-					area: '149号',
-					default: false,
-				}
+				// couponList: [
+				// 	{
+				// 		title: '新用户专享优惠券',
+				// 		price: 5,
+				// 	},
+				// 	{
+				// 		title: '庆五一发一波优惠券',
+				// 		price: 10,
+				// 	},
+				// 	{
+				// 		title: '优惠券优惠券优惠券优惠券',
+				// 		price: 15,
+				// 	}
+				// ],
+				addressData: {},
+				invoice:{},
+				goodsList:[],
+				totalMoney:null,
+				showImg:'',
+				filePath:'',
+				params:{}
 			}
 		},
 		onLoad(option){
 			//商品数据
-			//let data = JSON.parse(option.data);
-			//console.log(data);
+			let data = JSON.parse(option.data);
+			console.log(data);
+			this.goodsList=data.goodsList
+			this.totalMoney=data.totalMoney
+			this.initData()
+		},
+		computed: {
+			...mapState(['hasLogin','userInfo','weChat'])
 		},
 		methods: {
+			initData(){
+				this.$api.httpPost('userInfo/api/consigneeInfoList',{
+					parentId:this.userInfo.id,
+					pageSize:1,
+					pageNum:1
+				}).then(r=>{
+					console.log("请求结果：",r)
+					if(r.rows&&r.rows.length>0){
+						this.addressData=r.rows[0]
+					}
+				}).catch(e=>{
+					console.log("请求错误：",e)
+				})
+				this.$api.httpPost('userInfo/api/billingInfoList',{
+					parentId:this.userInfo.id,
+					pageSize:1,
+					pageNum:1
+				}).then(r=>{
+					console.log("请求结果：",r)
+					if(r.rows&&r.rows.length>0){
+						this.invoice=r.rows[0]
+					}
+				}).catch(e=>{
+					console.log("请求错误：",e)
+				})
+			},
 			//显示优惠券面板
 			toggleMask(type){
 				let timer = type === 'show' ? 10 : 300;
@@ -175,10 +221,113 @@
 			changePayType(type){
 				this.payType = type;
 			},
-			submit(){
-				uni.redirectTo({
-					url: '/pages/money/pay'
+			uploadCert(){
+				let _this = this
+				uni.chooseImage({count:1}).then(r=>{
+					const [err,res]=r
+					if(err){return}
+					_this.filePath=res.tempFilePaths[0]
+					_this.showImg=res.tempFilePaths[0]
+					const tempFilePaths = res.tempFilePaths;
+					uni.uploadFile({
+						url: RESOURCE.URL_API + 'orderMainInfo/api/uploadImage', //仅为示例，非真实的接口地址
+						filePath: tempFilePaths[0],
+						name: 'uploadFile',
+						formData: {},
+						success: (uploadFileRes) => {
+							console.log("上传图片结果string：",uploadFileRes);
+							if(uploadFileRes.statusCode===200){
+								let r = JSON.parse(uploadFileRes.data);
+								console.log("上传图片：",r);
+								_this.filePath = r.msg;
+								_this.showImg=RESOURCE.URL_SHOW+r.msg
+							}else{
+								_this.$api.msg('上传失败')
+							}
+						}
+					});
 				})
+			},
+			//提交订单
+			submit(){
+				if(!this.validateForm()){
+					return
+				}
+				this.$api.loading('请求中...')
+				this.$api.httpPost('orderMainInfo/api/save',this.params
+				).then(r=>{
+					console.log('请求结果：',r)
+					if(r.code==0){
+						// this.$api.msg(r.msg||'添加成功')
+						uni.navigateTo({
+							url: `/pages/money/pay?data=${JSON.stringify({
+								orderInfo: this.params,
+								// orderId:r.order.id
+							})}`
+						})
+					}else{
+						this.$api.msg(r.msg||'网络错误请重试')
+					}
+					uni.hideLoading()
+				}).catch(e=>{
+					console.log('请求错误：',e)
+					this.$api.msg(e.msg||'网络错误请重试')
+					uni.hideLoading()
+				})
+			},
+			//
+			validateForm(){
+				this.getParams()
+				console.log("params:",this.params)
+				if(!this.params.receiverAddress){
+					this.$api.msg('请选择收件地址')
+					return false
+				}
+				if(!this.params.filePath){
+					this.$api.msg('请上传行驶证')
+					return false
+				}
+				if(this.params.orderChildInfoList.length<=0){
+					this.$api.msg('商品信息丢失')
+					return false
+				}
+				return true
+			},
+			getParams(){
+				let productNum = 0
+				let orderChildInfoList = []
+				this.goodsList.forEach(e=>{
+					productNum+=e.productNum
+					let item = {
+						productName:e.productName,//商品名称
+						productNum:e.productNum,//商品数量
+						unitPrice:e.price,//单价
+						totalPrice:Number((e.price*e.productNum).toFixed(2)),//总价
+						productId:e.productId,//商品ID
+						imgPath:e.imgPath
+					}
+					orderChildInfoList.push(item)
+				})
+				this.params={
+					customer:this.userInfo.userName,
+					linkMan:this.userInfo.linkMan,//联系人
+					phoneNumber:this.userInfo.phoneNumber,//手机号
+					productNum:productNum,//商品总数量
+					orderPrice:this.totalMoney,//订单金额
+					receiverAddress:this.addressData.receiverAddress,//收货地址
+					receiverLinkMan:this.addressData.linkMan,//收货联系人
+					receiverPhoneNumber:this.addressData.phoneNumber,//收货人电话
+					isOpen:this.userInfo.companyName?'是':'否',//是否开票（是或否）
+					companyName:this.invoice.companyName,//公司名称
+					duty:this.invoice.duty,//税号
+					companyPhoneNumber:this.invoice.phoneNumber,//公司电话
+					companyAddress:this.invoice.address,//公司地址
+					openingBank:this.invoice.openingBank,//开户行
+					account:this.invoice.account,//账户
+					userId:this.userInfo.id,//用户ID
+					filePath:this.filePath,//附件路径
+					orderChildInfoList:orderChildInfoList//商品信息
+				}
 			},
 			stopPrevent(){}
 		}
@@ -189,6 +338,9 @@
 	page {
 		background: $page-color-base;
 		padding-bottom: 100upx;
+	}
+	.container{
+		padding-bottom: 100rpx;
 	}
 
 	.address-section {
@@ -404,6 +556,30 @@
 			flex: 1;
 			font-size: $font-base;
 			color: $font-color-dark;
+		}
+	}
+	.yt-list-file {
+		margin-top: 16upx;
+		background: #fff;
+		margin-bottom: 20rpx;
+		.input-item2{
+			display:flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0 30upx;
+			height: 220upx;
+			border-radius: 4px;
+			image{
+				width: 30%;
+				height: 100%;
+			}
+			.tit{
+				font-size: $font-lg;
+				background-color: #ccc;
+				padding: 20upx;
+				border-radius: 10upx;
+				color:#303133
+			}
 		}
 	}
 	

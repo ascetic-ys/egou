@@ -1,12 +1,16 @@
 <template>
 	<view class="content">
 		<view class="row b-b">
-			<text class="tit">联系人</text>
-			<input class="input" type="text" v-model="form.linkMan" placeholder="收货人姓名" placeholder-class="placeholder" />
+			<text class="tit">公司名称</text>
+			<input class="input" type="text" v-model="form.companyName" placeholder="公司名称" placeholder-class="placeholder" />
 		</view>
 		<view class="row b-b">
-			<text class="tit">手机号</text>
-			<input class="input" type="number" v-model="form.phoneNumber" placeholder="收货人手机号码" placeholder-class="placeholder" />
+			<text class="tit">税号</text>
+			<input class="input" type="text" v-model="form.duty" placeholder="税号" placeholder-class="placeholder" />
+		</view>
+		<view class="row b-b">
+			<text class="tit">电话</text>
+			<input class="input" type="number" v-model="form.phoneNumber" placeholder="电话" placeholder-class="placeholder" />
 		</view>
 		<view class="row b-b">
 			<text class="tit">省市区</text>
@@ -20,10 +24,18 @@
 			<text class="tit">具体位置</text>
 			<input class="input" type="text" v-model="form.area" placeholder="楼号、门牌" placeholder-class="placeholder" />
 		</view>
+		<view class="row b-b">
+			<text class="tit">开户行</text>
+			<input class="input" v-model="form.openingBank" placeholder="开户行" placeholder-class="placeholder" />
+		</view>
+		<view class="row b-b">
+			<text class="tit">账户</text>
+			<input class="input" type="number" v-model="form.account" placeholder="账户" placeholder-class="placeholder" />
+		</view>
 		
 		<view class="row default-row">
 			<text class="tit">设为默认</text>
-			<text class="tit-l">提醒：每次下单会默认推荐使用该地址</text>
+			<text class="tit-l">提醒：每次下单会默认推荐使用该发票</text>
 			<switch :checked="form.isDefault==1" color="#fa436a" @change="switchChange" />
 		</view>
 		<button class="add-btn" @click="confirm">提交</button>
@@ -34,7 +46,7 @@
 <script>
 	import {mapState} from 'vuex';
 	import pickerAddress from '@/components/pickerAddress/pickerAddress.vue'
-	import {isMobile} from '@/api/validate.js'
+	import {isMobile,isPhone} from '@/api/validate.js'
 	export default {
 		components:{
 			pickerAddress
@@ -44,25 +56,28 @@
 				title: 'Hello',
 				form: {
 					id:'',
-					receiverAddress: '',
-					linkMan: '',
+					companyName: '',
+					duty: '',
 					phoneNumber: '',
-					addressName:'选择地址',
 					address:'',
+					openingBank:'',
+					account:'',
 					area: '',
+					addressName:'选择地址',
+					addressValue:'',
 					parentId:'',
-					isDefault: 0,//是否默认（1：是，0：否）
+					isDefault: 0,
 				}
 			}
 		},
 		onLoad(option){
-			let title = '新增收货地址';
+			let title = '新增发票信息';
 			if(option.type==='edit'){
-				title = '编辑收货地址'
+				title = '编辑发票信息'
 				this.form = JSON.parse(option.data)
-				this.form.addressName = this.form.receiverAddress.substring(0,this.form.receiverAddress.indexOf(' '))
-				this.form.address = this.form.receiverAddress.substring(0,this.form.receiverAddress.indexOf(' '))
-				this.form.area = this.form.receiverAddress.slice(this.form.receiverAddress.indexOf(' ')+1,-1)
+				this.form.addressName = this.form.address.substring(0,this.form.address.indexOf(' '))
+				this.form.addressValue = this.form.address.substring(0,this.form.address.indexOf(' '))
+				this.form.area = this.form.address.slice(this.form.address.indexOf(' ')+1,-1)
 			}
 			this.manageType = option.type;
 			uni.setNavigationBarTitle({
@@ -78,7 +93,7 @@
 			},
 			changeAddress(data){
 				this.form.addressName = data.data.join('');
-				this.form.address = data.data.join('');
+				this.form.addressValue = data.data.join('');
 				console.log('省市区',data.data.join(''))
 			},
 			// 地图选择地址
@@ -96,19 +111,19 @@
 				if(!this.validateForm()){
 					return
 				}
-				let url = 'userInfo/api/saveConsigneeInfo'
+				let url = 'userInfo/api/saveBillingInfo'
 				if(this.manageType==='edit'||this.form.id){
-					url = 'userInfo/api/updateConsigneeInfo'
+					url = 'userInfo/api/updateBillingInfo'
 				}
 				this.form.parentId=this.userInfo.id
-				this.form.receiverAddress=this.form.address+' '+this.form.area
+				this.form.address=this.form.addressValue+' '+this.form.area
 				this.$api.loading('请求中...')
 				this.$api.httpPost(url,this.form).then(r=>{
 					console.log("请求结果：",r)
 					if(r.code==0){
 						//this.$api.prePage()获取上一页实例，可直接调用上页所有数据和方法，在App.vue定义
 						this.$api.prePage().refreshList();
-						this.$api.msg(`地址${this.manageType=='edit' ? '修改': '添加'}成功`);
+						this.$api.msg(`发票信息${this.manageType=='edit' ? '修改': '添加'}成功`);
 					}else{
 						this.$api.msg(r.msg||'网络异常请重试')
 					}
@@ -123,24 +138,36 @@
 				})
 			},
 			validateForm(){
-				if(!this.form.linkMan){
-					this.$api.msg('请填写收货人姓名');
+				if(!this.form.companyName){
+					this.$api.msg('请填写公司名称');
+					return false
+				}
+				if(!this.form.duty){
+					this.$api.msg('请填写税号');
 					return false
 				}
 				if(!this.form.phoneNumber){
-					this.$api.msg('请填写手机号码');
+					this.$api.msg('请填写电话');
 					return false
 				}
-				if(!isMobile(this.form.phoneNumber)){
-					this.$api.msg('请输入正确的手机号码');
+				if(!isMobile(this.form.phoneNumber) && !isPhone(this.form.phoneNumber)){
+					this.$api.msg('请输入正确的电话');
 					return false
 				}
-				if(!this.form.address){
+				if(!this.form.addressValue){
 					this.$api.msg('请选择省市区');
 					return false
 				}
 				if(!this.form.area){
 					this.$api.msg('请输入具体位置信息');
+					return false
+				}
+				if(!this.form.openingBank){
+					this.$api.msg('请填写开户行');
+					return false
+				}
+				if(!this.form.account){
+					this.$api.msg('请填写账户');
 					return false
 				}
 				return true

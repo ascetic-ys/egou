@@ -125,7 +125,7 @@
 				</view>
 				<view class="input-item2">
 					<text class="tit" @tap="uploadCert">上传营业执照</text>
-					<image :src="form.filePath" mode=""></image>
+					<image :src="showImg" mode=""></image>
 				</view>
 			</view>
 			<button class='confirm-btn' open-type="getUserInfo" withCredentials="true" lang="zh_CN" @getuserinfo="toRegister">注册</button>
@@ -166,6 +166,7 @@
 					officePhone:'',
 					filePath:''
 				},
+				showImg:'',
 				userPassword2: ''
 			}
 		},
@@ -214,18 +215,20 @@
 					const [err,res]=r
 					if(err){return}
 					_this.form.filePath=res.tempFilePaths[0]
+					_this.showImg=res.tempFilePaths[0]
 					const tempFilePaths = res.tempFilePaths;
 					uni.uploadFile({
-						url: RESOURCE.URL_API + '/upload/uploadImage', //仅为示例，非真实的接口地址
+						url: RESOURCE.URL_API + 'orderMainInfo/api/uploadImage', //仅为示例，非真实的接口地址
 						filePath: tempFilePaths[0],
-						name: 'file',
+						name: 'uploadFile',
 						formData: {},
 						success: (uploadFileRes) => {
-							// console.log("上传头像结果string：",uploadFileRes);
+							console.log("上传图片结果string：",uploadFileRes);
 							if(uploadFileRes.statusCode===200){
 								let r = JSON.parse(uploadFileRes.data);
-								// console.log("上传头像：",r);
-								// _this.form.filePath = r.url;
+								console.log("上传图片：",r);
+								_this.form.filePath = r.msg;
+								_this.showImg=RESOURCE.URL_SHOW+r.msg
 							}else{
 								_this.$api.msg('上传失败')
 							}

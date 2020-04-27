@@ -16,7 +16,7 @@
 			</view>
 			<text class="cate-item yticon icon-fenlei1" @click="toggleCateMask('show')"></text>
 		</view>
-		<mescroll-body ref="mescrollRef" @init="mescrollInit" :down="downOption" @down="downCallback" @up="upCallback">
+		<mescroll-body :up='upOption' @down="downCallback" @up="upCallback" @init="mescrollInit">
 			<view class="goods-list">
 				<view 
 					v-for="(item, index) in goodsList" :key="index"
@@ -102,15 +102,14 @@
 
 <script>
 	import MescrollMixin from "@/components/mescroll-uni/mescroll-mixins.js";
+	import {mapState} from 'vuex';
 	export default {
 		mixins: [MescrollMixin], // 使用mixin (在main.js注册全局组件)
 		data() {
 			return {
+				bottom:120,
 				upOption:{
 					auto:false,
-				},
-				downOption: {
-					auto: false //是否在初始化后,自动执行downCallback; 默认true
 				},
 				cateMaskState: 0, //分类面板展开状态
 				headerPosition:"fixed",
@@ -155,9 +154,7 @@
 					color:'',
 					size:'',
 					lowPrice:'',
-					highPrice:'',
-					pageSize:10,
-					pageNum:1
+					highPrice:''
 				}
 			},
 			/*下拉刷新的回调 */
@@ -184,7 +181,7 @@
 					// this.mescroll.endByPage(r.length, t.total); //必传参数(当前页的数据个数, 总页数)
 								
 					//方法二(推荐): 后台接口有返回列表的总数据量 totalSize
-					this.mescroll.endBySize(r.length, t.total); //必传参数(当前页的数据个数, 总数据量)
+					this.mescroll.endBySize(this.goodsList.length, r.total); //必传参数(当前页的数据个数, 总数据量)
 								
 					//方法三(推荐): 您有其他方式知道是否有下一页 hasNext
 					//this.mescroll.endSuccess(curPageData.length, hasNext); //必传参数(当前页的数据个数, 是否有下一页true/false)
@@ -196,17 +193,19 @@
 				})
 			},
 			//加载商品 ，带下拉刷新和上滑加载
-			async loadData(data={}) {
+			loadData(data={}) {
 				const {pageNum=1,pageSize=10}=data
-				if(!this.params.isAsc){
+				if(!this.params.orderByColumn){
+					delete this.params.orderByColumn
 					delete this.params.isAsc
-				}
-				if(this.params.orderByColumn=='sales'){
-					this.params.orderByColumn=''
 				}
 				delete this.params.size
 				this.$api.loading('加载中...')
-				this.$api.httpPost('productInfo/api/list',{pageNum,pageSize,...this.params}).then(r=>{
+				return this.$api.httpPost('productInfo/api/list',{
+					pageNum,
+					pageSize,
+					...this.params
+				}).then(r=>{
 					console.log("请求结果：",r)
 					if(pageNum===1){
 						this.goodsList=r.rows
@@ -214,7 +213,7 @@
 						this.goodsList=this.goodsList.concat(r.rows)
 					}
 					uni.hideLoading();
-					return this.goodsList
+					return r
 				}).catch(e=>{
 					console.log("请求错误：",e)
 					this.$api.msg(e.msg||'网络异常请重试')
