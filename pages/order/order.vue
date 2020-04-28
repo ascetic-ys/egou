@@ -11,28 +11,23 @@
 			</view>
 		</view>
 		
-		<!-- <scroll-view
-			class="list-scroll-content" 
-			scroll-y
-			@scrolltolower="loadData"
-		> -->
 		<view>
 			<!-- 空白页 -->
-			<!-- <empty v-if="tabItem.orderList.length === 0"></empty> -->
+			<empty v-if="list.length === 0"></empty>
 			<mescroll-body :bottom='bottom' :up='upOption' @down="downCallback" @up="upCallback" @init="mescrollInit">
 				<!-- 订单列表 -->
 				<view v-for="(item,index) in list" :key="index" class="order-item">
 					<view class="i-top b-b">
 						<text class="time">{{item.orderDate||''}}</text>
 						<text class="state" :style="{color: item.stateTipColor}">{{item.stateTip}}</text>
-						<text 
+						<!-- <text 
 							v-if="item.payState===9" 
 							class="del-btn yticon icon-iconfontshanchu1"
 							@click="deleteOrder(index)"
-						></text>
+						></text> -->
 					</view>
 					
-					<scroll-view @tap="goOrderXQ" v-if="item.orderChildInfoList.length > 1" class="goods-box" scroll-x>
+					<scroll-view @tap="goOrderXQ(item.id)" v-if="item.orderChildInfoList.length > 1" class="goods-box" scroll-x>
 						<view
 							v-for="(goodsItem, goodsIndex) in item.orderChildInfoList" :key="goodsIndex"
 							class="goods-item"
@@ -40,7 +35,7 @@
 							<image class="goods-img" :src="goodsItem.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
 						</view>
 					</scroll-view>
-					<view @tap="goOrderXQ"
+					<view @tap="goOrderXQ(item.id)"
 						v-if="item.orderChildInfoList.length === 1" 
 						class="goods-box-single"
 						v-for="(goodsItem, goodsIndex) in item.orderChildInfoList" :key="goodsIndex"
@@ -48,33 +43,26 @@
 						<image class="goods-img" :src="goodsItem.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
 						<view class="right">
 							<text class="title clamp">{{goodsItem.productName}}</text>
-							<text class="attr-box">{{goodsItem.color}}  x {{goodsItem.productNum}}</text>
+							<text class="attr-box">{{goodsItem.productInfo.color}}  x {{goodsItem.productNum}}</text>
 							<text class="price">{{goodsItem.totalPrice}}</text>
 						</view>
 					</view>
 					
-					<view class="price-box">
+					<view class="price-box" v-if="item.orderState != 0">
 						共
 						<text class="num">{{item.productNum}}</text>
 						件商品 实付款
 						<text class="price">{{item.orderPrice}}</text>
 					</view>
-					<view class="action-box b-t" v-if="item.orderState != 9">
-						<button class="action-btn" @click="gototk(item)">申请退款</button>
-						<button class="action-btn" @click="gotowl(item)">查看物流</button>
-						<button class="action-btn" @click="cancelOrder(item)">取消订单</button>
-						<button class="action-btn recom" @click="toPay(item)">立即支付</button>
+					<view class="action-box b-t" v-if="item.orderState != 0">
+						<button class="action-btn" v-if="item.orderState==2" :disabled="item.submitDisabled" @click="gototk(item)">申请退款</button>
+						<button class="action-btn" v-if="[3,4].indexOf(item.orderState)>-1" @click="gotowl(item)">查看物流</button>
+						<button class="action-btn" v-if="item.orderState==1" :disabled="item.submitDisabled" @click="cancelOrder(item)">取消订单</button>
+						<button class="action-btn recom" v-if="item.orderState==1" @click="toPay(item)">立即支付</button>
 					</view>
 				</view>
 			</mescroll-body>
 		</view>
-<!-- 		</scroll-view> -->
-
-		<!-- <swiper :current="tabCurrentIndex" class="swiper-box" duration="300" @change="changeTab">
-			<swiper-item class="tab-content" v-for="(tabItem,tabIndex) in navList" :key="tabIndex">
-				
-			</swiper-item>
-		</swiper> -->
 	</view>
 </template> 
 
@@ -109,9 +97,10 @@
 		},
 		
 		async onLoad(options){
-			this.tabCurrentIndex = options.state||0;
+			this.tabCurrentIndex = +options.state||0;
 			this.initParams()
-			this.loadData()
+			this.tabClick(this.tabCurrentIndex);
+			// this.loadData()
 		},
 		computed: {
 			...mapState(['hasLogin','userInfo','weChat'])
@@ -193,20 +182,17 @@
 				})
 			},
 			// 跳转详情
-			goOrderXQ(){
+			goOrderXQ(id){
 				uni.navigateTo({
-					url:'/pages/order/orderXQ'
+					url:`/pages/order/orderXQ?id=${id}`
 				})
-			},
-			//swiper 切换
-			changeTab(e){
-				this.tabCurrentIndex = e.target.current;
-				this.setParams(index)
 			},
 			//顶部tab点击
 			tabClick(index){
 				this.tabCurrentIndex = index;
+				this.list=[]
 				this.setParams(index)
+				this.loadData()
 			},
 			setParams(index){
 				//1：待付款、2待发货、3：待收货、4：已完成
@@ -221,16 +207,6 @@
 				}else if(index==4){
 					this.params.orderState=4
 				}
-			},
-			//删除订单
-			deleteOrder(index){
-				uni.showLoading({
-					title: '请稍后'
-				})
-				setTimeout(()=>{
-					this.navList[this.tabCurrentIndex].orderList.splice(index, 1);
-					uni.hideLoading();
-				}, 600)
 			},
 			// 售后
 			gototk(){
@@ -247,24 +223,39 @@
 			},
 			//取消订单
 			cancelOrder(item){
-				uni.showLoading({
-					title: '请稍后'
+				let _this = this
+				uni.showModal({
+					title:'温馨提示',
+					content:'您确定要取消订单吗？',
+					success: function (res) {
+						if (res.confirm) {
+							console.log('用户点击确定');
+							item.submitDisabled=true
+							_this.$api.loading('请求中...')
+							_this.$api.httpPost('orderMainInfo/api/delete',{
+								id:item.id
+							}).then(r=>{
+								console.log('请求结果：',r)
+								if(r.code==0){
+									_this.$api.msg(r.msg||'取消成功')
+									_this.loadData()
+								}else{
+									item.submitDisabled=false
+									_this.$api.msg(r.msg||'网络错误请重试')
+								}
+								uni.hideLoading()
+							}).catch(e=>{
+								item.submitDisabled=false
+								console.log('请求错误：',e)
+								item.$api.msg(e.msg||'网络错误请重试')
+								uni.hideLoading()
+							})
+						} else if (res.cancel) {
+							console.log('用户点击取消');
+						}
+					}
 				})
-				setTimeout(()=>{
-					let {stateTip, stateTipColor} = this.orderExp(item);
-					item = Object.assign(item, {
-						state: 9,
-						stateTip, 
-						stateTipColor
-					})
-					
-					//取消订单后删除待付款中该项
-					let list = this.navList[1].orderList;
-					let index = list.findIndex(val=>val.id === item.id);
-					index !== -1 && list.splice(index, 1);
-					
-					uni.hideLoading();
-				}, 600)
+				
 			},
 			//去支付页面
 			toPay(item){
@@ -278,6 +269,10 @@
 				let stateTip = '',
 					stateTipColor = '#fa436a';
 				switch(+item.orderState){
+					case 0:
+						stateTip = '已取消'; 
+						stateTipColor = '#909399';
+						break;
 					case 1:
 						stateTip = '待付款'; break;
 					case 2:
@@ -294,7 +289,8 @@
 						stateTip = '待付款';
 					//更多自定义
 				}
-				return {stateTip, stateTipColor};
+				let submitDisabled=false
+				return {stateTip, stateTipColor,submitDisabled};
 			}
 		},
 	}
@@ -471,7 +467,7 @@
 		}
 		.action-btn{
 			width: 160upx;
-			height: 60upx;
+			height: 56upx;
 			margin: 0;
 			margin-left: 24upx;
 			padding: 0;

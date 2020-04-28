@@ -81,6 +81,14 @@
 					/>
 				</view>
 				<view class="input-item">
+					<text class="tit">销售人员手机号</text>
+					<input 
+						type="number" 
+						v-model="form.salesPersonPhoneNumber" 
+						placeholder="请输入销售人员手机号"
+					/>
+				</view>
+				<view class="input-item">
 					<text class="tit">公司名称</text>
 					<input 
 						type="" 
@@ -154,7 +162,7 @@
 		data(){
 			return {
 				form:{
-					tag:1,//用户标识 （0：企业管理人员 1：企业客户 2：厂家 3：销售人员 4：普通客户）
+					tag:1,//用户标识 （0：企业管理人员 1：企业客户 2：厂家 3：销售人员）
 					sex:0,//性别（0：男 1：女）
 					email:'',
 					userName:'',
@@ -164,13 +172,20 @@
 					linkMan:'',
 					phoneNumber: '',
 					officePhone:'',
-					filePath:''
+					filePath:'',
+					salesPersonPhoneNumber:''
 				},
 				showImg:'',
 				userPassword2: ''
 			}
 		},
-		onLoad(){
+		onLoad(query){
+			// scene 需要使用 decodeURIComponent 才能获取到生成二维码时传入的 scene
+			if(query.scene){
+				const scene = decodeURIComponent(query.scene)
+				console.log("scence:",scence)
+				this.form.salesPersonPhoneNumber = scence.phoneNumber
+			}
 			this.form.userName = this.weChat.nickName
 			this.form.sex=this.weChat.gender==1?0:1
 		},
@@ -215,7 +230,7 @@
 					const [err,res]=r
 					if(err){return}
 					_this.form.filePath=res.tempFilePaths[0]
-					_this.showImg=res.tempFilePaths[0]
+					// _this.showImg=res.tempFilePaths[0]
 					const tempFilePaths = res.tempFilePaths;
 					uni.uploadFile({
 						url: RESOURCE.URL_API + 'orderMainInfo/api/uploadImage', //仅为示例，非真实的接口地址
@@ -310,6 +325,10 @@
 				}
 				if(this.form.email && !isEmail(this.form.email)){
 					this.$api.msg('邮箱格式错误')
+					return 
+				}
+				if(this.form.salesPersonPhoneNumber && !isMobile(this.form.salesPersonPhoneNumber)){
+					this.$api.msg('销售人员手机号码格式不正确')
 					return 
 				}
 				if(!this.form.companyName){

@@ -86,10 +86,10 @@
 				<text class="cell-tit clamp">运费</text>
 				<text class="cell-tip">免运费</text>
 			</view> -->
-			<view class="yt-list-cell desc-cell">
+			<!-- <view class="yt-list-cell desc-cell">
 				<text class="cell-tit clamp">备注</text>
 				<input class="desc" type="text" v-model="desc" maxlength="20" placeholder="请填写备注信息" placeholder-class="placeholder" />
-			</view>
+			</view> -->
 		</view>
 		
 		<!-- 行驶证 -->
@@ -107,32 +107,8 @@
 				<text class="price-tip">￥</text>
 				<text class="price">{{totalMoney}}</text>
 			</view>
-			<text class="submit" @click="submit">提交订单</text>
+			<button class="submit" :disabled='submitDisabled' @click="submit">提交订单</button>
 		</view>
-		
-		<!-- 优惠券面板 -->
-		<!-- <view class="mask" :class="maskState===0 ? 'none' : maskState===1 ? 'show' : ''" @click="toggleMask"> -->
-			<!-- <view class="mask-content" @click.stop.prevent="stopPrevent"> -->
-				<!-- 优惠券页面，仿mt -->
-				<!-- <view class="coupon-item" v-for="(item,index) in couponList" :key="index">
-					<view class="con">
-						<view class="left">
-							<text class="title">{{item.title}}</text>
-							<text class="time">有效期至2019-06-30</text>
-						</view>
-						<view class="right">
-							<text class="price">{{item.price}}</text>
-							<text>满30可用</text>
-						</view>
-						
-						<view class="circle l"></view>
-						<view class="circle r"></view>
-					</view>
-					<text class="tips">限新用户使用</text>
-				</view> -->
-			<!-- </view> -->
-		<!-- </view> -->
-
 	</scroll-view>
 </template>
 
@@ -144,28 +120,14 @@
 			return {
 				maskState: 0, //优惠券面板显示状态
 				desc: '', //备注
-				payType: 1, //1微信 2支付宝
-				// couponList: [
-				// 	{
-				// 		title: '新用户专享优惠券',
-				// 		price: 5,
-				// 	},
-				// 	{
-				// 		title: '庆五一发一波优惠券',
-				// 		price: 10,
-				// 	},
-				// 	{
-				// 		title: '优惠券优惠券优惠券优惠券',
-				// 		price: 15,
-				// 	}
-				// ],
 				addressData: {},
 				invoice:{},
 				goodsList:[],
 				totalMoney:null,
 				showImg:'',
 				filePath:'',
-				params:{}
+				params:{},
+				submitDisabled:false
 			}
 		},
 		onLoad(option){
@@ -181,39 +143,40 @@
 		},
 		methods: {
 			initData(){
+				this.initAddressInfo()
+				this.initInvoiceInfo()
+			},
+			initAddressInfo(){
+				//获取默认地址
 				this.$api.httpPost('userInfo/api/consigneeInfoList',{
 					parentId:this.userInfo.id,
+					isDefault:1,
 					pageSize:1,
 					pageNum:1
 				}).then(r=>{
-					console.log("请求结果：",r)
+					console.log("默认地址请求结果：",r)
 					if(r.rows&&r.rows.length>0){
 						this.addressData=r.rows[0]
 					}
 				}).catch(e=>{
 					console.log("请求错误：",e)
 				})
+			},
+			initInvoiceInfo(){
+				//获取默认发票
 				this.$api.httpPost('userInfo/api/billingInfoList',{
 					parentId:this.userInfo.id,
+					isDefault:1,
 					pageSize:1,
 					pageNum:1
 				}).then(r=>{
-					console.log("请求结果：",r)
+					console.log("默认发票请求结果：",r)
 					if(r.rows&&r.rows.length>0){
 						this.invoice=r.rows[0]
 					}
 				}).catch(e=>{
 					console.log("请求错误：",e)
 				})
-			},
-			//显示优惠券面板
-			toggleMask(type){
-				let timer = type === 'show' ? 10 : 300;
-				let	state = type === 'show' ? 1 : 0;
-				this.maskState = 2;
-				setTimeout(()=>{
-					this.maskState = state;
-				}, timer)
 			},
 			numberChange(data) {
 				this.number = data.number;
@@ -227,7 +190,7 @@
 					const [err,res]=r
 					if(err){return}
 					_this.filePath=res.tempFilePaths[0]
-					_this.showImg=res.tempFilePaths[0]
+					// _this.showImg=res.tempFilePaths[0]
 					const tempFilePaths = res.tempFilePaths;
 					uni.uploadFile({
 						url: RESOURCE.URL_API + 'orderMainInfo/api/uploadImage', //仅为示例，非真实的接口地址
@@ -253,6 +216,7 @@
 				if(!this.validateForm()){
 					return
 				}
+				this.submitDisabled=true
 				this.$api.loading('请求中...')
 				this.$api.httpPost('orderMainInfo/api/save',this.params
 				).then(r=>{
@@ -260,16 +224,15 @@
 					if(r.code==0){
 						// this.$api.msg(r.msg||'添加成功')
 						uni.navigateTo({
-							url: `/pages/money/pay?data=${JSON.stringify({
-								orderInfo: this.params,
-								// orderId:r.order.id
-							})}`
+							url: `/pages/money/pay?id=${r.data.id}`
 						})
 					}else{
+						this.submitDisabled=false
 						this.$api.msg(r.msg||'网络错误请重试')
 					}
 					uni.hideLoading()
 				}).catch(e=>{
+					this.submitDisabled=false
 					console.log('请求错误：',e)
 					this.$api.msg(e.msg||'网络错误请重试')
 					uni.hideLoading()
@@ -317,7 +280,7 @@
 					receiverAddress:this.addressData.receiverAddress,//收货地址
 					receiverLinkMan:this.addressData.linkMan,//收货联系人
 					receiverPhoneNumber:this.addressData.phoneNumber,//收货人电话
-					isOpen:this.userInfo.companyName?'是':'否',//是否开票（是或否）
+					isOpen:this.invoice.companyName?'是':'否',//是否开票（是或否）
 					companyName:this.invoice.companyName,//公司名称
 					duty:this.invoice.duty,//税号
 					companyPhoneNumber:this.invoice.phoneNumber,//公司电话

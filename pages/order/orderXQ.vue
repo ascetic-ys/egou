@@ -1,15 +1,15 @@
 <template>
-	<view>
+	<view class="container">
 		<!-- 地址 -->
-		<navigator url="/pages/customer/goodsliu" class="address-section">
+		<navigator url="/pages/customer/goodsliu" class="address-section" v-if="orderInfo.orderState != 0">
 			<view class="order-content">
 				<text class="yticon icon-shouhuodizhi"></text>
 				<view class="cen">
 					<view class="top">
-						<text class="name">{{addressData.name}}</text>
-						<text class="mobile">{{addressData.mobile}}</text>
+						<text class="name">{{orderInfo.receiverLinkMan}}</text>
+						<text class="mobile">{{orderInfo.receiverPhoneNumber}}</text>
 					</view>
-					<text class="address">{{addressData.address}} {{addressData.area}}</text>
+					<text class="address">{{orderInfo.receiverAddress}}</text>
 				</view>
 				<text class="yticon icon-you"></text>
 			</view>
@@ -17,81 +17,50 @@
 
 		<view class="goods-section">
 			<view class="g-header b-b">
-				<image class="logo" src="http://duoduo.qibukj.cn/./Upload/Images/20190321/201903211727515.png"></image>
-				<text class="name">西城有限公司</text>
+				<!-- <image class="logo" src="http://duoduo.qibukj.cn/./Upload/Images/20190321/201903211727515.png"></image> -->
+				<text class="name">商品信息</text>
 			</view>
 			<!-- 商品列表 -->
-			<view class="g-item">
-				<image src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=298298368,1308836146&fm=26&gp=0.jpg"></image>
+			<view class="g-item" v-for="(product,pi) in orderInfo.orderChildInfoList" :key='pi'>
+				<image :src="product.productInfo.imgPath||`https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=298298368,1308836146&fm=26&gp=0.jpg`"></image>
 				<view class="right">
-					<text class="title clamp">2019新款地板</text>
-					<text class="spec">春装款 L</text>
+					<text class="title clamp">{{product.productInfo.brand}}{{product.productInfo.productName}}{{product.productInfo.largeCategory}}{{product.productInfo.littleCategory}}</text>
+					<text class="spec">{{product.productInfo.color}}</text>
 					<view class="price-box">
-						<text class="price">￥17.8</text>
-						<text class="number">x 1</text>
-					</view>
-				</view>
-			</view>
-			<view class="g-item">
-				<image src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2576405641,2794108916&fm=26&gp=0.jpg"></image>
-				<view class="right">
-					<text class="title clamp">浴室防滑简约居家地板</text>
-					<text class="spec">春装款 L</text>
-					<view class="price-box">
-						<text class="price">￥17.8</text>
-						<text class="number">x 1</text>
+						<text class="price">￥{{product.unitPrice}}</text>
+						<text class="number">x {{product.productNum}}</text>
 					</view>
 				</view>
 			</view>
 		</view>
 
-		<!-- 优惠明细 -->
-	<!-- 	<view class="yt-list">
-			<view class="yt-list-cell b-b" @click="toggleMask('show')">
-				<view class="cell-icon">
-					券
-				</view>
-				<text class="cell-tit clamp">优惠券</text>
-				<text class="cell-tip active">
-					选择优惠券
-				</text>
-				<text class="cell-more wanjia wanjia-gengduo-d"></text>
-			</view>
-			<view class="yt-list-cell b-b">
-				<view class="cell-icon hb">
-					减
-				</view>
-				<text class="cell-tit clamp">商家促销</text>
-				<text class="cell-tip disabled">暂无可用优惠</text>
-			</view>
-		</view> -->
 		<!-- 金额明细 -->
 		<view class="yt-list">
 			<view class="yt-list-cell b-b">
 				<text class="cell-tit clamp">订单状态</text>
-				<text class="cell-tip red">已发货</text>
+				<text class="cell-tip red">{{orderInfo.stateTip}}</text>
 			</view>
-			<view class="yt-list-cell b-b">
+			<view class="yt-list-cell b-b" v-if="orderInfo.orderState != 0">
 				<text class="cell-tit clamp">订单总计</text>
-				<text class="cell-tip red">￥179.88</text>
+				<text class="cell-tip red">￥{{orderInfo.orderPrice}}</text>
 			</view>
 			<view class="yt-list-cell b-b">
 				<text class="cell-tit clamp">订单编号</text>
-				<text class="cell-tip">1232551234123</text>
+				<text class="cell-tip">{{orderInfo.orderNo}}</text>
 			</view>
 			<view class="yt-list-cell b-b">
 				<text class="cell-tit clamp">创建时间</text>
-				<text class="cell-tip">2020-02-02</text>
+				<text class="cell-tip">{{orderInfo.orderDate}}</text>
 			</view>
-			<view class="yt-list-cell b-b">
+			<view class="yt-list-cell b-b" v-if="orderInfo.orderState != 0">
 				<text class="cell-tit clamp">运费</text>
 				<text class="cell-tip">免运费</text>
 			</view>
-			<view class="yt-list-cell b-b">
+			<view class="yt-list-cell b-b" v-if="orderInfo.orderState != 0">
 				<text class="cell-tit clamp">物流公司</text>
 				<text class="cell-tip">韵达快递</text>
 			</view>
-			<view class="yt-list-cell b-b">
+			<view class="yt-list-cell b-b" v-if="orderInfo.orderState != 0">
 				<text class="cell-tit clamp">物流单号</text>
 				<text class="cell-tip">45612644646</text>
 			</view>
@@ -102,35 +71,17 @@
 		</view>
 		
 		<!-- 底部 -->
-		<view class="footer">
+		<view class="footer" v-if="orderInfo.orderState != 0">
 			<view class="price-content">
 				<text>实付款</text>
 				<text class="price-tip">￥</text>
-				<text class="price">475</text>
+				<text class="price">{{orderInfo.orderPrice}}</text>
 			</view>
-			<text class="submit" @click="submit">确认收货</text>
-		</view>
-		
-		<!-- 优惠券面板 -->
-		<view class="mask" :class="maskState===0 ? 'none' : maskState===1 ? 'show' : ''" @click="toggleMask">
-			<view class="mask-content" @click.stop.prevent="stopPrevent">
-				<!-- 优惠券页面，仿mt -->
-				<view class="coupon-item" v-for="(item,index) in couponList" :key="index">
-					<view class="con">
-						<view class="left">
-							<text class="title">{{item.title}}</text>
-							<text class="time">有效期至2019-06-30</text>
-						</view>
-						<view class="right">
-							<text class="price">{{item.price}}</text>
-							<text>满30可用</text>
-						</view>
-						
-						<view class="circle l"></view>
-						<view class="circle r"></view>
-					</view>
-					<text class="tips">限新用户使用</text>
-				</view>
+			<view class="footer-btn">
+				<button class="submit" :disabled="submitDisabled" v-if="orderInfo.orderState==1" @click="cancelOrder">取消订单</button>
+				<button class="submit" :disabled="submitDisabled" v-if="orderInfo.orderState==2" @click="applyRefund">申请退款</button>
+				<button class="submit" :disabled="submitDisabled" v-if="orderInfo.orderState==3" @click="confirmReceipt">确认收货</button>
+				<button class="submit" :disabled="submitDisabled" v-if="orderInfo.orderState==4" @click="applyFeedback">售后反馈</button>
 			</view>
 		</view>
 
@@ -138,50 +89,69 @@
 </template>
 
 <script>
+	import {mapState} from 'vuex';
 	export default {
+		computed: {
+			...mapState(['hasLogin','userInfo','weChat'])
+		},
 		data() {
 			return {
-				maskState: 0, //优惠券面板显示状态
-				desc: '', //备注
-				payType: 1, //1微信 2支付宝
-				couponList: [
-					{
-						title: '新用户专享优惠券',
-						price: 5,
-					},
-					{
-						title: '庆五一发一波优惠券',
-						price: 10,
-					},
-					{
-						title: '优惠券优惠券优惠券优惠券',
-						price: 15,
-					}
-				],
-				addressData: {
-					name: '许小星',
-					mobile: '13853989563',
-					addressName: '金九大道',
-					address: '山东省济南市历城区',
-					area: '149号',
-					default: false,
-				}
+				id:'',
+				orderInfo:{},//订单信息
+				submitDisabled:false
 			}
 		},
 		onLoad(option){
-			//商品数据
-			//let data = JSON.parse(option.data);
-			//console.log(data);
+			this.id=option.id
+			this.initData()
 		},
 		methods: {
-			//显示优惠券面板
-			toggleMask(type){
-				let timer = type === 'show' ? 10 : 300;
-				let	state = type === 'show' ? 1 : 0;
-				this.maskState = 2;
-				setTimeout(()=>{
-					this.maskState = state;
-				}, timer)
+			initData(){
+				this.$api.httpPost('orderMainInfo/api/detail',{id:this.id}).then(r=>{
+					console.log("请求结果：",r)
+					this.orderInfo=r.data
+					this.orderInfo = Object.assign(this.orderInfo, this.orderExp(this.orderInfo));
+				}).catch(e=>{
+					console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+				})
+			},
+			//取消订单
+			cancelOrder(){
+				this.submitDisabled=true
+				this.$api.loading('请求中...')
+				this.$api.httpPost('orderMainInfo/api/delete',{
+					id:this.orderInfo.id
+				}).then(r=>{
+					console.log('请求结果：',r)
+					if(r.code==0){
+						this.$api.msg(r.msg||'取消成功')
+						uni.navigateTo({
+							url: `/pages/order/order`
+						})
+					}else{
+						this.submitDisabled=false
+						this.$api.msg(r.msg||'网络错误请重试')
+					}
+					uni.hideLoading()
+				}).catch(e=>{
+					this.submitDisabled=false
+					console.log('请求错误：',e)
+					this.$api.msg(e.msg||'网络错误请重试')
+					uni.hideLoading()
+				})
+			},
+			//申请退款
+			applyRefund(){
+				
+			},
+			//确认收货
+			confirmReceipt(){
+				
+			},
+			//申请售后
+			applyFeedback(){
+				
 			},
 			numberChange(data) {
 				this.number = data.number;
@@ -192,6 +162,34 @@
 			submit(){
 				this.$api.msg('确认收货成功！')
 			},
+			//订单状态文字和颜色
+			orderExp(item){
+				let stateTip = '',
+					stateTipColor = '#fa436a';
+				switch(+item.orderState){
+					case 0:
+						stateTip = '已取消'; 
+						stateTipColor = '#909399';
+						break;
+					case 1:
+						stateTip = '待付款'; break;
+					case 2:
+						stateTip = '待发货'; break;
+					case 3:
+						stateTip = '待收货'; break;
+					case 4:
+						stateTip = '已完成'; break;
+					case 9:
+						stateTip = '订单已关闭'; 
+						stateTipColor = '#909399';
+						break;
+					default:
+						stateTip = '待付款';
+					//更多自定义
+				}
+				let submitDisabled=false
+				return {stateTip, stateTipColor,submitDisabled};
+			},
 			stopPrevent(){}
 		}
 	}
@@ -200,6 +198,8 @@
 <style lang="scss">
 	page {
 		background: $page-color-base;
+	}
+	.container{
 		padding-bottom: 100upx;
 	}
 
@@ -485,15 +485,17 @@
 			font-size: 36upx;
 			color: $base-color;
 		}
-		.submit{
-			display:flex;
-			align-items:center;
-			justify-content: center;
-			width: 280upx;
-			height: 100%;
-			color: #fff;
-			font-size: 32upx;
-			background-color: $base-color;
+		.footer-btn{
+			.submit{
+				// display:flex;
+				// align-items:center;
+				// justify-content: center;
+				width: 280upx;
+				height: 100%;
+				color: #fff;
+				font-size: 32upx;
+				background-color: $base-color;
+			}
 		}
 	}
 	

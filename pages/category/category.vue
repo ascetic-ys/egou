@@ -1,12 +1,12 @@
 <template>
 	<view class="content">
 		<scroll-view scroll-y class="left-aside">
-			<view v-for="item in flist" :key="item.id" class="f-item b-b" :class="{active: item.id === currentId}" @click="tabtap(item)">
+			<view v-for="item in cateLit" :key="item.id" class="f-item b-b" :class="{active: item.id === currentId}" @click="tabtap(item)">
 				{{item.largeCategory}}
 			</view>
 		</scroll-view>
 		<scroll-view scroll-with-animation scroll-y class="right-aside" @scroll="asideScroll" :scroll-top="tabScrollTop">
-			<view v-for="item in slist" :key="item.id" class="s-list" :id="'main-'+item.id">
+			<view v-for="item in cateLit" :key="item.id" class="s-list" :id="'main-'+item.id">
 				<text class="s-item">{{item.largeCategory}}</text>
 				<view class="t-list">
 					<view @click="navToList(titem,item)" class="t-item" v-for="titem in item.littleCategorylist" :key="titem.id">
@@ -29,9 +29,7 @@
 				sizeCalcState: false,
 				tabScrollTop: 0,
 				currentId: 1,
-				flist: [],
-				slist: [],
-				tlist: [],
+				cateLit: []
 			}
 		},
 		created() {
@@ -45,17 +43,10 @@
 			},
 			async loadData(){
 				this.$api.loading('加载中...')
-				this.$api.httpGet('largeCategory/api/list').then(r=>{
+				this.$api.httpGet('largeCategory/api/listAll').then(r=>{
 					console.log("请求结果：",r)
 					if(r.code==0){
-						this.flist = r.data
-					}
-					uni.hideLoading();
-					return this.$api.httpGet('largeCategory/api/listAll')
-				}).then(r=>{
-					console.log("请求结果：",r)
-					if(r.code==0){
-						this.slist = r.data
+						this.cateLit = r.data
 					}
 					uni.hideLoading();
 				}).catch(e=>{
@@ -63,25 +54,15 @@
 					this.$api.msg(e.msg||'网络异常请重试')
 					uni.hideLoading();
 				})
-				// list.forEach(item=>{
-				// 	if(!item.pid){
-				// 		this.flist.push(item);  //pid为父级id, 没有pid或者pid=0是一级分类
-				// 	}else if(!item.picture){
-				// 		this.slist.push(item); //没有图的是2级分类
-				// 	}else{
-				// 		this.tlist.push(item); //3级分类
-				// 	}
-				// }) 
 			},
 			//一级分类点击
 			tabtap(item){
 				if(!this.sizeCalcState){
 					this.calcSize();
 				}
-				
 				this.currentId = item.id;
-				let index = this.slist.findIndex(sitem=>sitem.pid === item.id);
-				this.tabScrollTop = this.slist[index].top;
+				let index = this.cateLit.findIndex(sitem=>sitem.id === item.id);
+				this.tabScrollTop = this.cateLit[index].top;
 			},
 			//右侧栏滚动
 			asideScroll(e){
@@ -89,19 +70,22 @@
 					this.calcSize();
 				}
 				let scrollTop = e.detail.scrollTop;
-				let tabs = this.slist.filter(item=>item.top <= scrollTop).reverse();
+				let tabs = this.cateLit.filter(item=>item.top <= scrollTop).reverse();
 				if(tabs.length > 0){
-					this.currentId = tabs[0].pid;
+					this.currentId = tabs[0].id;
 				}
 			},
 			//计算右侧栏每个tab的高度等信息
 			calcSize(){
 				let h = 0;
-				this.slist.forEach(item=>{
+				this.cateLit.forEach(item=>{
 					let view = uni.createSelectorQuery().select("#main-" + item.id);
+					console.log('view:',view)
 					view.fields({
-						size: true
+						size: true,
+						scrollOffset: true
 					}, data => {
+						console.log('data:',data)
 						item.top = h;
 						h += data.height;
 						item.bottom = h;

@@ -165,6 +165,7 @@
 		display: flex;
 		align-items: center;
 		.tag{
+			width: 75rpx;
 			font-size: 24upx;
 			color: $base-color;
 			margin-right: 10upx;

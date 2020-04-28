@@ -218,7 +218,7 @@
 			//数量
 			numberChange(data){
 				this.cartList[data.index].productNum = data.number;
-				this.$api.loading('请求中...')
+				// this.$api.loading('请求中...')
 				this.$api.httpPost('shoppingCart/api/update',{
 					id:this.cartList[data.index].id,
 					productNum:this.cartList[data.index].productNum

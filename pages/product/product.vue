@@ -22,7 +22,7 @@
 		</view>
 		
 		<view class="introduce-section">
-			<text class="title">{{product.productName}}</text>
+			<text class="title">{{product.brand}}{{product.color}}{{product.productName}}{{product.largeCategory}}{{product.littleCategory}}</text>
 			<view class="price-box">
 				<text class="price-tip">¥</text>
 				<text class="price">{{product.price}}</text>

@@ -19,7 +19,7 @@
 				<image class="goods-img" :src="goodsItem.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
 				<view class="right">
 					<text class="title clamp">{{goodsItem.productName}}</text>
-					<text class="attr-box">{{goodsItem.color}}  x {{goodsItem.productNum}}</text>
+					<text class="attr-box">{{goodsItem.productInfo.color}}  x {{goodsItem.productNum}}</text>
 					<text class="price">{{goodsItem.totalPrice}}</text>
 				</view>
 			</view>

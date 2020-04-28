@@ -10,6 +10,9 @@
 				<view class="info-box">
 					<text class="username">{{userInfo.userName || '游客'}}</text>
 				</view>
+				<view class="code-box" v-if="hasLogin && userInfo.tag==3" @click="toMyQrCode">
+					<image src="/static/images/qr-code.png"></image>
+				</view>
 			</view>
 		<!-- 	<view class="vip-card-box">
 				<image class="card-bg" src="/static/vip-card-bg.png" mode=""></image>
@@ -61,7 +64,7 @@
 					<text class="yticon icon-daifukuan"></text>
 					<text>待付款</text>
 				</view>
-				<view class="order-item" @click="navTo('/pages/order/order?state=2')" hover-class="common-hover"  :hover-stay-time="50">
+				<view class="order-item" @click="navTo('/pages/order/order?state=3')" hover-class="common-hover"  :hover-stay-time="50">
 					<text class="yticon icon-yishouhuo"></text>
 					<text>待收货</text>
 				</view>
@@ -90,10 +93,10 @@
 				<list-cell v-if='userInfo.tag==0' icon="icon-share" iconColor="#9789f7" title="订单统计" tips="查看最近订单图表信息" @eventClick="navTo('/pages/orderTj/orderTj?state=0')"></list-cell>
 				<list-cell v-if='userInfo.tag==0' icon="icon-pinglun-copy" iconColor="#ee883b" title="待办事项" tips="有新的消息" @eventClick="navTo('/pages/notice/notice')"></list-cell>
 				<!-- <list-cell icon="icon-shoucang_xuanzhongzhuangtai" iconColor="#54b4ef" title="我的收藏"></list-cell> -->
-				<list-cell icon="icon-shezhi1" iconColor="#e07472" title="设置" border="" @eventClick="navTo('/pages/set/set')"></list-cell>
 				<list-cell v-if='userInfo.tag==3' icon="icon-shoucang_xuanzhongzhuangtai" iconColor="#e07472" title="我的客户" border="" @eventClick="navTo('/pages/myUser/myUser?state=0')"></list-cell>
-				<list-cell v-if='userInfo.tag==3' icon="icon-iconfontweixin" iconColor="#e0ae70" title="我的业绩" border="" @eventClick="navTo('/pages/myAchievement/myAchievement?state=0')"></list-cell>
+				<!-- <list-cell v-if='userInfo.tag==3' icon="icon-iconfontweixin" iconColor="#e0ae70" title="我的业绩" border="" @eventClick="navTo('/pages/myAchievement/myAchievement?state=0')"></list-cell> -->
 				<!-- <list-cell icon="icon-shezhi1" title=""></list-cell> -->
+				<list-cell icon="icon-shezhi1" iconColor="#e07472" title="设置" border="" @eventClick="navTo('/pages/set/set')"></list-cell>
 				<view v-show="true">
 					<list-cell icon="icon-yiguoqi1" title="icon-yiguoqi1"></list-cell>
 					<list-cell icon="icon-iconfontshanchu1" title="icon-iconfontshanchu1"></list-cell>
@@ -219,6 +222,11 @@
 			...mapState(['hasLogin','userInfo','weChat'])
 		},
         methods: {
+			toMyQrCode(){
+				uni.navigateTo({
+					url:'/pages/user/myQrCode'
+				}) 
+			},
 			clickTab(item){
 				uni.navigateTo({
 					url:item.pagePath
@@ -340,6 +348,15 @@
 			font-size: $font-lg + 6upx;
 			color: $font-color-dark;
 			margin-left: 20upx;
+		}
+		.code-box{
+			flex: 1;
+			text-align: right;
+			margin-right: 50rpx;
+			image{
+				height: 60rpx;
+				width: 60rpx;
+			}
 		}
 	}
 

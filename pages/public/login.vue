@@ -78,6 +78,7 @@
 					console.log('微信授权信息：',infoData)
 					const {userInfo,loginData}=infoData
 					this.setWeChat(userInfo.userInfo)
+					uni.hideLoading();
 					//授权成功后去注册页面
 					uni.navigateTo({
 						url:'/pages/public/regist'
@@ -110,7 +111,7 @@
 					if(r.code==0){
 						uni.hideLoading();
 						console.log("登录成功：",r)
-						r.data.tag=1
+						// r.data.tag=1
 						this.login(r.data)
 						this.$api.msg('登录成功')
 						this.changeTabBar(r.data.tag)

@@ -4,8 +4,12 @@
 			<text class="cell-tit">个人资料</text>
 			<text class="cell-more yticon icon-you"></text>
 		</view>
-		<view class="list-cell b-b" @click="navTo('/pages/address/address')" hover-class="cell-hover" :hover-stay-time="50">
+		<view v-if="userInfo.tag==1" class="list-cell b-b" @click="navTo('/pages/address/address')" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">收货地址</text>
+			<text class="cell-more yticon icon-you"></text>
+		</view>
+		<view v-if="userInfo.tag==1" class="list-cell b-b" @click="navTo('/pages/invoice/invoice')" hover-class="cell-hover" :hover-stay-time="50">
+			<text class="cell-tit">发票信息</text>
 			<text class="cell-more yticon icon-you"></text>
 		</view>
 		<!-- <view class="list-cell" @click="navTo('实名认证')" hover-class="cell-hover" :hover-stay-time="50">
@@ -13,10 +17,10 @@
 			<text class="cell-more yticon icon-you"></text>
 		</view> -->
 		
-		<view class="list-cell m-t">
+		<!-- <view class="list-cell m-t">
 			<text class="cell-tit">消息推送</text>
 			<switch checked color="#fa436a" @change="switchChange" />
-		</view>
+		</view> -->
 		<!-- <view class="list-cell m-t b-b" @click="navTo('清除缓存')" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">清除缓存</text>
 			<text class="cell-more yticon icon-you"></text>
@@ -38,7 +42,7 @@
 
 <script>
 	import {  
-	    mapMutations  
+	    mapMutations ,mapState 
 	} from 'vuex';
 	export default {
 		data() {
@@ -46,11 +50,14 @@
 				
 			};
 		},
+		computed: {
+			...mapState(['hasLogin','userInfo','weChat'])
+		},
 		methods:{
 			...mapMutations(['logout']),
 
 			navTo(url){
-				this.$api.msg(`跳转到${url}`);
+				// this.$api.msg(`跳转到${url}`);
 				uni.navigateTo({
 					url:url
 				})
@@ -72,7 +79,7 @@
 			//switch
 			switchChange(e){
 				let statusTip = e.detail.value ? '打开': '关闭';
-				this.$api.msg(`${statusTip}消息推送`);
+				// this.$api.msg(`${statusTip}消息推送`);
 			},
 			checkUpdate(){
 				let _this = this

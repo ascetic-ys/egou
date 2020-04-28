@@ -135,6 +135,11 @@
 				}
 			}
 		}, {
+			"path": "pages/user/myQrCode",
+			"style": {
+				"navigationBarTitleText": "二维码名片"
+			}
+		}, {
 			"path": "pages/detail/detail",
 			"style": {
 				"navigationBarTitleText": "",
@@ -248,12 +253,16 @@
             "style" : {
 				"navigationBarTitleText": "我的业绩"
 			}
-        }
-        ,{
+        },{
             "path" : "pages/person/person",
             "style" : {
 				"navigationBarTitleText": "个人资料"
 			}
+        },{
+            "path" : "pages/person/updatePerson",
+            "style" : {
+        		"navigationBarTitleText": "修改个人资料"
+        	}
         },{
             "path" : "pages/person/updatePwd",
             "style" : {
