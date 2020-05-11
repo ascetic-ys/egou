@@ -1,102 +1,115 @@
 <template>
 	<view class="content">
-		<view class="navbar">
-			<view 
-				v-for="(item, index) in navList" :key="index" 
-				class="nav-item" 
-				:class="{current: tabCurrentIndex === index}"
-				@click="tabClick(index)"
-			>
-				{{item.text}}
+		<view class="navbar-date">
+			<view class="search-date">
+				<picker mode="date" :value="date1" :start="startDate" :end="endDate" @change="bindDateChange1">
+						<view class="uni-input">起始：{{date1}}</view>
+				</picker>
+				<text style="line-height: 70upx;">--</text>
+				<picker mode="date" :value="date2" :start="startDate" :end="endDate" @change="bindDateChange2">
+						<view class="uni-input">结束：{{date2}}</view>
+				</picker>
 			</view>
 		</view>
 		
 		<view>
 			<!-- 空白页 -->
-			<empty v-if="list.length === 0"></empty>
-			<view class="order-numb" v-if="tabCurrentIndex!==2" >
-				<view>订单总数：<text class="num">{{totalNum}}</text></view>
-				<view>总金额：<text class="num">￥{{totalPrice}}</text></view>
-			</view>
-			<!-- 统计图表页 -->
-			<view class="" v-if="tabCurrentIndex===2">
-				<orderNumb/>
-				<orderMoney/>
-			</view>
-			<!-- 订单列表 -->
-			<view v-else v-for="(item,index) in list" :key="index" class="order-item" @tap="goOrderXQ(item.id)">
-				<view class="i-top b-b">
-					<text class="time">{{item.orderDate}}</text>
-					<text class="state" :style="{color: item.stateTipColor}">{{item.stateTip}}</text>
-				</view>
-				<view class="goods-box-single">
-					<view class="right">
-						<view class="orderLItem">
-							<text>订单编号：{{item.orderNo}}</text>
+			<!-- <empty v-if="list.length === 0"></empty> -->
+			<mescroll-body :bottom='bottom' :up='upOption' @down="downCallback" @up="upCallback" @init="mescrollInit">
+				<!-- 订单列表 -->
+				<view v-for="(item,index) in list" :key="index" class="order-item" @tap="goRefundXQ(item.id)">
+					<view class="i-top b-b">
+						<text class="time">申请时间：{{item.applicationDate||''}}</text>
+						<text class="state" :style="{color: item.stateTipColor}" v-if="item.refundConclusion">{{item.refundConclusion}}</text>
+					</view>
+					
+					<scroll-view v-if="item.orderChildInfoList.length > 1" class="goods-box" scroll-x>
+						<view
+							v-for="(goodsItem, goodsIndex) in item.orderChildInfoList" :key="goodsIndex"
+							class="goods-item"
+						>
+							<image class="goods-img" :src="goodsItem.productInfo.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
 						</view>
-						<view class="orderLItem">
-							<text>客户名称：{{item.customer}}</text>
-						</view>
-						<view class="orderLItem">
-							<text>收货地址：{{item.receiverAddress}}</text>
+					</scroll-view>
+					<view
+						v-if="item.orderChildInfoList.length === 1" 
+						class="goods-box-single"
+						v-for="(goodsItem, goodsIndex) in item.orderChildInfoList" :key="goodsIndex"
+					>
+						<image class="goods-img" :src="goodsItem.productInfo.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
+						<view class="right">
+							<text class="title clamp">{{goodsItem.productName}}</text>
+							<text class="attr-box">{{goodsItem.productInfo.color}}  x {{goodsItem.productNum}}</text>
+							<text class="price">{{goodsItem.totalPrice}}</text>
 						</view>
 					</view>
+					<view class="desc-box">
+						退款理由：
+						<text class="desc-text">{{item.refundReason}}</text>
+					</view>
+					<view class="desc-box" v-if="item.auditorOpinion">
+						审核意见：
+						<text class="desc-text">{{item.auditorOpinion}}</text>
+					</view>
+					<view class="price-box">
+						共
+						<text class="num">{{item.productNum}}</text>
+						件商品 实付款
+						<text class="price">{{item.orderPrice}}</text>
+					</view>
 				</view>
-				
-				<view class="price-box">
-					共
-					<text class="num">{{item.productNum||0}}</text>
-					件商品 实付款
-					<text class="price">{{item.orderPrice||0}}</text>
-				</view>
-			</view>
+			</mescroll-body>
 		</view>
+		
 	</view>
 </template> 
 
 <script>
+	import MescrollMixin from "@/components/mescroll-uni/mescroll-mixins.js";
 	import {mapState} from 'vuex';
+	import {RESOURCE } from '@/api/resource.js'
 	import empty from "@/components/empty";
-	import orderNumb from "./orderNumb.vue";
-	import orderMoney from "./orderMoney.vue";
+	
 	export default {
+		mixins: [MescrollMixin], // 使用mixin (在main.js注册全局组件)
 		components: {
-			empty,
-			orderNumb,
-			orderMoney
+			empty
 		},
 		data() {
 			return {
-				tabCurrentIndex: 0,
+				bottom:120,
+				upOption:{
+					auto:false,
+				},
+				list: [],
 				params:{},
-				list:[],
-				totalNum:0,
-				totalPrice:0,
-				navList: [
-					{state: 0,text: '今日订单'},
-					{state: 1,text: '本月订单'},
-					{state: 2,text: '订单统计'}
-				]
+				date1: 0,
+				date2: 0,
 			};
 		},
-		created() {
-			this.initParams(0)
+		
+		async onLoad(options){
+			this.initParams()
 			this.loadData()
 		},
 		computed: {
+			startDate() {
+				return this.getDate('start');
+			},
+			endDate() {
+				return this.getDate('end');
+			},
 			...mapState(['hasLogin','userInfo','weChat'])
 		},
 		methods: {
-			initParams(index){
+			initParams(){
+				this.date1 = this.getDate('lastmouth')
+				this.date2 = this.getDate()
 				this.params={
-					queryType:"day",
+					queryType:'orderRefundInfo',
 					orderByColumn:"",
-					isAsc:""
-				}
-				if(index==0){
-					this.params.queryType="day"
-				}else{
-					this.params.queryType="month"
+					isAsc:"",
+					userId:this.userInfo.id
 				}
 			},
 			/*下拉刷新的回调 */
@@ -135,12 +148,15 @@
 				})
 			},
 			//加载商品 ，带下拉刷新和上滑加载
-			loadData(data={}) {
+			async loadData(data={}) {
 				const {pageNum=1,pageSize=10}=data
+				this.params.userId=this.userInfo.id
 				if(!this.params.orderByColumn){
 					delete this.params.orderByColumn
 					delete this.params.isAsc
 				}
+				this.params.applicationDateStart=this.date1
+				this.params.applicationDateEnd=this.date2
 				return this.$api.httpPost('orderMainInfo/api/list',{
 					pageNum,
 					pageSize,
@@ -158,27 +174,48 @@
 					}else{
 						this.list=this.list.concat(orderList)
 					}
-					this.totalNum=r.total
-					this.totalPrice=r.totalPrice
 					return r
 				}).catch(e=>{
 					console.log("请求错误：",e)
 					this.$api.msg(e.msg||'网络异常请重试')
 				})
 			},
+			// 跳转详情
+			goRefundXQ(id){
+				console.log("id:",id)
+				uni.navigateTo({
+					url:`/pages/order/orderRefundDetail?id=${id}`
+				})
+			},
 			//顶部tab点击
 			tabClick(index){
-				this.tabCurrentIndex = index;
-				if(index!=2){
-					this.initParams(index)
-					this.loadData()
-				}
+				this.list=[]
+				this.loadData()
 			},
-			// 跳转详情
-			goOrderXQ(id){
-				uni.navigateTo({
-					url:`/pages/order/orderXQ?id=${id}`
-				})
+			bindDateChange1(e) {
+				this.date1 = e.target.value
+				this.loadData()
+			},
+			bindDateChange2(e) {
+				this.date2 = e.target.value
+				this.loadData()
+			},
+			getDate(type) {
+				const date = new Date();
+				let year = date.getFullYear();
+				let month = date.getMonth() + 1;
+				let day = date.getDate();
+		
+				if (type === 'start') {
+						year = year - 60;
+				} else if (type === 'end') {
+						year = year + 2;
+				}else if (type === 'lastmouth') {
+						month = month - 1;
+				}
+				month = month > 9 ? month : '0' + month;;
+				day = day > 9 ? day : '0' + day;
+				return `${year}-${month}-${day}`;
 			},
 			//订单状态文字和颜色
 			orderExp(item){
@@ -213,22 +250,41 @@
 </script>
 
 <style lang="scss">
-	.order-numb {
-		width: 100%;
-		background-color: #FFFFFF;
-		display: flex;
-		font-size: $font-base;
-		justify-content: space-between;
-		padding: 20upx;
-		.num{
-			font-size: 36rpx;
-			color:$font-color-red ;
-		}
-	}
 	page, .content{
 		background: $page-color-base;
 		height: 100%;
 	}
+	
+	.navbar-date{
+		display: flex;
+		padding: 0 5px;
+		background: #fff;
+		box-shadow: 0 1px 5px rgba(0,0,0,.06);
+		position: relative;
+		z-index: 10;
+		.search-date {
+			width: 100%;
+			background-color: #fffefc;
+			font-size: $font-base;
+			display: flex;
+			justify-content: space-between;
+			padding: 20upx 30upx;
+			.uni-input{
+				background-color: #d6dfdf;
+				padding:20upx;
+				border-radius: 10upx;
+			}
+			.num{
+				font-size: $font-lg;
+				color:$font-color-red ;
+			}
+			.money{
+				font-size: $font-lg;
+				color:$font-color-red ;
+			}
+		}
+	}
+	
 	
 	.swiper-box{
 		height: calc(100% - 40px);
@@ -342,10 +398,6 @@
 				flex-direction: column;
 				padding: 0 30upx 0 24upx;
 				overflow: hidden;
-				.orderLItem{
-					font-size: $font-base;
-					padding: 6upx 0;
-				}
 				.title{
 					font-size: $font-base + 2upx;
 					color: $font-color-dark;
@@ -365,6 +417,20 @@
 						margin: 0 2upx 0 8upx;
 					}
 				}
+			}
+		}
+		
+		.desc-box{
+			display: flex;
+			justify-content: flex-start;
+			align-items: baseline;
+			padding: 20upx 30upx;
+			font-size: $font-sm + 2upx;
+			color: $font-color-light;
+			.desc-text{
+				margin: 0 8upx;
+				font-size: $font-lg;
+				color: $font-color-dark;
 			}
 		}
 		
@@ -399,7 +465,7 @@
 		}
 		.action-btn{
 			width: 160upx;
-			height: 60upx;
+			height: 56upx;
 			margin: 0;
 			margin-left: 24upx;
 			padding: 0;

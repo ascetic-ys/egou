@@ -52,26 +52,6 @@
 			</view>
 		</navigator>
 		
-		<!-- 优惠明细 -->
-		<!-- <view class="yt-list">
-			<view class="yt-list-cell b-b" @click="toggleMask('show')">
-				<view class="cell-icon">
-					券
-				</view>
-				<text class="cell-tit clamp">优惠券</text>
-				<text class="cell-tip active">
-					选择优惠券
-				</text>
-				<text class="cell-more wanjia wanjia-gengduo-d"></text>
-			</view>
-			<view class="yt-list-cell b-b">
-				<view class="cell-icon hb">
-					减
-				</view>
-				<text class="cell-tit clamp">商家促销</text>
-				<text class="cell-tip disabled">暂无可用优惠</text>
-			</view>
-		</view> -->
 		<!-- 金额明细 -->
 		<view class="yt-list">
 			<view class="yt-list-cell b-b">
@@ -107,7 +87,9 @@
 				<text class="price-tip">￥</text>
 				<text class="price">{{totalMoney}}</text>
 			</view>
-			<button class="submit" :disabled='submitDisabled' @click="submit">提交订单</button>
+			<view class="footer-btn">
+				<button class="submit" :disabled='submitDisabled' @click="submit">提交订单</button>
+			</view>
 		</view>
 	</scroll-view>
 </template>
@@ -611,15 +593,14 @@
 			font-size: 36upx;
 			color: $base-color;
 		}
-		.submit{
-			display:flex;
-			align-items:center;
-			justify-content: center;
-			width: 280upx;
-			height: 100%;
-			color: #fff;
-			font-size: 32upx;
-			background-color: $base-color;
+		.footer-btn{
+			.submit{
+				width: 280upx;
+				height: 100%;
+				color: #fff;
+				font-size: 32upx;
+				background-color: $base-color;
+			}
 		}
 	}
 	

@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<StaticalOrder ref='staticalOrder' v-if='userInfo.tag==0'></StaticalOrder>
-		<Cart ref='cart' :tag='userInfo.tag' v-if='!userInfo.tag||userInfo.tag==1'></Cart>
+		<Cart ref='cart' :tag='userInfo.tag' v-if='!userInfo.id||userInfo.tag==1'></Cart>
 		<MyOrder ref='myOrder' v-if='userInfo.tag==2'></MyOrder>
 		<MyAchievement ref='myAchievement' v-if='userInfo.tag==3'></MyAchievement>
 	</view>
@@ -35,13 +35,19 @@
 		},
 		methods: {
 			initPageTitle(){
-				if(!this.userInfo.tag||this.userInfo.tag==1){
+				if(!this.userInfo.id||this.userInfo.tag==1){
 					this.$nextTick(() => {
 						this.$refs.cart.initData()
 					})
-				}else if(this.userInfo&&[0,2].indexOf(this.userInfo.tag)>-1){
+				}else if(this.userInfo.id&&[0,2].indexOf(this.userInfo.tag)>-1){
+					let title = '订单统计'
+					if(this.userInfo.tag==0){
+						title='订单统计'
+					}else{
+						title='我的订单'
+					}
 					uni.setNavigationBarTitle({
-					    title: '我的订单'
+					    title: title
 					});
 					uni.setTabBarItem({
 					  index: 2,
@@ -49,7 +55,7 @@
 					  iconPath: "static/tab-order.png",
 					  selectedIconPath: "static/tab-order-current.png",
 					})
-				}else if(this.userInfo&&this.userInfo.tag==3){
+				}else if(this.userInfo.id&&this.userInfo.tag==3){
 					uni.setNavigationBarTitle({
 					    title: '我的业绩'
 					});

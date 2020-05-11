@@ -30,7 +30,7 @@
 				default: 375,
 			},
 			cHeight: {
-				default: 250,
+				default: 350,
 			},
 			pixelRatio: {
 				type: Number,
@@ -77,6 +77,7 @@
 					dataLabel: true,
 					width: this.cWidth * this.pixelRatio,
 					height: this.cHeight * this.pixelRatio,
+					padding: [25,15,5,15],
 					extra: {
 						column: {
 							type: 'group',

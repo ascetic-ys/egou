@@ -4,7 +4,7 @@
 			"path": "pages/index/index",
 			"style": {
 				// #ifdef MP
-				"navigationBarTitleText": "E-购商城",
+				"navigationBarTitleText": "地垫E购通",
 				//"navigationStyle": "custom",
 				// #endif 
 				"app-plus": {
@@ -158,6 +158,14 @@
 				}
 			}
 		}, {
+			"path": "pages/myOrder/myOrder",
+			"style": {
+				"navigationBarTitleText": "我的订单",
+				"app-plus": {
+					"bounce": "none"
+				}
+			}
+		}, {
 			"path": "pages/money/money",
 			"style": {}
 		}, {
@@ -169,6 +177,36 @@
 			"path": "pages/order/orderXQ",
 			"style": {
 				"navigationBarTitleText": "订单详情"
+			}
+		},{
+			"path": "pages/order/orderRefund",
+			"style": {
+				"navigationBarTitleText": "申请退款"
+			}
+		},{
+			"path": "pages/order/refundList",
+			"style": {
+				"navigationBarTitleText": "我的退款申请"
+			}
+		},{
+			"path": "pages/order/orderRefundDetail",
+			"style": {
+				"navigationBarTitleText": "退款详情"
+			}
+		},{
+			"path": "pages/order/orderService",
+			"style": {
+				"navigationBarTitleText": "售后反馈"
+			}
+		},{
+			"path": "pages/order/serviceList",
+			"style": {
+				"navigationBarTitleText": "售后反馈列表"
+			}
+		},{
+			"path": "pages/order/orderServiceDetail",
+			"style": {
+				"navigationBarTitleText": "售后反馈详情"
 			}
 		}, {
 			"path": "pages/address/address",

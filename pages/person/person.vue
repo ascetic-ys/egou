@@ -42,7 +42,7 @@
 		</view>
 		<view v-if="userInfo.tag==1" class="list-cell b-b" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">营业执照</text>
-			<view class="cell-img2"><image :src="showImage" mode=""></image></view>
+			<view class="cell-img2" @tap.stop="previewImg(showImage)"><image :src="showImage" mode=""></image></view>
 		</view>
 		
 		<view class="list-cell log-out-btn"  @tap="navTo('/pages/person/updatePerson')" v-if="userInfo.tag==1">
@@ -76,6 +76,22 @@
 					url:url
 				})
 			},
+			previewImg(imgUrl){
+				// 预览图片
+				let imgList = [imgUrl]
+				uni.previewImage({
+					urls: imgList,
+					longPressActions: {
+						itemList: ['发送给朋友', '保存图片', '收藏'],
+						success: function(data) {
+							console.log('选中了第' + (data.tapIndex + 1) + '个按钮,第' + (data.index + 1) + '张图片');
+						},
+						fail: function(err) {
+							console.log(err.errMsg);
+						}
+					}
+				});
+			}
 		}
 	}
 </script>

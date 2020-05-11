@@ -11,8 +11,8 @@
 				</picker>
 			</view>
 			<view class="order-numb">
-				<text>订单总数：<text class="num">1020</text></text>
-				<text>总金额：<text class="money">￥15684</text></text>
+				<text>订单总数：<text class="num">{{totalNum}}</text></text>
+				<text>总金额：<text class="money">￥{{totalPrice}}</text></text>
 			</view>
 		</view>
 
@@ -68,6 +68,8 @@
 			return {
 				params:{},
 				list:[],
+				totalNum:0,
+				totalPrice:0,
 				yearArray: ['2018', '2019', '2020', '2021','2022','2023','2024','2025'],
 				mouthArray: ['全部','1','2','3','4','5','6','7','8','9','10','11','12'],
 				date1: 0,
@@ -76,6 +78,8 @@
 		},
 		
 		created() {
+			this.date1 = this.getDate('lastmouth')
+			this.date2 = this.getDate()
 			this.initParams()
 			this.loadData()
 		},
@@ -95,6 +99,8 @@
 		methods: {
 			initParams(){
 				this.params={
+					orderDateStart:'',
+					orderDateEnd:'',
 					orderByColumn:"",
 					isAsc:"",
 					id:this.userInfo.id
@@ -124,7 +130,7 @@
 					// this.mescroll.endByPage(r.length, r.total); //必传参数(当前页的数据个数, 总页数)
 								
 					//方法二(推荐): 后台接口有返回列表的总数据量 totalSize
-					this.mescroll.endBySize(this.list.length, r.total); //必传参数(当前页的数据个数, 总数据量)
+					this.mescroll.endBySize(this.list.length, r.data.totalNum); //必传参数(当前页的数据个数, 总数据量)
 								
 					//方法三(推荐): 您有其他方式知道是否有下一页 hasNext
 					//this.mescroll.endSuccess(curPageData.length, hasNext); //必传参数(当前页的数据个数, 是否有下一页true/false)
@@ -139,6 +145,8 @@
 			async loadData(data={}) {
 				const {pageNum=1,pageSize=10}=data
 				this.params.id=this.userInfo.id
+				this.params.orderDateStart=this.date1
+				this.params.orderDateEnd=this.date2
 				if(!this.params.orderByColumn){
 					delete this.params.orderByColumn
 					delete this.params.isAsc
@@ -149,7 +157,7 @@
 					...this.params
 				}).then(r=>{
 					console.log("请求结果：",r)
-					let orderList = r.rows
+					let orderList = r.data.rows
 					orderList.forEach(item=>{
 						//添加不同状态下订单的表现形式
 						item = Object.assign(item, this.orderExp(item));
@@ -160,6 +168,8 @@
 					}else{
 						this.list=this.list.concat(orderList)
 					}
+					this.totalNum=r.data.totalNum
+					this.totalPrice=r.data.totalPrice
 					return r
 				}).catch(e=>{
 					console.log("请求错误：",e)
@@ -168,28 +178,29 @@
 			},
 			bindDateChange1(e) {
 				this.date1 = e.target.value
+				this.loadData()
 			},
 			bindDateChange2(e) {
 				this.date2 = e.target.value
+				this.loadData()
 			},
 			getDate(type) {
-					const date = new Date();
-					let year = date.getFullYear();
-					let month = date.getMonth() + 1;
-					let day = date.getDate();
+				const date = new Date();
+				let year = date.getFullYear();
+				let month = date.getMonth() + 1;
+				let day = date.getDate();
 
-					if (type === 'start') {
-							year = year - 60;
-					} else if (type === 'end') {
-							year = year + 2;
-					}else if (type === 'lastmouth') {
-							month = month - 1;
-					}
-					month = month > 9 ? month : '0' + month;;
-					day = day > 9 ? day : '0' + day;
-					return `${year}-${month}-${day}`;
+				if (type === 'start') {
+						year = year - 60;
+				} else if (type === 'end') {
+						year = year + 2;
+				}else if (type === 'lastmouth') {
+						month = month - 1;
+				}
+				month = month > 9 ? month : '0' + month;;
+				day = day > 9 ? day : '0' + day;
+				return `${year}-${month}-${day}`;
 			},
-			//订单状态文字和颜色
 			//订单状态文字和颜色
 			orderExp(item){
 				let stateTip = '',

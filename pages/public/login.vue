@@ -91,10 +91,6 @@
 			},
 			//登录
 			toLogin(){
-				// this.form={
-				// 	phoneNumber:'13688888888',
-				// 	userPassword:'aa222222'
-				// }
 				if(!this.verifyForm()){
 					return
 				}
@@ -111,7 +107,7 @@
 					if(r.code==0){
 						uni.hideLoading();
 						console.log("登录成功：",r)
-						// r.data.tag=1
+						// r.data.tag=2
 						this.login(r.data)
 						this.$api.msg('登录成功')
 						this.changeTabBar(r.data.tag)

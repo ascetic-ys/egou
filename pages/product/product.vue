@@ -110,7 +110,9 @@
 				<text>图文详情</text>
 			</view>
 			<!-- <rich-text :nodes="desc"></rich-text> -->
-			<rich-text :nodes="product.introductory"></rich-text>
+			<!-- <rich-text :nodes="product.introductory"></rich-text> -->
+			<jyf-parser domain="https://6874-html-foe72-1259071903.tcb.qcloud.la" gesture-zoom lazy-load ref="article" selectable
+			 show-with-animation use-anchor @error="error" @imgtap="imgtap" @linkpress="linkpress" @parse="parse" @ready="ready">加载中...</jyf-parser>
 			<view class="d-bottom"></view>
 		</view>
 		
@@ -198,11 +200,13 @@
 </template>
 
 <script>
+	import jyfParser from '@/components/jyf-parser/jyf-parser'; // HBuilderX 2.5.5 及以上可以不需要
 	import {mapState} from 'vuex';
 	import share from '@/components/share';
 	export default{
 		components: {
-			share
+			share,
+			jyfParser
 		},
 		data() {
 			return {
@@ -259,6 +263,7 @@
 					console.log("请求结果：",r)
 					if(r.data){
 						this.product=r.data
+						this.$refs.article.setContent(this.product.introductory);
 					}else{
 						this.$api.msg('未找到产品信息')
 						uni.navigateBack()
@@ -269,6 +274,23 @@
 					this.$api.msg(e.msg||'网络异常请重试')
 					uni.hideLoading();
 				})
+			},
+			parse(e) {
+				console.log('parse finish', e);
+			},
+			ready(e) {
+				console.log('ready', e);
+				console.log('api: getText', this.$refs.article.getText());
+				console.log('imgList', this.$refs.article.imgList);
+			},
+			imgtap(e) {
+				console.log('imgtap', e);
+			},
+			linkpress(e) {
+				console.log('linkpress', e);
+			},
+			error(e) {
+				console.error(e);
 			},
 			//规格弹窗开关
 			toggleSpec() {
@@ -326,8 +348,18 @@
 				this.favorite = !this.favorite;
 			},
 			buy(){
+				let goodsList = [];
+				let goods = this.product
+				goods.productNum=1
+				goods.productId=this.product.id
+				delete goods.introductory
+				goodsList.push(goods)
+				console.log("goodsList",goodsList)
 				uni.navigateTo({
-					url: `/pages/order/createOrder`
+					url: `/pages/order/createOrder?data=${JSON.stringify({
+						goodsList: goodsList,
+						totalMoney: this.product.price
+					})}`
 				})
 			},
 			//加入购物车

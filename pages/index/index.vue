@@ -287,7 +287,7 @@
 			</scroll-view>
 		</view> -->
 		<!-- 推荐商品 -->
-		<view class="f-header m-t">
+		<view class="f-header m-t" @tap="navTo('/pages/product/list')">
 			<image src="/static/temp/h1.png"></image>
 			<view class="tit-box">
 				<text class="tit">商品推荐</text>
@@ -300,12 +300,12 @@
 			<view 
 				v-for="(item, index) in goodsList" :key="index"
 				class="guess-item"
-				@click="navToDetailPage(item)"
+				@click="navToProductDetailPage(item)"
 			>
 				<view class="image-wrapper">
 					<image :src="item.image" mode="aspectFill"></image>
 				</view>
-				<text class="title clamp">{{item.title}}</text>
+				<text class="title clamp">{{item.brand}}{{item.productName}}</text>
 				<text class="price">￥{{item.price}}</text>
 			</view>
 		</view>
@@ -315,7 +315,9 @@
 </template>
 
 <script>
-
+	import MescrollMixin from "@/components/mescroll-uni/mescroll-mixins.js";
+	import {mapState} from 'vuex';
+	import {RESOURCE } from '@/api/resource.js'
 	export default {
 
 		data() {
@@ -354,9 +356,8 @@
 				this.swiperLength = carouselList.length;
 				this.carouselList = carouselList;
 				
-				let goodsList = await this.$api.json('goodsList');
-				this.goodsList = goodsList || [];
 				this.initCateList()
+				this.initRecommendGoodsList()
 			},
 			initCateList(){
 				this.$api.httpGet('largeCategory/api/listAll').then(r=>{
@@ -384,11 +385,30 @@
 					this.$api.msg(e.msg||'网络异常请重试')
 				})
 			},
+			initRecommendGoodsList(){
+				this.$api.httpGet('productInfo/api/recommend').then(r=>{
+					console.log("请求结果：",r)
+					if(r.code==0){
+						this.goodsList = r.data
+						this.goodsList.forEach(e=>{
+							e.image=e.imgPath?e.imgPath:''
+						})
+					}
+				}).catch(e=>{
+					console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+				})
+			},
 			//轮播图切换修改背景色
 			swiperChange(e) {
 				const index = e.detail.current;
 				this.swiperCurrent = index;
 				this.titleNViewBackground = this.carouselList[index].background;
+			},
+			navTo(url){
+				uni.navigateTo({
+					url:url
+				})
 			},
 			//详情页
 			navToDetailPage(item) {
@@ -399,6 +419,12 @@
 					url: `/pages/product/factoryPage?id=${id}`
 				})
 			},
+			navToProductDetailPage(item){
+				let id = item.id;
+				uni.navigateTo({
+					url: `/pages/product/product?id=${id}`
+				})
+			}
 		},
 		// #ifndef MP
 		// 标题栏input搜索框点击
@@ -576,10 +602,10 @@
 		/* 原图标颜色太深,不想改图了,所以加了透明度 */
 		image {
 			width: 120upx;
-			height: 100upx;
+			height: 120upx;
 			margin-bottom: 14upx;
 			// border-radius: 50%;
-			opacity: .7;
+			// opacity: .7;
 			box-shadow: 4upx 4upx 20upx rgba(250, 67, 106, 0.3);
 		}
 	}

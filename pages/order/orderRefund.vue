@@ -1,7 +1,7 @@
 <template>
 	<view class="container">
 		<!-- 地址 -->
-		<navigator :url="`/pages/customer/goodsliu?orderId=${orderInfo.id}`" class="address-section" v-if="orderInfo.orderState != 0">
+		<navigator url="/pages/customer/goodsliu" class="address-section" v-if="orderInfo.orderState != 0">
 			<view class="order-content">
 				<text class="yticon icon-shouhuodizhi"></text>
 				<view class="cen">
@@ -17,7 +17,6 @@
 
 		<view class="goods-section">
 			<view class="g-header b-b">
-				<!-- <image class="logo" src="http://duoduo.qibukj.cn/./Upload/Images/20190321/201903211727515.png"></image> -->
 				<text class="name">商品信息</text>
 			</view>
 			<!-- 商品列表 -->
@@ -41,7 +40,7 @@
 				<text class="cell-tip red">{{orderInfo.stateTip}}</text>
 			</view>
 			<view class="yt-list-cell b-b" v-if="orderInfo.orderState != 0">
-				<text class="cell-tit clamp">订单金额</text>
+				<text class="cell-tit clamp">订单总计</text>
 				<text class="cell-tip red">￥{{orderInfo.orderPrice}}</text>
 			</view>
 			<view class="yt-list-cell b-b">
@@ -49,40 +48,18 @@
 				<text class="cell-tip">{{orderInfo.orderNo}}</text>
 			</view>
 			<view class="yt-list-cell b-b">
-				<text class="cell-tit clamp">订单日期</text>
+				<text class="cell-tit clamp">创建时间</text>
 				<text class="cell-tip">{{orderInfo.orderDate}}</text>
 			</view>
-			<view class="yt-list-cell b-b" v-if="orderInfo.orderState != 0">
-				<text class="cell-tit clamp">运费</text>
-				<text class="cell-tip">免运费</text>
+			<view class="yt-list-cell desc-cell">
+				<text class="cell-tit clamp">退款理由</text>
+				<textarea class="desc" v-model="refundReason" placeholder="请填写退款理由" maxlength="100"/>
 			</view>
-			<view class="yt-list-cell b-b" v-if="orderInfo.orderState != 0">
-				<text class="cell-tit clamp">物流公司</text>
-				<text class="cell-tip">韵达快递</text>
-			</view>
-			<view class="yt-list-cell b-b" v-if="orderInfo.orderState != 0">
-				<text class="cell-tit clamp">物流单号</text>
-				<text class="cell-tip">45612644646</text>
-			</view>
-			<!-- <view class="yt-list-cell desc-cell">
-				<text class="cell-tit clamp">备注</text>
-				<input class="desc" type="text" v-model="desc" placeholder="请填写备注信息" placeholder-class="placeholder" />
-			</view> -->
 		</view>
 		
 		<!-- 底部 -->
-		<view class="footer" v-if="orderInfo.orderState != 0 && userInfo.tag==1">
-			<view class="price-content">
-				<text>实付款</text>
-				<text class="price-tip">￥</text>
-				<text class="price">{{orderInfo.orderPrice}}</text>
-			</view>
-			<view class="footer-btn">
-				<button class="submit" :disabled="submitDisabled" v-if="orderInfo.orderState==1" @click="cancelOrder">取消订单</button>
-				<button class="submit" :disabled="submitDisabled" v-if="orderInfo.orderState==2" @click="applyRefund">申请退款</button>
-				<button class="submit" :disabled="submitDisabled" v-if="orderInfo.orderState==3" @click="confirmReceipt">确认收货</button>
-				<button class="submit" :disabled="submitDisabled" v-if="orderInfo.orderState==4" @click="applyFeedback">售后反馈</button>
-			</view>
+		<view class="footer">
+			<button class="confirm-btn" :disabled="submitDisabled" @tap="applyRefund">提交</button>
 		</view>
 
 	</view>
@@ -98,7 +75,8 @@
 			return {
 				id:'',
 				orderInfo:{},//订单信息
-				submitDisabled:false
+				submitDisabled:false,
+				refundReason:''
 			}
 		},
 		onLoad(option){
@@ -116,16 +94,21 @@
 					this.$api.msg(e.msg||'网络异常请重试')
 				})
 			},
-			//取消订单
-			cancelOrder(){
+			//提交申请
+			applyRefund(){
+				if(!this.refundReason){
+					this.$api.msg('请填写退款理由！')
+					return
+				}
 				this.submitDisabled=true
 				this.$api.loading('请求中...')
-				this.$api.httpPost('orderMainInfo/api/delete',{
-					id:this.orderInfo.id
+				this.$api.httpPost('orderMainInfo/api/refund',{
+					id:this.orderInfo.id,
+					refundReason:this.refundReason,
 				}).then(r=>{
 					console.log('请求结果：',r)
 					if(r.code==0){
-						this.$api.msg(r.msg||'取消成功')
+						this.$api.msg(r.msg||'提交成功')
 						uni.navigateTo({
 							url: `/pages/order/order`
 						})
@@ -140,27 +123,6 @@
 					this.$api.msg(e.msg||'网络错误请重试')
 					uni.hideLoading()
 				})
-			},
-			//申请退款
-			applyRefund(){
-				
-			},
-			//确认收货
-			confirmReceipt(){
-				
-			},
-			//申请售后
-			applyFeedback(){
-				
-			},
-			numberChange(data) {
-				this.number = data.number;
-			},
-			changePayType(type){
-				this.payType = type;
-			},
-			submit(){
-				this.$api.msg('确认收货成功！')
 			},
 			//订单状态文字和颜色
 			orderExp(item){
@@ -408,15 +370,18 @@
 		}
 
 		&.desc-cell {
-			.cell-tit {
-				max-width: 90upx;
+			display: flex;
+			justify-content: space-between;
+			.desc {
+				flex: 3;
+				font-size: $font-base;
+				color: $font-color-dark;
+				border: 1px solid #ccc;
+				border-radius: 10rpx;
+				height: 240rpx;
+				line-height: 28rpx;
+				text-indent: 10rpx;
 			}
-		}
-
-		.desc {
-			flex: 1;
-			font-size: $font-base;
-			color: $font-color-dark;
 		}
 	}
 	
@@ -474,27 +439,16 @@
 		z-index: 998;
 		color: $font-color-base;
 		box-shadow: 0 -1px 5px rgba(0,0,0,.1);
-		.price-content{
-			padding-left: 30upx;
-		}
-		.price-tip{
-			color: $base-color;
-			margin-left: 8upx;
-		}
-		.price{
-			font-size: 36upx;
-			color: $base-color;
-		}
-		.footer-btn{
-			.submit{
-				// display:flex;
-				// align-items:center;
-				// justify-content: center;
-				width: 280upx;
-				height: 100%;
-				color: #fff;
-				font-size: 32upx;
-				background-color: $base-color;
+		.confirm-btn{
+			width: 630upx;
+			height: 76upx;
+			line-height: 76upx;
+			border-radius: 50px;
+			background: $uni-color-primary;
+			color: #fff;
+			font-size: $font-lg;
+			&:after{
+				border-radius: 100px;
 			}
 		}
 	}

@@ -13,10 +13,10 @@
 		
 		<view>
 			<!-- 空白页 -->
-			<empty v-if="list.length === 0"></empty>
+			<!-- <empty v-if="list.length === 0"></empty> -->
 			<mescroll-body :bottom='bottom' :up='upOption' @down="downCallback" @up="upCallback" @init="mescrollInit">
 				<!-- 订单列表 -->
-				<view v-for="(item,index) in list" :key="index" class="order-item">
+				<view v-for="(item,index) in list" :key="index" class="order-item" @tap="goOrderXQ(item.id)">
 					<view class="i-top b-b">
 						<text class="time">{{item.orderDate||''}}</text>
 						<text class="state" :style="{color: item.stateTipColor}">{{item.stateTip}}</text>
@@ -27,20 +27,20 @@
 						></text> -->
 					</view>
 					
-					<scroll-view @tap="goOrderXQ(item.id)" v-if="item.orderChildInfoList.length > 1" class="goods-box" scroll-x>
+					<scroll-view v-if="item.orderChildInfoList.length > 1" class="goods-box" scroll-x>
 						<view
 							v-for="(goodsItem, goodsIndex) in item.orderChildInfoList" :key="goodsIndex"
 							class="goods-item"
 						>
-							<image class="goods-img" :src="goodsItem.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
+							<image class="goods-img" :src="goodsItem.productInfo.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
 						</view>
 					</scroll-view>
-					<view @tap="goOrderXQ(item.id)"
+					<view
 						v-if="item.orderChildInfoList.length === 1" 
 						class="goods-box-single"
 						v-for="(goodsItem, goodsIndex) in item.orderChildInfoList" :key="goodsIndex"
 					>
-						<image class="goods-img" :src="goodsItem.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
+						<image class="goods-img" :src="goodsItem.productInfo.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
 						<view class="right">
 							<text class="title clamp">{{goodsItem.productName}}</text>
 							<text class="attr-box">{{goodsItem.productInfo.color}}  x {{goodsItem.productNum}}</text>
@@ -48,17 +48,18 @@
 						</view>
 					</view>
 					
-					<view class="price-box" v-if="item.orderState != 0">
+					<view class="price-box">
 						共
 						<text class="num">{{item.productNum}}</text>
 						件商品 实付款
 						<text class="price">{{item.orderPrice}}</text>
 					</view>
 					<view class="action-box b-t" v-if="item.orderState != 0">
-						<button class="action-btn" v-if="item.orderState==2" :disabled="item.submitDisabled" @click="gototk(item)">申请退款</button>
-						<button class="action-btn" v-if="[3,4].indexOf(item.orderState)>-1" @click="gotowl(item)">查看物流</button>
-						<button class="action-btn" v-if="item.orderState==1" :disabled="item.submitDisabled" @click="cancelOrder(item)">取消订单</button>
-						<button class="action-btn recom" v-if="item.orderState==1" @click="toPay(item)">立即支付</button>
+						<button class="action-btn" v-if="[2,5].indexOf(item.orderState)>-1" :disabled="item.submitDisabled" @tap.stop="gotoRefund(item.id)">申请退款</button>
+						<button class="action-btn" v-if="[3,4].indexOf(item.orderState)>-1" @tap.stop="gotowl(item.id)">查看物流</button>
+						<button class="action-btn" v-if="item.orderState==1" :disabled="item.submitDisabled" @tap.stop="cancelOrder(item)">取消订单</button>
+						<button class="action-btn" v-if="item.orderState==3" :disabled="item.submitDisabled" @tap.stop="confirmReceipt(item)">确认收货</button>
+						<button class="action-btn recom" v-if="item.orderState==1" @tap.stop="toPay(item)">立即支付</button>
 					</view>
 				</view>
 			</mescroll-body>
@@ -68,8 +69,8 @@
 
 <script>
 	import MescrollMixin from "@/components/mescroll-uni/mescroll-mixins.js";
-	import {RESOURCE } from '@/api/resource.js'
 	import {mapState} from 'vuex';
+	import {RESOURCE } from '@/api/resource.js'
 	import empty from "@/components/empty";
 	
 	export default {
@@ -88,9 +89,10 @@
 				navList: [
 					{state: 0,text: '全部'},
 					{state: 1,text: '待付款'},
-					{state: 2,text: '待发货'},
-					{state: 3,text: '待收货'},
-					{state: 4,text: '已完成'}
+					{state: 2,text: '待确认'},
+					{state: 3,text: '待发货'},
+					{state: 4,text: '待收货'},
+					{state: 5,text: '已完成'}
 				],
 				params:{}
 			};
@@ -100,7 +102,7 @@
 			this.tabCurrentIndex = +options.state||0;
 			this.initParams()
 			this.tabClick(this.tabCurrentIndex);
-			// this.loadData()
+			this.loadData()
 		},
 		computed: {
 			...mapState(['hasLogin','userInfo','weChat'])
@@ -126,8 +128,6 @@
 			},
 			/*上拉加载的回调: 其中page.num:当前页 从1开始, page.size:每页数据条数,默认10 */
 			upCallback(mescroll) {
-				console.log('page',mescroll)
-				console.log('this.mescroll',this.mescroll)
 				//联网加载数据
 				let pageNum = mescroll.num; // 页码, 默认从1开始
 				let pageSize = mescroll.size; // 页长, 默认每页10条
@@ -195,30 +195,68 @@
 				this.loadData()
 			},
 			setParams(index){
-				//1：待付款、2待发货、3：待收货、4：已完成
+				//1待付款、2待发货、5待确认、3待收货、4已完成
 				if(index==0){
 					this.params.orderState=''
 				}else if(index==1){
 					this.params.orderState=1
 				}else if(index==2){
-					this.params.orderState=2
+					this.params.orderState=5
 				}else if(index==3){
-					this.params.orderState=3
+					this.params.orderState=2
 				}else if(index==4){
+					this.params.orderState=3
+				}else if(index==5){
 					this.params.orderState=4
 				}
 			},
-			// 售后
-			gototk(){
-				this.$api.msg('敬请期待...')
-				// uni.navigateTo({
-				// 	url:'/pages/customer/customer'
-				// })
+			// 退款
+			gotoRefund(id){
+				uni.navigateTo({
+					url:`/pages/order/orderRefund?id=${id}`
+				})
 			},
 			// 物流
-			gotowl(){
+			gotowl(id){
 				uni.navigateTo({
-					url:'/pages/customer/goodsliu'
+					url:`/pages/customer/goodsliu?orderId=${id}`
+				})
+			},
+			//确认收货
+			confirmReceipt(item){
+				let _this = this
+				uni.showModal({
+					title:'温馨提示',
+					content:'您是否收到该订单商品？',
+					cancelText:'未收货',
+					confirmText:'已收货',
+					success: function (res) {
+						if (res.confirm) {
+							console.log('用户点击确定');
+							item.submitDisabled=true
+							_this.$api.loading('请求中...')
+							_this.$api.httpPost('orderMainInfo/api/update',{
+								id:item.id
+							}).then(r=>{
+								console.log('请求结果：',r)
+								if(r.code==0){
+									_this.$api.msg(r.msg||'操作成功')
+									_this.loadData()
+								}else{
+									item.submitDisabled=false
+									_this.$api.msg(r.msg||'网络错误请重试')
+								}
+								uni.hideLoading()
+							}).catch(e=>{
+								item.submitDisabled=false
+								console.log('请求错误：',e)
+								item.$api.msg(e.msg||'网络错误请重试')
+								uni.hideLoading()
+							})
+						} else if (res.cancel) {
+							console.log('用户点击取消');
+						}
+					}
 				})
 			},
 			//取消订单

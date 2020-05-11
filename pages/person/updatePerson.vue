@@ -40,7 +40,7 @@
 			<view class="input-item2">
 				<text class="tit" @tap="uploadCert">上传营业执照</text>
 			</view>
-			<view class="cell-img"><image :src="showImg" mode=""></image></view>
+			<view class="cell-img" @tap.stop="previewImg(showImg)"><image :src="showImg" mode=""></image></view>
 		</view>
 		
 		<button class="confirm-btn" @tap="saveUser">保存</button>
@@ -177,6 +177,22 @@
 					return false
 				}
 				return true
+			},
+			previewImg(imgUrl){
+				// 预览图片
+				let imgList = [imgUrl]
+				uni.previewImage({
+					urls: imgList,
+					longPressActions: {
+						itemList: ['发送给朋友', '保存图片', '收藏'],
+						success: function(data) {
+							console.log('选中了第' + (data.tapIndex + 1) + '个按钮,第' + (data.index + 1) + '张图片');
+						},
+						fail: function(err) {
+							console.log(err.errMsg);
+						}
+					}
+				});
 			}
 		}
 	}

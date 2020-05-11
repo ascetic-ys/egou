@@ -9,14 +9,14 @@
 					v-for="(goodsItem, goodsIndex) in orderInfo.orderChildInfoList" :key="goodsIndex"
 					class="goods-item"
 				>
-					<image class="goods-img" :src="goodsItem.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
+					<image class="goods-img" :src="goodsItem.productInfo.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
 				</view>
 			</scroll-view>
 			<view class="goods-box-single"
 				v-if="orderInfo.orderChildInfoList.length === 1" 
 				v-for="(goodsItem, goodsIndex) in orderInfo.orderChildInfoList" :key="goodsIndex"
 			>
-				<image class="goods-img" :src="goodsItem.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
+				<image class="goods-img" :src="goodsItem.productInfo.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
 				<view class="right">
 					<text class="title clamp">{{goodsItem.productName}}</text>
 					<text class="attr-box">{{goodsItem.productInfo.color}}  x {{goodsItem.productNum}}</text>
@@ -118,29 +118,30 @@
 			//确认支付
 			paySubmit: async function() {
 				this.disabledPay=true
-				this.$api.httpPost('orderMainInfo/api/pay',this.orderInfo).then(r=>{
+				console.log("支付请求：",this.orderInfo)
+				this.$api.httpPost('wechatPayInfo/api/payMoney',this.orderInfo).then(r=>{
 					console.log("支付结果：",r)
 					if(r.code==0){
 						let _this = this
 						uni.requestPayment({
 							provider: 'wxpay',
-							timeStamp: r.resp.timeStamp,
-							nonceStr: r.resp.nonceStr,
-							package: r.resp.package,
-							signType: r.resp.signType,
-							paySign: r.resp.sign,
+							timeStamp: r.data.resp.timeStamp,
+							nonceStr: r.data.resp.nonceStr,
+							package: r.data.resp.package,
+							signType: r.data.resp.signType,
+							paySign: r.data.resp.sign,
 							success: function (res) {
 								console.log('success:' + JSON.stringify(res));
-								this.$api.msg(r.msg||'支付成功')
+								// this.$api.msg(r.msg||'支付成功')
 								//跳转至支付结果
 								uni.redirectTo({
-									url: '/pages/money/paySuccess'
+									url: `/pages/money/paySuccess?id=${_this.orderInfo.id}`
 								})
 							},
 							fail: function (err) {
 								console.log('fail:' + JSON.stringify(err));
-								this.$api.msg(err||'网络异常请重试')
-								this.disabledPay=false;
+								_this.$api.msg(err||'网络异常请重试')
+								_this.disabledPay=false;
 							}
 						});
 					}else{
@@ -149,6 +150,7 @@
 					}
 					uni.hideLoading()
 				}).catch(e=>{
+					console.log("请求错误：",e)
 					uni.hideLoading()
 					this.disabledPay=false;
 					this.$api.msg(e.msg||'网络异常请重试')

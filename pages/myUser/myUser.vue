@@ -2,8 +2,8 @@
 	<view class="content">
 		<view class="navbar">
 			<view class="order-numb">
-				<text>今日新增：<text class="num">12</text></text>
-				<text>客户总量：<text class="num">{{list.length}}</text></text>
+				<text>今日新增：<text class="num">{{newUsers||0}}</text></text>
+				<text>客户总量：<text class="num">{{totalUsers||0}}</text></text>
 			</view>
 		</view>
 
@@ -14,27 +14,27 @@
 			<!-- 订单列表 -->
 			<view v-for="(item,index) in list" :key="index" class="order-item">
 				<view class="i-top b-b">
-					<text class="time">客户名称：{{item.userName}}</text>
+					<text class="time">客户名称：{{item.user.userName}}</text>
 				</view>
 				<view class="goods-box-single">
 					<view class="right">
 						<view class="orderLItem">
-							<text>联系人：{{item.linkMan}}</text>
+							<text>联系人：{{item.user.linkMan}}</text>
 						</view>
 						<view class="orderLItem">
-							<text>联系电话：{{item.phoneNumber}}</text>
+							<text>联系电话：{{item.user.phoneNumber}}</text>
 						</view>
 						<view class="orderLItem">
-							<text>公司地址：{{item.companyAddress}}</text>
+							<text>公司地址：{{item.user.companyAddress}}</text>
 						</view>
 					</view>
 				</view>
 				
 				<view class="price-box">
 					共买过
-					<text class="num">100</text>
+					<text class="num">{{item.totalProductNum||0}}</text>
 					件商品 累计消费
-					<text class="price">1430.7元</text>
+					<text class="price">{{item.totalPrice||0}}元</text>
 				</view>
 			</view>
 		</view>
@@ -53,6 +53,8 @@
 		data() {
 			return {
 				params:{},
+				newUsers:0,
+				totalUsers:0,
 				list:[]
 			};
 		},
@@ -95,7 +97,7 @@
 					// this.mescroll.endByPage(r.length, r.total); //必传参数(当前页的数据个数, 总页数)
 								
 					//方法二(推荐): 后台接口有返回列表的总数据量 totalSize
-					this.mescroll.endBySize(this.list.length, r.total); //必传参数(当前页的数据个数, 总数据量)
+					this.mescroll.endBySize(this.list.length, this.totalUsers); //必传参数(当前页的数据个数, 总数据量)
 								
 					//方法三(推荐): 您有其他方式知道是否有下一页 hasNext
 					//this.mescroll.endSuccess(curPageData.length, hasNext); //必传参数(当前页的数据个数, 是否有下一页true/false)
@@ -121,10 +123,12 @@
 				}).then(r=>{
 					console.log("请求结果：",r)
 					if(pageNum===1){
-						this.list=r.rows
+						this.list=r.data.rows
 					}else{
-						this.list=this.list.concat(r.rows)
+						this.list=this.list.concat(r.data.rows)
 					}
+					this.newUsers=r.data.newUsers
+					this.totalUsers=r.data.totalUsers
 					return r
 				}).catch(e=>{
 					console.log("请求错误：",e)

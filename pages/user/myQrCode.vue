@@ -25,7 +25,6 @@
 
 <script>
 	import {mapState} from 'vuex';
-	import {RESOURCE} from '@/api/resource.js'
 	
 	export default {
 		data(){
@@ -36,55 +35,43 @@
 			}
 		},
 		onLoad(){
-			// this.getAccessToken()
-			// this.createQrCode()
+			this.createQrCode()
 		},
 		computed: {
 			...mapState(['hasLogin','userInfo','weChat'])
 		},
 		methods: {
-			createQrCode(){
-				var that = this;
-				this.getAccessToken()
-				let url = 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token='+this.access_token
-				// 生成页面的二维码
-				uni.request({
-					//注意：下面的access_token值可以不可以直接复制使用，需要自己请求获取
-					url: url,
-					data: {
-						width: 600,
-						scene: 'pUserId='+that.userInfo.id+'&phoneNumber='+that.userInfo.phoneNumber,
-						page: "pages/public/regist"  //这里按照需求设置值和参数   
-					},
-					method: "POST",
-					responseType: 'arraybuffer',  //设置响应类型
-					success(res) {
-						console.log(res)
-						that.qrCodeImage = 'data:image/png;base64,'+uni.arrayBufferToBase64(res.data);  //对数据进行转换操作
-					},
-					fail(e) {
-						console.log(e)
-					}
+			async createQrCode(){
+				this.$api.httpPost('wechatPayInfo/api/getAccessToken').then(r=>{
+					console.log("请求结果：",r)
+					this.access_token=r.data.access_token
+					this.expires_in=r.data.expires_in
+					var that = this;
+					let url = 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token='+this.access_token
+					// 生成页面的二维码
+					uni.request({
+						//注意：下面的access_token值可以不可以直接复制使用，需要自己请求获取
+						url: url,
+						data: {
+							width: 600,
+							scene: 'pUserId='+that.userInfo.id+'&phoneNumber='+that.userInfo.phoneNumber,
+							page: "pages/public/regist"  //这里按照需求设置值和参数   
+						},
+						method: "POST",
+						responseType: 'arraybuffer',  //设置响应类型
+						success(res) {
+							console.log(res)
+							that.qrCodeImage = 'data:image/png;base64,'+uni.arrayBufferToBase64(res.data);  //对数据进行转换操作
+						},
+						fail(e) {
+							console.log(e)
+						}
+					})
+				}).catch(e=>{
+					console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
 				})
-			},
-			getAccessToken(){
-				let _this = this
-				let url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential'
-				url += '&appid='+RESOURCE.appid+'&secret='+RESOURCE.secert
-				uni.request({
-					//注意：下面的access_token值可以不可以直接复制使用，需要自己请求获取
-					url: url,
-					data: {},
-					method: "GET",
-					success(res) {
-						console.log(res)
-						_this.access_token=res.data.access_token
-						_this.expires_in=res.data.expires_in
-					},
-					fail(e) {
-						console.log(e)
-					}
-				})
+				
 			}
 		}
 	}

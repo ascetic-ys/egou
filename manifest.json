@@ -1,5 +1,5 @@
 {
-    "name" : "E-购",
+    "name" : "地垫E购通",
     "appid" : "__UNI__00BB2A1",
     "description" : "",
     "versionName" : "1.0.0",
@@ -58,7 +58,7 @@
     "mp-weixin" : {
         /* 小程序特有相关 */
         "usingComponents" : true,
-        "appid" : "wx06c619704536ab15",
+        "appid" : "wx2b13999266897202",
         "setting" : {
             "urlCheck" : false
         }
