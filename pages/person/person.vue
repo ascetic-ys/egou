@@ -163,7 +163,7 @@
 			right: 20upx;
 			overflow: hidden;
 			width: 60upx;
-			height: 80upx;
+			height: 60upx;
 			image {
 				width: 100%;
 				height: 100%;

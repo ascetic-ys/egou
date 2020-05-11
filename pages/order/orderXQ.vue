@@ -21,7 +21,7 @@
 				<text class="name">商品信息</text>
 			</view>
 			<!-- 商品列表 -->
-			<view class="g-item" v-for="(product,pi) in orderInfo.orderChildInfoList" :key='pi'>
+			<view class="g-item" v-for="(product,pi) in orderInfo.orderChildInfoList" :key='pi' @click="navToProductDetailPage(product.productInfo)">
 				<image :src="product.productInfo.imgPath||`https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=298298368,1308836146&fm=26&gp=0.jpg`"></image>
 				<view class="right">
 					<text class="title clamp">{{product.productInfo.brand}}{{product.productInfo.productName}}{{product.productInfo.largeCategory}}{{product.productInfo.littleCategory}}</text>
@@ -64,6 +64,12 @@
 				<text class="cell-tit clamp">物流单号</text>
 				<text class="cell-tip">45612644646</text>
 			</view>
+			<view class="yt-list-cell b-b" v-if="orderInfo.orderState != 0">
+				<text class="cell-tit clamp">行驶证</text>
+				<view class="cell-img2" @tap.stop="previewImg(showImage)">
+					<image :src="showImage" mode=""></image>
+				</view>
+			</view>
 			<!-- <view class="yt-list-cell desc-cell">
 				<text class="cell-tit clamp">备注</text>
 				<input class="desc" type="text" v-model="desc" placeholder="请填写备注信息" placeholder-class="placeholder" />
@@ -90,6 +96,7 @@
 
 <script>
 	import {mapState} from 'vuex';
+	import {RESOURCE } from '@/api/resource.js'
 	export default {
 		computed: {
 			...mapState(['hasLogin','userInfo','weChat'])
@@ -98,6 +105,7 @@
 			return {
 				id:'',
 				orderInfo:{},//订单信息
+				showImage:'',
 				submitDisabled:false
 			}
 		},
@@ -110,11 +118,28 @@
 				this.$api.httpPost('orderMainInfo/api/detail',{id:this.id}).then(r=>{
 					console.log("请求结果：",r)
 					this.orderInfo=r.data
+					this.showImage=this.orderInfo.filePath?RESOURCE.URL_SHOW+this.orderInfo.filePath:''
 					this.orderInfo = Object.assign(this.orderInfo, this.orderExp(this.orderInfo));
 				}).catch(e=>{
 					console.log("请求错误：",e)
 					this.$api.msg(e.msg||'网络异常请重试')
 				})
+			},
+			previewImg(imgUrl){
+				// 预览图片
+				let imgList = [imgUrl]
+				uni.previewImage({
+					urls: imgList,
+					longPressActions: {
+						itemList: ['发送给朋友', '保存图片', '收藏'],
+						success: function(data) {
+							console.log('选中了第' + (data.tapIndex + 1) + '个按钮,第' + (data.index + 1) + '张图片');
+						},
+						fail: function(err) {
+							console.log(err.errMsg);
+						}
+					}
+				});
 			},
 			//取消订单
 			cancelOrder(){
@@ -189,6 +214,14 @@
 				}
 				let submitDisabled=false
 				return {stateTip, stateTipColor,submitDisabled};
+			},
+			//详情
+			navToProductDetailPage(item){
+				//测试数据没有写id，用title代替
+				let id = item.id;
+				uni.navigateTo({
+					url: `/pages/product/product?id=${id}`
+				})
 			},
 			stopPrevent(){}
 		}
@@ -417,6 +450,18 @@
 			flex: 1;
 			font-size: $font-base;
 			color: $font-color-dark;
+		}
+		.cell-img2{
+			position: absolute;
+			top: 16upx;
+			right: 20upx;
+			overflow: hidden;
+			width: 60upx;
+			height: 60upx;
+			image {
+				width: 100%;
+				height: 100%;
+			}
 		}
 	}
 	

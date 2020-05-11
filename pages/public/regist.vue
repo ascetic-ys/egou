@@ -121,6 +121,13 @@
 						/>
 					</view>
 					<view class="input-item">
+						<text class="tit">省市区</text>
+						<view class="input">
+							<!-- {{form.addressName}} -->
+							<pickerAddress @change="changeAddress">{{form.addressName}}</pickerAddress>
+						</view>
+					</view>
+					<view class="input-item">
 						<text class="tit">公司地址</text>
 						<input 
 							type="" 
@@ -186,11 +193,13 @@
 	import {wxToAuth} from '@/api/login.js'
 	import {RESOURCE } from '@/api/resource.js'
 	import {isMobile,isPwd,isAccount,isPhone,isEmail} from '@/api/validate.js'
+	import pickerAddress from '@/components/pickerAddress/pickerAddress.vue'
 	import jyfParser from '@/components/jyf-parser/jyf-parser'; // HBuilderX 2.5.5 及以上可以不需要
 	
 	export default{
 		components:{
-			jyfParser
+			jyfParser,
+			pickerAddress
 		},
 		data(){
 			return {
@@ -203,10 +212,15 @@
 					userPassword: '',
 					companyName:'',
 					companyAddress:'',
+					addressName:'请选择省市区',
+					address:'',
 					linkMan:'',
 					phoneNumber: '',
 					officePhone:'',
 					filePath:'',
+					province:'',
+					city:'',
+					district:'',
 					salesPersonPhoneNumber:''
 				},
 				showImg:'',
@@ -515,7 +529,7 @@
 				this.form.salesPersonPhoneNumber = scence.phoneNumber
 			}
 			this.form.userName = this.weChat.nickName
-			this.form.sex=this.weChat.gender==1?0:1
+			this.form.sex=this.weChat.gender==0?1:0
 			
 			this.$refs.article.setContent(this.agreement);
 		},
@@ -527,6 +541,15 @@
 			inputChange(e){
 				const key = e.currentTarget.dataset.key;
 				this.form[key] = e.detail.value;
+			},
+			changeAddress(data){
+				console.log('选择省市区',data.data)
+				this.form.province=data.data[0]
+				this.form.city=data.data[1]
+				this.form.district=data.data[2]
+				this.form.addressName = data.data.join('');
+				this.form.address = data.data.join('');
+				console.log('省市区',data.data.join(''))
 			},
 			// switchTypeChange(e){
 			// 	console.log("switch:",e.detail.value)
@@ -687,6 +710,10 @@
 				}
 				if(!isPhone(this.form.officePhone)){
 					this.$api.msg('办公电话格式不正确')
+					return false
+				}
+				if(!this.form.address){
+					this.$api.msg('请选择省市区')
 					return false
 				}
 				if(!this.form.companyAddress){
@@ -855,6 +882,18 @@
 			font-size: $font-base + 2upx;
 			color: $font-color-dark;
 			width: 100%;
+		}
+		.input{
+			height: 60upx;
+			font-size: $font-base + 2upx;
+			color: $font-color-dark;
+			width: 100%;
+			picker{
+				height: 60upx;
+				font-size: $font-base + 2upx;
+				color: $font-color-dark;
+				width: 100%;
+			}
 		}
 		.content{
 			display: flex;
