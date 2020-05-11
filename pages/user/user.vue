@@ -92,7 +92,8 @@
 				</view>
 				<view class="right">
 					<text class="title">今日订单数</text>
-					<text class="num">{{orderNum}}</text>
+					<text class="num">{{todayOrderNum}}</text>
+					<text class="static">较上日{{yesterdayOrderNum}}{{['减少','持平','增加'][todayOrderNumUp]}}<text v-if="todayOrderNumUp!=1">{{todayOrderNumChange}}</text></text>
 				</view>
 			</view>
 			<view class="order-panel" v-if='[0,3].indexOf(userInfo.tag)>-1'>
@@ -101,7 +102,8 @@
 				</view>
 				<view class="right">
 					<text class="title">今日订单额</text>
-					<text class="num">{{orderPrice}}</text>
+					<text class="num">{{todayOrderPrice}}</text>
+					<text class="static">较上日{{yesterdayOrderPrice}}{{['减少','持平','增加'][todayOrderPriceUp]}}<text v-if="todayOrderPriceUp!=1">{{todayOrderPriceChange}}</text></text>
 				</view>
 			</view>
 			<view class="order-panel" v-if='userInfo.tag==3'>
@@ -110,7 +112,8 @@
 				</view>
 				<view class="right">
 					<text class="title">今日注册用户</text>
-					<text class="num">{{clientNum}}</text>
+					<text class="num">{{todayUser}}</text>
+					<text class="static">较上日{{yesterdayUser}}{{['减少','持平','增加'][todayUserUp]}}<text v-if="todayUserUp!=1">{{todayUserChange}}</text></text>
 				</view>
 			</view>
 			<view class="ad-1">
@@ -206,9 +209,21 @@
 				coverTransform: 'translateY(0px)',
 				coverTransition: '0s',
 				moving: false,
-				orderNum:0,
-				orderPrice:0,
-				clientNum:0
+				todayOrderPrice:0,//	今日新增订单总金额
+				todayOrderPriceUp:0,//	今日新增订单总金额较昨日是否增加-1减少，0持平，1增加
+				todayOrderPriceChange:0,//	今日新增订单总金额较昨日变化值
+				todayOrderNum:0,//	今日新增订单数量
+				todayOrderNumUp:0,//	今日新增订单数量较昨日是否增加-1减少，0持平，1增加
+				todayOrderNumChange:0,//	今日新增订单数量较昨日变化值
+				todayProductNum:0,//	今日新增订单商品总数量
+				yesterdayOrderPrice:0,//	昨日新增订单总金额
+				yesterdayOrderNum:0,//	昨日新增订单数量
+				yesterdayProductNum:0,//	昨日新增订单商品总数量
+				todayUser:0,//	今日新增用户
+				todayUserUp:0,//	今日新增用户较昨日是否增加-1减少，0持平，1增加
+				todayUserChange:0,//	今日新增用户较昨日变化值
+				yesterdayUser:0,//	昨日新增用户
+				
 			}
 		},
 		onLoad(){
@@ -244,47 +259,71 @@
 			initData(){
 				this.initPageTitle()
 				if(this.userInfo.tag==0){
-					this.$api.httpPost('orderMainInfo/api/list',{
-						pageNum:1,
-						pageSize:10,
-						queryType:"day",
-					}).then(r=>{
-						console.log("请求结果：",r)
-						this.orderNum=r.total||0
-						this.orderPrice=r.totalPrice||0
-					}).catch(e=>{
-						console.log("请求错误：",e)
-						this.$api.msg(e.msg||'网络异常请重试')
-					})
+					this.getNewOrder()
 				}else if(this.userInfo.tag==3){
-					this.$api.httpPost('userInfo/api/myCustomer',{
-						pageNum:1,
-						pageSize:10,
-						id:this.userInfo.id
-					}).then(r=>{
-						console.log("请求结果：",r)
-						this.clientNum=r.data.newUsers||0
-					}).catch(e=>{
-						console.log("请求错误：",e)
-						this.$api.msg(e.msg||'网络异常请重试')
-					})
-					
-					this.$api.httpPost('userInfo/api/myGrade',{
-						pageNum:1,
-						pageSize:10,
-						id:this.userInfo.id,
-						orderDateStart:this.getDate(),
-						orderDateEnd:this.getDate()
-					}).then(r=>{
-						console.log("请求结果：",r)
-						this.orderNum=r.data.totalNum||0
-						this.orderPrice=r.data.totalPrice||0
-						return r
-					}).catch(e=>{
-						console.log("请求错误：",e)
-						this.$api.msg(e.msg||'网络异常请重试')
-					})
+					this.getNewUser()
+					this.getNewOrder()
 				}
+			},
+			getNewOrder(){
+				let params={}
+				if(this.userInfo.tag==3){
+					params={
+						salesManId:this.userInfo.id
+					}
+				}
+				this.$api.httpPost('userInfo/api/newOrder',{
+					...params
+				}).then(r=>{
+					console.log("商家新增订单请求结果：",r)
+					this.todayOrderNum=r.data.todayOrderNum||0
+					this.yesterdayOrderNum=r.data.yesterdayOrderNum||0
+					this.todayOrderNumChange=this.todayOrderNum-this.yesterdayOrderNum
+					if(this.todayOrderNumChange<0){
+						this.todayOrderNumUp=0
+					}else if(this.todayOrderNumChange==0){
+						this.todayOrderNumUp=1
+					}else if(this.todayOrderNumChange>0){
+						this.todayOrderNumUp=2
+					}
+					this.todayOrderPrice=r.data.todayOrderPrice||0
+					this.yesterdayOrderPrice=r.data.yesterdayOrderPrice||0
+					this.todayOrderPriceChange=this.todayOrderPrice-this.yesterdayOrderPrice
+					if(this.todayOrderPriceChange<0){
+						this.todayOrderPriceUp=0
+					}else if(this.todayOrderPriceChange==0){
+						this.todayOrderPriceUp=1
+					}else if(this.todayOrderPriceChange>0){
+						this.todayOrderPriceUp=2
+					}
+					
+					this.todayOrderNumChange=Math.abs(this.todayOrderNumChange);
+					this.todayOrderPriceChange=Math.abs(this.todayOrderPriceChange);
+				}).catch(e=>{
+					console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+				})
+			},
+			getNewUser(){
+				this.$api.httpPost('userInfo/api/newUser',{
+					id:this.userInfo.id
+				}).then(r=>{
+					console.log("销售人员新增客户请求结果：",r)
+					this.todayUser=r.data.todayUser||0
+					this.yesterdayUser=r.data.yesterdayUser||0
+					this.todayUserChange=this.todayUser-this.yesterdayUser
+					if(this.todayUserChange<0){
+						this.todayUserUp=0
+					}else if(this.todayUserChange==0){
+						this.todayUserUp=1
+					}else if(this.todayUserChange>0){
+						this.todayUserUp=2
+					}
+					this.todayUserChange=Math.abs(this.todayUserChange);
+				}).catch(e=>{
+					console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+				})
 			},
 			getDate(type) {
 				const date = new Date();
@@ -585,14 +624,14 @@
 	}
 	
 	.order-panel{
-		height: 160rpx;
+		height: 190rpx;
 		margin: 20rpx 0;
 		background: #fff;
 		padding: 10rpx;
 		.left{
 			float: left;
-			width: 140rpx;
-			height: 140rpx;
+			width: 170rpx;
+			height: 170rpx;
 			display: flex;
 			align-items: center;
 			justify-content: space-around;
@@ -609,10 +648,15 @@
 			flex-direction: column;
 			.title{
 				color: #fa436a;
-				line-height: 60rpx;
+				line-height: 50rpx;
 			}
 			.num{
-				line-height: 60rpx;
+				line-height: 50rpx;
+			}
+			.static{
+				color: green;
+				line-height: 50rpx;
+				text-align: right;
 			}
 			
 		}
