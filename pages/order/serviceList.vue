@@ -55,9 +55,9 @@
 			</mescroll-body>
 		</view>
 		
-		<view class="feedback-add">
+		<!-- <view class="feedback-add">
 			<button @click="toFeedbackAdd"><text class="yticon icon-jia1"></text></button>
-		</view>
+		</view> -->
 	</view>
 </template> 
 

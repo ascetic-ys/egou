@@ -69,7 +69,66 @@
 				"navigationBarTitleText": "设置"
 			}
 		},
-
+		{
+			"path": "pages/set/service",
+			"style": {
+				"navigationBarTitleText": "服务须知"
+			}
+		},
+		{
+			"path": "pages/set/aboutUs",
+			"style": {
+				"navigationBarTitleText": "关于我们"
+			}
+		},
+		{
+			"path": "pages/set/protocolPartner",
+			"style": {
+				"navigationBarTitleText": "合伙人协议"
+			}
+		},
+		{
+			"path": "pages/set/protocolReg",
+			"style": {
+				"navigationBarTitleText": "用户注册协议"
+			}
+		},
+		{
+			"path": "pages/set/protocolSecret",
+			"style": {
+				"navigationBarTitleText": "用户隐私协议"
+			}
+		},
+		{
+			"path": "pages/order/favoriteList",
+			"style": {
+				"navigationBarTitleText": "我的收藏"
+			}
+		},
+		{
+			"path": "pages/order/historyList",
+			"style": {
+				"navigationBarTitleText": "浏览足迹"
+			}
+		},
+		{
+			"path": "pages/order/opinionList",
+			"style": {
+				"navigationBarTitleText": "意见反馈列表"
+			}
+		},
+		{
+			"path": "pages/order/opinionAdd",
+			"style": {
+				"navigationBarTitleText": "意见反馈"
+			}
+		},
+		{
+			"path": "pages/order/opinionDetail",
+			"style": {
+				"navigationBarTitleText": "意见反馈详情"
+			}
+		},
 		{
 			"path": "pages/userinfo/userinfo",
 			"style": {
@@ -306,6 +365,42 @@
             "style" : {
 				"navigationBarTitleText": "修改密码"
 			}
+        }
+        ,{
+            "path" : "pages/partner/partner",
+            "style" : {
+            	"navigationBarTitleText": "城市合伙人注册"
+            }
+        },{
+            "path" : "pages/partner/partnerPay",
+            "style" : {
+            	"navigationBarTitleText": "合伙人会员费用支付"
+            }
+        },{
+            "path" : "pages/partner/partnerProtocol",
+            "style" : {
+            	"navigationBarTitleText": "合伙人协议"
+            }
+        },{
+            "path" : "pages/partner/partnerVipPay",
+            "style" : {
+            	"navigationBarTitleText": "会员费用支付"
+            }
+        },{
+            "path" : "pages/partner/partnerProtocolDetail",
+            "style" : {
+            	"navigationBarTitleText": "协议详情"
+            }
+        },{
+            "path" : "pages/partner/paySuccess",
+            "style" : {
+            	"navigationBarTitleText": "支付成功"
+            }
+        },{
+            "path" : "pages/partner/partnerProtocolAgree",
+            "style" : {
+            	"navigationBarTitleText": "城市合伙人协议"
+            }
         }
     ],
 	"globalStyle": {

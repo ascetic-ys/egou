@@ -2,21 +2,12 @@
 	<view class="container">
 		<view class="yt-list">
 			<view class="yt-list-cell desc-cell">
-				<text class="cell-tit clamp">反馈描述</text>
-				<textarea class="desc" v-model="description" placeholder="请填写反馈描述" maxlength="100"/>
+				<text class="cell-tit clamp">标题</text>
+				<input class="input" v-model="title" placeholder="请填写标题" maxlength="50"/>
 			</view>
-			<view class="upload-list" hover-class="cell-hover" :hover-stay-time="50">
-				<view class="upload-item">
-					<text class="tit" @tap="uploadImage">上传图片</text>
-				</view>
-				<view class="cell-img">
-					<view class="image-box" v-for="(item,index) in imgList" :key="index" @tap="viewImage">
-						<image :src="item" mode=""></image>
-						<view class="cu-tag bg-red" @tap.stop="delImg" :data-index="index">
-							<text class='yticon icon-fork'></text>
-						</view>
-					</view>
-				</view>
+			<view class="yt-list-cell desc-cell">
+				<text class="cell-tit clamp">内容</text>
+				<textarea class="desc" v-model="content" placeholder="请填写内容" maxlength="500"/>
 			</view>
 		</view>
 		
@@ -35,17 +26,12 @@
 		data() {
 			return {
 				submitDisabled:false,
-				description:'',
-				orderId:'',
-				orderNo:'',
+				title:'',
+				content:'',
 				params:{},
-				imgList:[],//选择的图片
-				imageList:[],//图片地址
 			}
 		},
-		async onLoad(options){
-			this.orderId=options.orderId
-			this.orderNo=options.orderNo
+		async onLoad(){
 			this.initParams()
 		},
 		computed: {
@@ -56,32 +42,29 @@
 				this.params={
 					userId: this.userInfo.id,
 					userName: this.userInfo.userName,
-					description:this.description,
-					orderId:this.orderId,
-					orderNo:this.orderNo,
-					uploadFiles:this.imageList
+					content:this.content,
+					title:this.title
 				}
 			},
 			//提交
 			async submit(){
-				this.imageList = await this.uploads()
-				if(!this.description){
-					this.$api.msg('请填写反馈描述！')
+				if(!this.title){
+					this.$api.msg('请填写标题！')
 					return
 				}
-				if(!this.imageList || this.imageList.length==0){
-					this.$api.msg('请上传图片！')
+				if(!this.content){
+					this.$api.msg('请填写内容！')
 					return
 				}
 				this.initParams()
 				this.submitDisabled=true
 				this.$api.loading('请求中...')
-				this.$api.httpPost('customerFeedback/api/save',this.params).then(r=>{
+				this.$api.httpPost('opinionFeedback/api/save',this.params).then(r=>{
 					console.log('请求结果：',r)
 					if(r.code==0){
 						this.$api.msg(r.msg||'提交成功')
 						uni.navigateTo({
-							url: `/pages/order/serviceList`
+							url: `/pages/order/opinionList`
 						})
 					}else{
 						this.submitDisabled=false
@@ -95,56 +78,6 @@
 					uni.hideLoading()
 				})
 			},
-			uploadImage(){
-				let _this = this
-				uni.chooseImage().then(r=>{
-					const [err,res]=r
-					if(err){return}
-					_this.imgList = res.tempFilePaths;
-				})
-			},
-			//小程序不支持多文件上传 
-			async uploads(){ 
-				const that=this
-				let arr=[]
-				for (let k in that.imgList) {
-					let data = await that.uploadImageOne(that.imgList[k])
-					arr[k] = data.msg
-				} 
-				return arr
-			},
-			uploadImageOne(url){
-				return new Promise((resolve, reject) => {  
-					uni.uploadFile({
-						url: RESOURCE.URL_API + 'orderMainInfo/api/uploadImage', //仅为示例，非真实的接口地址
-						filePath: url,
-						name: 'uploadFile',
-						success: (uploadFileRes) => { 
-							resolve(JSON.parse(uploadFileRes.data));  
-						}
-					});
-				})  
-			},
-			viewImage(e) {
-				uni.previewImage({
-					urls: this.imgList,
-					current: e.currentTarget.dataset.url
-				});
-			},
-			delImg(e) {
-				console.log("e:",e,e.currentTarget.dataset.index)
-				uni.showModal({
-					title: '删除',
-					content: '确定要删除吗？',
-					cancelText: '否',
-					confirmText: '是',
-					success: res => {
-						if (res.confirm) {
-							this.imgList.splice(e.currentTarget.dataset.index, 1)
-						}
-					}
-				})
-			}
 		}
 	}
 </script>
@@ -360,12 +293,21 @@
 				color: $base-color;
 			}
 		}
+		.input{
+			flex: 5;
+			font-size: $font-base;
+			color: $font-color-dark;
+			border: 1px solid #ccc;
+			border-radius: 10rpx;
+			padding: 10rpx;
+			height: 80rpx;
+		}
 
 		&.desc-cell {
 			display: flex;
 			justify-content: space-between;
 			.desc {
-				flex: 3;
+				flex: 5;
 				font-size: $font-base;
 				color: $font-color-dark;
 				border: 1px solid #ccc;

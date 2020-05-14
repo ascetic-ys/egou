@@ -119,7 +119,9 @@
 			paySubmit: async function() {
 				this.disabledPay=true
 				console.log("支付请求：",this.orderInfo)
-				this.$api.httpPost('wechatPayInfo/api/payMoney',this.orderInfo).then(r=>{
+				let params = this.orderInfo
+				params.type=1
+				this.$api.httpPost('wechatPayInfo/api/payMoney',params).then(r=>{
 					console.log("支付结果：",r)
 					if(r.code==0){
 						let _this = this

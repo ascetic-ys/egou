@@ -126,10 +126,10 @@
 				<text class="yticon icon-gouwuche"></text>
 				<text>购物车</text>
 			</navigator>
-			<!-- <view class="p-b-btn" :class="{active: favorite}" @click="toFavorite">
+			<view class="p-b-btn" :class="{active: favorite}" @click="toFavorite">
 				<text class="yticon icon-shoucang"></text>
 				<text>收藏</text>
-			</view> -->
+			</view>
 			
 			<view class="action-btn-group">
 				<button type="primary" class=" action-btn no-border buy-now-btn" @click="buy">立即购买</button>
@@ -216,26 +216,8 @@
 				product:{},
 				favorite: true,
 				shareList: [],
-				imgList: [
-					{
-						src: 'https://cbu01.alicdn.com/img/ibank/2017/204/302/4522203402_1844785635.220x220.jpg?_=2020'
-					},
-					{
-						src: 'https://cbu01.alicdn.com/img/ibank/2018/846/325/8891523648_387505191.220x220.jpg?_=2020'
-					},
-					{
-						src: 'https://cbu01.alicdn.com/img/ibank/2019/955/924/11733429559_1422859246.220x220.jpg?_=2020'
-					}
-				],
-				desc: `
-					<div style="width:100%">
-						<img style="width:100%;display:block;" src="https://cbu01.alicdn.com/img/ibank/2019/673/299/11580992376_864454145.220x220.jpg?_=2020" />
-						<img style="width:100%;display:block;" src="https://cbu01.alicdn.com/img/ibank/2018/495/677/9194776594_1324667211.220x220.jpg?_=2020" />
-						<img style="width:100%;display:block;" src="https://cbu01.alicdn.com/img/ibank/2019/762/974/12246479267_1421470042.220x220.jpg?_=2020" />
-						<img style="width:100%;display:block;" src="https://cbu01.alicdn.com/img/ibank/2019/673/299/11580992376_864454145.220x220.jpg?_=2020" />
-						<img style="width:100%;display:block;" src="https://cbu01.alicdn.com/img/ibank/2018/495/677/9194776594_1324667211.220x220.jpg?_=2020" />
-					</div>
-				`,
+				imgList: [],
+				desc: ``,
 				sizeList:[],
 				colorList:[]
 			};
@@ -263,6 +245,7 @@
 					console.log("请求结果：",r)
 					if(r.data){
 						this.product=r.data
+						this.favorite=this.product.isFavorite==1
 						this.$refs.article.setContent(this.product.introductory);
 					}else{
 						this.$api.msg('未找到产品信息')
@@ -345,7 +328,49 @@
 			},
 			//收藏
 			toFavorite(){
-				this.favorite = !this.favorite;
+				this.$api.loading('请求中...')
+				this.$api.httpPost('footmark/api/save',{
+					productId:this.product.id,
+					userId:this.userInfo.id
+				}).then(r=>{
+					console.log("请求结果：",r)
+					if(r.code==0){
+						this.favorite = !this.favorite;
+						this.$api.msg(r.msg||'收藏成功')
+					}else{
+						this.$api.msg(r.msg||'收藏失败')
+					}
+					uni.hideLoading();
+				}).catch(e=>{
+					console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+					uni.hideLoading();
+				})
+			},
+			//收藏
+			toFavorite(){
+				if(this.favorite){
+					this.$api.msg('您已收藏')
+					return
+				}
+				this.$api.loading('请求中...')
+				this.$api.httpPost('footmark/api/save',{
+					productId:this.product.id,
+					userId:this.userInfo.id
+				}).then(r=>{
+					console.log("请求结果：",r)
+					if(r.code==0){
+						this.favorite = !this.favorite;
+						this.$api.msg(r.msg||'收藏成功')
+					}else{
+						this.$api.msg(r.msg||'收藏失败')
+					}
+					uni.hideLoading();
+				}).catch(e=>{
+					console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+					uni.hideLoading();
+				})
 			},
 			buy(){
 				let goodsList = [];
