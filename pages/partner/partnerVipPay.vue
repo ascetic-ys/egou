@@ -21,8 +21,8 @@
 						支付日期：
 						<text class="desc-text">{{item.payTime||''}}</text>
 					</view>
-					<view class="action-box b-t" v-if="item.payState==2">
-						<button class="action-btn recom" @tap.stop="toPayPage(item)">会员续费</button>
+					<view class="action-box b-t" v-if="[0,1,3].indexOf(item.payState)>-1 || !item.payState">
+						<button class="action-btn recom" @tap.stop="toPayPage(item)">支付</button>
 					</view>
 				</view>
 			</mescroll-body>
@@ -130,7 +130,7 @@
 			// 跳转会员续费界面
 			toPayPage(item){
 				uni.navigateTo({
-					url:`/pages/partner/partnerProtocolAgree?parentId=${item.parentId}&recordId=${item.id}`
+					url:`/pages/partner/partnerPay?price=${item.price}&parentId=${item.parentId}&recordId=${item.id}&startDate=${item.startDate}&endDate=${item.endDate}`
 				})
 			},
 		},
@@ -229,7 +229,8 @@
 			height: 80upx;
 			padding-right:30upx;
 			font-size: $font-base;
-			color: $font-color-dark;
+			color: #fa436a;
+			font-weight: 800;
 			position: relative;
 			.time{
 				flex: 1;

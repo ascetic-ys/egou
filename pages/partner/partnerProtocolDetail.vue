@@ -29,11 +29,11 @@
 							</scroll-view>
 						</view>
 						<!-- 底部 -->
-						<view class="footer">
+						<!-- <view class="footer">
 							<view class="footer-btn">
 								<button class="submit" @click="continueProtocol">协议续签</button>
 							</view>
-						</view>
+						</view> -->
 					</view>
 				</view>
 			</view>
@@ -336,7 +336,7 @@
 				display: flex;
 				flex-direction:column;
 				margin-bottom: 20rpx;
-				height: 15%;
+				height: 11%;
 				
 				.text-title{
 					color: #232323;
@@ -348,13 +348,13 @@
 				}
 			}
 			.user-info-bottom{
-				height: 20%;
+				height: 18%;
 				.text-title{
 					margin-left: 50%;
 				}
 			}
 			.text-box{
-				height: 63%;
+				height: 68%;
 			}
 		}
 		.btn {
@@ -397,7 +397,7 @@
 				height: 10%;
 			}
 			.content{
-				height: 77%;
+				height: 90%;
 				jyf-parser{
 					height: 100%;
 				}

@@ -75,19 +75,20 @@
 			</view>
 			<!-- 浏览历史 -->
 			<view class="history-section icon">
-				<list-cell v-if='!userInfo.id || [1].indexOf(userInfo.tag)>-1' icon="icon-icon--" iconColor="#e07472" title="城市合伙人注册" border="" @eventClick="navTo('/pages/partner/partner')"></list-cell>
-				<list-cell v-if='hasLogin' icon="icon-lishijilu" iconColor="#e07472" title="浏览足迹" border="" @eventClick="navTo('/pages/order/historyList')"></list-cell>
-				<list-cell v-if='hasLogin' icon="icon-shoucang_xuanzhongzhuangtai" iconColor="#e07472" title="收藏夹" border="" @eventClick="navTo('/pages/order/favoriteList')"></list-cell>
-				<list-cell v-if='hasLogin' icon="icon-pingjia" iconColor="#e07472" title="意见反馈" border="" @eventClick="navTo('/pages/order/opinionList')"></list-cell>
-				<list-cell v-if='userInfo.tag==1' icon="icon-dizhi" iconColor="#5fcda2" title="地址管理" @eventClick="navTo('/pages/address/address')"></list-cell>
-				<list-cell v-if='userInfo.tag==1' icon="icon-shouye" iconColor="#54b4ef" title="发票管理" @eventClick="navTo('/pages/invoice/invoice')"></list-cell>
-				<list-cell v-if='userInfo.tag==1' icon="icon-iLinkapp-" iconColor="#9789f7" title="售后反馈" @eventClick="navTo('/pages/order/serviceList')"></list-cell>
-				<list-cell v-if='userInfo.tag==2' icon="icon-shouye" iconColor="#e07472" title="我的订单" @eventClick="navTo('/pages/myOrder/myOrder')"></list-cell>
-				<list-cell v-if='userInfo.tag==0' icon="icon-share" iconColor="#9789f7" title="订单统计" tips="查看最近订单图表信息" @eventClick="navTo('/pages/orderTj/orderTj?state=0')"></list-cell>
+				<list-cell v-if='!userInfo.id || [1].indexOf(userInfo.tag)>-1' icon="icon-icon--" iconColor="#e07472" title="城市合伙人注册" border="" @eventClick="navTo('/pages/partner/partner',true)"></list-cell>
+				<list-cell v-if='[0].indexOf(userInfo.tag)>-1' icon="icon-icon--" iconColor="#e07472" title="城市合伙人信息" tips="查看已注册的合伙人" border="" @eventClick="navTo('/pages/partner/partnerList')"></list-cell>
+				<list-cell v-if='hasLogin' icon="icon-lishijilu" iconColor="#e07472" title="浏览足迹" border="" tips="查看我最近浏览过的商品" @eventClick="navTo('/pages/order/historyList')"></list-cell>
+				<list-cell v-if='hasLogin' icon="icon-shoucang_xuanzhongzhuangtai" iconColor="#e07472" title="收藏夹" border="" tips="查看我收藏的商品列表" @eventClick="navTo('/pages/order/favoriteList')"></list-cell>
+				<list-cell v-if='hasLogin' icon="icon-pingjia" iconColor="#e07472" title="意见反馈" border="" tips="查看我反馈的意见" @eventClick="navTo('/pages/order/opinionList')"></list-cell>
+				<list-cell v-if='userInfo.tag==1' icon="icon-dizhi" iconColor="#5fcda2" title="地址管理" border="" tips="查看我录入的地址信息" @eventClick="navTo('/pages/address/address')"></list-cell>
+				<list-cell v-if='userInfo.tag==1' icon="icon-shouye" iconColor="#54b4ef" title="发票管理" border="" tips="查看我记录的发票信息" @eventClick="navTo('/pages/invoice/invoice')"></list-cell>
+				<list-cell v-if='userInfo.tag==1' icon="icon-iLinkapp-" iconColor="#9789f7" title="售后反馈" border="" tips="查看我的售后反馈申请" @eventClick="navTo('/pages/order/serviceList')"></list-cell>
+				<list-cell v-if='userInfo.tag==2' icon="icon-shouye" iconColor="#e07472" title="我的订单" border="" tips="查看我提交的订单" @eventClick="navTo('/pages/myOrder/myOrder')"></list-cell>
+				<list-cell v-if='userInfo.tag==0' icon="icon-share" iconColor="#9789f7" title="订单统计" border="" tips="查看最近订单图表信息" @eventClick="navTo('/pages/orderTj/orderTj?state=0')"></list-cell>
 				<!-- <list-cell v-if='userInfo.tag==0' icon="icon-pinglun-copy" iconColor="#ee883b" title="待办事项" tips="有新的消息" @eventClick="navTo('/pages/notice/notice')"></list-cell> -->
-				<list-cell v-if='userInfo.tag==3' icon="icon-tuandui" iconColor="#e07472" title="我的客户" border="" @eventClick="navTo('/pages/myUser/myUser?state=0')"></list-cell>
-				<list-cell v-if='userInfo.tag==3' icon="icon-bianji" iconColor="#e07472" title="合伙人协议" border="" @eventClick="navTo('/pages/partner/partnerProtocol')"></list-cell>
-				<list-cell v-if='userInfo.tag==3' icon="icon-iconfontweixin" iconColor="#e07472" title="会员费用支付" border="" @eventClick="navTo('/pages/partner/partnerVipPay')"></list-cell>
+				<list-cell v-if='userInfo.tag==3' icon="icon-tuandui" iconColor="#e07472" title="我的客户" border="" tips="查看我的客户信息" @eventClick="navTo('/pages/myUser/myUser?state=0')"></list-cell>
+				<list-cell v-if='userInfo.tag==3' icon="icon-bianji" iconColor="#e07472" title="合伙人协议" border="" tips="查看曾签订的协议" @eventClick="navTo('/pages/partner/partnerProtocol')"></list-cell>
+				<list-cell v-if='userInfo.tag==3' icon="icon-iconfontweixin" iconColor="#e07472" title="会员费用支付" tips="查看会员续费记录" border="" @eventClick="navTo('/pages/partner/partnerVipPay')"></list-cell>
 				
 				<list-cell icon="icon-shezhi1" iconColor="#e07472" title="设置" border="" @eventClick="navTo('/pages/set/set')"></list-cell>
 				<list-cell icon="icon-bangzhu" iconColor="#e07472" title="服务须知" border="" @eventClick="navTo('/pages/set/service')"></list-cell>
@@ -383,8 +384,8 @@
 			 * 统一跳转接口,拦截未登录路由
 			 * navigator标签现在默认没有转场动画，所以用view
 			 */
-			navTo(url){
-				if(!this.hasLogin){
+			navTo(url,flag){
+				if(!flag && !this.hasLogin){
 					url = '/pages/public/login';
 				}
 				uni.navigateTo({  

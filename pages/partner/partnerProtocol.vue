@@ -12,6 +12,13 @@
 					</view>
 				</view>
 			</mescroll-body>
+			<!-- <view class="action-box b-t" v-if="list.length>0">
+				<button class="action-btn recom" @tap.stop="continueProtocol()">协议续签</button>
+			</view> -->
+			<!-- 底部 -->
+			<view class="footer" v-if="list.length>0">
+				<button class="confirm-btn" @tap="continueProtocol">协议续签</button>
+			</view>
 		</view>
 	</view>
 </template> 
@@ -99,6 +106,12 @@
 					this.$api.msg(e.msg||'网络异常请重试')
 				})
 				
+			},
+			//协议续签
+			continueProtocol(){
+				uni.navigateTo({
+					url:`/pages/partner/partnerProtocolAgree?parentId=${this.userInfo.id}`
+				})
 			},
 			// 跳转详情
 			toProtocolDetail(item){
@@ -490,6 +503,34 @@
 				font-size: 60rpx;
 				height: 100rpx;
 				line-height: 100rpx;
+			}
+		}
+	}
+	.footer{
+		position: fixed;
+		left: 0;
+		bottom: 0;
+		z-index: 995;
+		display: flex;
+		align-items: center;
+		width: 100%;
+		height: 90upx;
+		justify-content: space-between;
+		font-size: 30upx;
+		background-color: #fff;
+		z-index: 998;
+		color: $font-color-base;
+		box-shadow: 0 -1px 5px rgba(0,0,0,.1);
+		.confirm-btn{
+			width: 50%;
+			height: 76upx;
+			line-height: 76upx;
+			border-radius: 50px;
+			background: $uni-color-primary;
+			color: #fff;
+			font-size: $font-lg;
+			&:after{
+				border-radius: 100px;
 			}
 		}
 	}

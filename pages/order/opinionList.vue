@@ -558,7 +558,7 @@
 	.feedback-add{
 		position: fixed;
 		bottom: 50rpx;
-		left: 50rpx;
+		left: 44%;
 		width: 100rpx;
 		height: 100rpx;
 		button{

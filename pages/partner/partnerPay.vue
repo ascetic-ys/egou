@@ -41,16 +41,22 @@
 			console.log("options:",options)
 			this.memberPayRecord.parentId=options.parentId
 			this.memberPayRecord.price=options.price
-			this.initData()
+			this.memberPayRecord.recordId=options.recordId
+			if(options.startDate){
+				this.memberPayRecord.startDate=options.startDate
+			}else{
+				this.memberPayRecord.startDate=this.getDate()
+			}
+			if(options.endDate){
+				this.memberPayRecord.endDate=options.endDate
+			}else{
+				this.memberPayRecord.endDate=this.getDate('year')
+			}
 		},
 		computed: {
 			...mapState(['hasLogin','userInfo','weChat'])
 		},
 		methods: {
-			initData(){
-				this.memberPayRecord.startDate=this.getDate()
-				this.memberPayRecord.endDate=this.getDate('year')
-			},
 			getDate(type) {
 				const date = new Date();
 				let year = date.getFullYear();
@@ -96,7 +102,7 @@
 								// this.$api.msg(r.msg||'支付成功')
 								//跳转至支付结果
 								uni.redirectTo({
-									url: `/pages/partner/paySuccess?id=${_this.orderInfo.id}`
+									url: `/pages/partner/paySuccess`
 								})
 							},
 							fail: function (err) {

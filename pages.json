@@ -401,6 +401,16 @@
             "style" : {
             	"navigationBarTitleText": "城市合伙人协议"
             }
+        },{
+            "path" : "pages/partner/partnerList",
+            "style" : {
+            	"navigationBarTitleText": "城市合伙人列表"
+            }
+        },{
+            "path" : "pages/partner/partnerDetail",
+            "style" : {
+            	"navigationBarTitleText": "城市合伙人详情"
+            }
         }
     ],
 	"globalStyle": {

@@ -138,6 +138,7 @@
 			},
 			agreeYes(){
 				this.initPartnerParams()
+				console.log("`/pages/partner/partnerPay?price=${this.protocol.fee}&parentId=${this.partner.id}`")
 				this.$api.httpPost('protocolRecord/api/save',{
 					...this.partnerForm
 				}).then(r=>{

@@ -62,11 +62,19 @@
 							password 
 						/>
 					</view>
-					<view class="input-item">
+					<!-- <view class="input-item">
 						<text class="tit">邮箱</text>
 						<input 
 							v-model="form.email" 
 							placeholder="请输入邮箱"
+							maxlength="100"
+						/>
+					</view> -->
+					<view class="input-item">
+						<text class="tit">推荐人</text>
+						<input 
+							v-model="form.referrer" 
+							placeholder="请输入推荐人"
 							maxlength="100"
 						/>
 					</view>
@@ -327,9 +335,13 @@
 					this.$api.msg('两次密码不一致')
 					return 
 				}
-				if(this.form.email && !isEmail(this.form.email)){
-					this.$api.msg('邮箱格式错误')
-					return 
+				// if(this.form.email && !isEmail(this.form.email)){
+				// 	this.$api.msg('邮箱格式错误')
+				// 	return 
+				// }
+				if(!this.form.referrer){
+					this.$api.msg('请输入推荐人')
+					return false
 				}
 				if(!this.form.address){
 					this.$api.msg('请选择省市区')

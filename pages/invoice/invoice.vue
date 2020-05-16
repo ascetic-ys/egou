@@ -68,8 +68,6 @@
 			},
 			/*上拉加载的回调: 其中page.num:当前页 从1开始, page.size:每页数据条数,默认10 */
 			upCallback(mescroll) {
-				console.log('page',mescroll)
-				console.log('this.mescroll',this.mescroll)
 				//联网加载数据
 				let pageNum = mescroll.num; // 页码, 默认从1开始
 				let pageSize = mescroll.size; // 页长, 默认每页10条
