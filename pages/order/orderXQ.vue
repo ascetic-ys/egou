@@ -16,19 +16,34 @@
 			</navigator>
 
 		<view class="goods-section">
-			<view class="g-header b-b">
-				<!-- <image class="logo" src="http://duoduo.qibukj.cn/./Upload/Images/20190321/201903211727515.png"></image> -->
-				<text class="name">商品信息</text>
-			</view>
 			<!-- 商品列表 -->
-			<view class="g-item" v-for="(product,pi) in orderInfo.orderChildInfoList" :key='pi' @click="navToProductDetailPage(product.productInfo)">
-				<image :src="product.productInfo.imgPath||`https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=298298368,1308836146&fm=26&gp=0.jpg`"></image>
-				<view class="right">
-					<text class="title clamp">{{product.productInfo.brand}}{{product.productInfo.productName}}{{product.productInfo.largeCategory}}{{product.productInfo.littleCategory}}</text>
-					<text class="spec">{{product.productInfo.color}}</text>
-					<view class="price-box">
-						<text class="price">￥{{product.unitPrice}}</text>
-						<text class="number">x {{product.productNum}}</text>
+			<view class="g-item" v-for="(group,pi) in orderInfo.groupList" :key='pi'>
+				<view style="background: #EEEEEE;height: 4rpx;"></view>
+				<view class="g-header b-b">
+					<!-- <image class="logo" src="http://duoduo.qibukj.cn/./Upload/Images/20190321/201903211727515.png"></image> -->
+					<text class="name">{{group.factoryShortName}}</text>
+				</view>
+				<view class="goods-box" v-for="(product,pi) in group.orderChildInfoList" :key='pi' @click="navToProductDetailPage(product.productInfo)">
+					<image :src="product.imgPath||`https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=298298368,1308836146&fm=26&gp=0.jpg`"></image>
+					<view class="right">
+						<text class="title clamp">{{product.productName}}</text>
+						<text class="spec">{{product.color}}</text>
+						<view class="price-box">
+							<text class="price">￥{{product.unitPrice}}</text>
+							<text class="number">x {{product.productNum}}</text>
+						</view>
+					</view>
+				</view>
+				<view class="wuliu-box b-t" v-if="[3,4].indexOf(item.orderState)>-1" @tap.stop="gotowl(orderInfo.id,group.factoryNo)">
+					<view class="left-box">
+						<text class="left">配送</text>
+					</view>
+					<view class="middle-box">
+						<text class="top middle" >快递运输</text>
+						<text class="bottom middle" >工作日、双休日与节假日均可送货</text>
+					</view>
+					<view class="right-box">
+						<text class="yticon icon-you" ></text>
 					</view>
 				</view>
 			</view>
@@ -52,7 +67,7 @@
 				<text class="cell-tit clamp">订单日期</text>
 				<text class="cell-tip">{{orderInfo.orderDate}}</text>
 			</view>
-			<view class="yt-list-cell b-b" v-if="orderInfo.orderState != 0">
+			<!-- <view class="yt-list-cell b-b" v-if="orderInfo.orderState != 0">
 				<text class="cell-tit clamp">运费</text>
 				<text class="cell-tip">免运费</text>
 			</view>
@@ -63,7 +78,7 @@
 			<view class="yt-list-cell b-b" v-if="orderInfo.orderState != 0">
 				<text class="cell-tit clamp">物流单号</text>
 				<text class="cell-tip">45612644646</text>
-			</view>
+			</view> -->
 			<view class="yt-list-cell b-b" v-if="orderInfo.orderState != 0">
 				<text class="cell-tit clamp">行驶证</text>
 				<view class="cell-img2" @tap.stop="previewImg(showImage)">
@@ -77,7 +92,7 @@
 		</view>
 		
 		<!-- 底部 -->
-		<view class="footer" v-if="orderInfo.orderState != 0 && userInfo.tag==1">
+		<view class="footer" v-if="orderInfo.orderState != 0 && [1,4].indexOf(userInfo.tag)>-1">
 			<view class="price-content">
 				<text>实付款</text>
 				<text class="price-tip">￥</text>
@@ -114,7 +129,7 @@
 			this.initData()
 		},
 		methods: {
-			initData(){
+			async initData(){
 				this.$api.httpPost('orderMainInfo/api/detail',{id:this.id}).then(r=>{
 					console.log("请求结果：",r)
 					this.orderInfo=r.data
@@ -166,6 +181,12 @@
 					uni.hideLoading()
 				})
 			},
+			// 物流
+			gotowl(id,factoryNo){
+				uni.navigateTo({
+					url:`/pages/customer/goodsliu?orderId=${id}&factoryNo=${factoryNo}`
+				})
+			},
 			//申请退款
 			applyRefund(){
 				
@@ -204,6 +225,8 @@
 						stateTip = '待收货'; break;
 					case 4:
 						stateTip = '已完成'; break;
+					case 5:
+						stateTip = '待确认'; break;
 					case 9:
 						stateTip = '订单已关闭'; 
 						stateTipColor = '#909399';
@@ -300,8 +323,10 @@
 			display: flex;
 			align-items: center;
 			height: 84upx;
-			padding: 0 30upx;
 			position: relative;
+			.name {
+				margin-left: 0upx;
+			}
 		}
 
 		.logo {
@@ -319,51 +344,77 @@
 
 		.g-item {
 			display: flex;
+			flex-direction: column;
 			margin: 20upx 30upx;
-
-			image {
-				flex-shrink: 0;
-				display: block;
-				width: 140upx;
-				height: 140upx;
-				border-radius: 4upx;
-			}
-
-			.right {
-				flex: 1;
-				padding-left: 24upx;
-				overflow: hidden;
-			}
-
-			.title {
-				font-size: 30upx;
-				color: $font-color-dark;
-			}
-
-			.spec {
-				font-size: 26upx;
-				color: $font-color-light;
-			}
-
-			.price-box {
+			.goods-box{
 				display: flex;
-				align-items: center;
-				font-size: 32upx;
-				color: $font-color-dark;
-				padding-top: 10upx;
-
-				.price {
-					margin-bottom: 4upx;
+				image {
+					flex-shrink: 0;
+					display: block;
+					width: 140upx;
+					height: 140upx;
+					border-radius: 4upx;
 				}
-				.number{
+				
+				.right {
+					flex: 1;
+					padding-left: 24upx;
+					overflow: hidden;
+				}
+				
+				.title {
+					font-size: 30upx;
+					color: $font-color-dark;
+				}
+				
+				.spec {
 					font-size: 26upx;
-					color: $font-color-base;
-					margin-left: 20upx;
+					color: $font-color-light;
+				}
+				
+				.price-box {
+					display: flex;
+					align-items: center;
+					font-size: 32upx;
+					color: $font-color-dark;
+					padding-top: 10upx;
+				
+					.price {
+						margin-bottom: 4upx;
+					}
+					.number{
+						font-size: 26upx;
+						color: $font-color-base;
+						margin-left: 20upx;
+					}
+				}
+				
+				.step-box {
+					position: relative;
 				}
 			}
-
-			.step-box {
-				position: relative;
+			.wuliu-box{
+				display:flex;
+				justify-content: space-between;
+				padding: 20rpx 20rpx 20rpx 0;
+				color: #505256;
+				font-size: 28rpx;
+				.left-box{
+					display:flex;
+					justify-content: space-between;
+				}
+				.middle-box{
+					display:flex;
+					flex-direction: column;
+					text-align: right;
+					flex: 1;
+				}
+				.right-box{
+					text-align: right;
+					line-height: 40rpx;
+					padding-top: 14rpx;
+					padding-left: 10rpx;
+				}
 			}
 		}
 	}

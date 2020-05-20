@@ -4,7 +4,7 @@
 			<!-- 空白页 -->
 			<!-- <empty v-if="list.length === 0"></empty> -->
 			<mescroll-body :bottom='bottom' :up='upOption' @down="downCallback" @up="upCallback" @init="mescrollInit">
-				<view v-for="(item,index) in list" :key="index" class="order-item">
+				<view v-for="(item,index) in list" :key="index" class="order-item" @tap="toDetail(item)">
 					<view class="i-top b-b">
 						<text class="time">费用：¥{{item.price||''}}元</text>
 						<text class="yticon icon-you"></text>
@@ -21,8 +21,13 @@
 						支付日期：
 						<text class="desc-text">{{item.payTime||''}}</text>
 					</view>
-					<view class="action-box b-t" v-if="[0,1,3].indexOf(item.payState)>-1 || !item.payState">
-						<button class="action-btn recom" @tap.stop="toPayPage(item)">支付</button>
+					<view class="desc-box">
+						审核状态：
+						<text class="desc-text">{{['未审核','审核中','审核通过','审核未通过'][item.auditState]||'未审核'}}</text>
+					</view>
+					<!-- auditState审核状态（0：未审核 1：审核中 2：审核通过 3：审核未通过） -->
+					<view class="action-box b-t" v-if="[3].indexOf(item.auditState)>-1">
+						<button class="action-btn recom" @tap.stop="toPayPage(item)">去支付</button>
 					</view>
 				</view>
 			</mescroll-body>
@@ -130,7 +135,13 @@
 			// 跳转会员续费界面
 			toPayPage(item){
 				uni.navigateTo({
-					url:`/pages/partner/partnerPay?price=${item.price}&parentId=${item.parentId}&recordId=${item.id}&startDate=${item.startDate}&endDate=${item.endDate}`
+					url:`/pages/partner/partnerPayEdit?item=${JSON.stringify(item)}`
+				})
+			},
+			// 跳转详情
+			toDetail(item){
+				uni.navigateTo({
+					url:`/pages/partner/partnerVipPayDetail?item=${JSON.stringify(item)}`
 				})
 			},
 		},

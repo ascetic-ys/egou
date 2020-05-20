@@ -48,9 +48,6 @@
 				memberPayRecord: {
 					parentId:'',
 					price:'',
-					// startDate:'',
-					// endDate:'',
-					// type:2,
 					userId:'',
 					payImgPath:'',
 					protocolRecordId:''
@@ -61,19 +58,7 @@
 		},
 		onLoad(options) {
 			console.log("options:",options)
-			this.memberPayRecord.parentId=options.parentId
-			this.memberPayRecord.price=options.price
-			this.memberPayRecord.protocolRecordId=options.protocolRecordId
-			// if(options.startDate){
-			// 	this.memberPayRecord.startDate=options.startDate
-			// }else{
-			// 	this.memberPayRecord.startDate=this.getDate()
-			// }
-			// if(options.endDate){
-			// 	this.memberPayRecord.endDate=options.endDate
-			// }else{
-			// 	this.memberPayRecord.endDate=this.getDate('year')
-			// }
+			this.memberPayRecord=JSON.parse(options.item)
 		},
 		computed: {
 			...mapState(['hasLogin','userInfo','weChat'])
@@ -134,8 +119,10 @@
 				this.disabledPay=true
 				this.memberPayRecord.userId==this.userInfo.id
 				this.$api.loading('请求中...')
-				this.$api.httpPost('memberPayRecord/api/save',{
-					...this.memberPayRecord
+				this.$api.httpPost('memberPayRecord/api/update',{
+					id:this.memberPayRecord.id,
+					price:this.memberPayRecord.price,
+					payImgPath:this.memberPayRecord.payImgPath
 				}).then(r=>{
 					console.log('请求结果：',r)
 					if(r.code==0){

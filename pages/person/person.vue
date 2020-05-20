@@ -16,7 +16,7 @@
 			<text class="cell-tit">性别</text>
 			<text class="cell-tip">{{userInfo.sex==0?'男':'女'}}</text>
 		</view>
-		<view v-if="userInfo.tag==1" class="list-cell b-b" hover-class="cell-hover" :hover-stay-time="50">
+		<view v-if="[1,4].indexOf(userInfo.tag)>-1" class="list-cell b-b" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">邮箱</text>
 			<text class="cell-tip">{{userInfo.email||''}}</text>
 		</view>

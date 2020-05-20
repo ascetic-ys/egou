@@ -1,5 +1,5 @@
 {
-    "name" : "地垫E购通",
+    "name" : "生活家车饰",
     "appid" : "__UNI__00BB2A1",
     "description" : "",
     "versionName" : "1.0.0",
@@ -61,6 +61,7 @@
         "appid" : "wx2b13999266897202",
         "setting" : {
             "urlCheck" : false
-        }
+        },
+        "permission" : {}
     }
 }

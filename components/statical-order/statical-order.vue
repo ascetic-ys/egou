@@ -197,6 +197,8 @@
 						stateTip = '待收货'; break;
 					case 4:
 						stateTip = '已完成'; break;
+					case 5:
+						stateTip = '待确认'; break;
 					case 9:
 						stateTip = '订单已关闭'; 
 						stateTipColor = '#909399';

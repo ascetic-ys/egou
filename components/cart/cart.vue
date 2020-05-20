@@ -15,41 +15,47 @@
 		<view v-else>
 			<!-- 列表 -->
 			<view class="cart-list">
-				<block v-for="(item, index) in cartList" :key="item.id">
+				<block v-for="(item, index) in cartList" :key="index">
 					<view
 						class="cart-item" 
 						:class="{'b-b': index!==cartList.length-1}"
 					>
-						<view class="image-wrapper">
-							<image :src="item.imgPath" 
-								:class="[item.loaded]"
-								mode="aspectFill" 
-								lazy-load 
-								@load="onImageLoad('cartList', index)" 
-								@error="onImageError('cartList', index)"
-							></image>
-							<view 
+						<view class="g-header">
+							<view
 								class="yticon icon-xuanzhong2 checkbox"
 								:class="{checked: item.checked}"
-								@click="check('item', index)"
+								@click="check('item',index)"
 							></view>
+							<!-- <image class="logo" src="http://duoduo.qibukj.cn/./Upload/Images/20190321/201903211727515.png"></image> -->
+							<text class="name">{{item.factoryShortName}}</text>
 						</view>
-						<view class="item-right">
-							<text class="clamp title">{{item.productName}}</text>
-							<text class="attr">{{item.color}}</text>
-							<text class="price">¥{{item.price}}</text>
-							<uni-number-box 
-								class="step"
-								:min="1" 
-								:max="100"
-								:value="item.productNum>100?100:item.productNum"
-								:isMax="item.productNum>=100?true:false"
-								:isMin="item.productNum===1"
-								:index="index"
-								@eventChange="numberChange"
-							></uni-number-box>
+						<view class="product-info" v-for="(product, m) in item.productInfoList" :key="m">
+							<view class="image-wrapper">
+								<image :src="product.imgPath" mode="aspectFill" ></image>
+								<view 
+									class="yticon icon-xuanzhong2 checkbox"
+									:class="{checked: product.checked}"
+									@click="check('product',index, m)"
+								></view>
+							</view>
+							<view class="item-right">
+								<text class="clamp title">{{product.productName}}</text>
+								<text class="attr">{{product.chooseProductColor.color}}</text>
+								<text class="price">¥{{product.price}}</text>
+								<uni-number-box 
+									class="step"
+									:min="1" 
+									:max="100"
+									:value="product.productNum>100?100:product.productNum"
+									:isMax="product.productNum>=100?true:false"
+									:isMin="product.productNum===1"
+									:index="index"
+									:mindex="m"
+									@eventChange="numberChange"
+								></uni-number-box>
+							</view>
+							<text class="del-btn yticon icon-fork" @click="deleteCartItem(product,m)"></text>
 						</view>
-						<text class="del-btn yticon icon-fork" @click="deleteCartItem(item,index)"></text>
 					</view>
 				</block>
 			</view>
@@ -171,6 +177,9 @@
 					}
 					this.cartList.forEach(e=>{
 						e.checked=true
+						e.productInfoList.forEach(x=>{
+							x.checked=true
+						})
 					})
 					this.empty = this.cartList.length === 0 ? true: false;
 					uni.hideLoading();
@@ -188,28 +197,65 @@
 					url:item.pagePath
 				})
 			},
-			//监听image加载完成
-			onImageLoad(key, index) {
-				this.$set(this[key][index], 'loaded', 'loaded');
-			},
-			//监听image加载失败
-			onImageError(key, index) {
-				this[key][index].image = '/static/errorImage.jpg';
-			},
 			navToLogin(){
 				uni.navigateTo({
 					url: '/pages/public/login'
 				})
 			},
 			 //选中状态处理
-			check(type, index){
+			check(type, index,mm){
+				console.log("type:",type,index,mm)
 				if(type === 'item'){
-					this.cartList[index].checked = !this.cartList[index].checked;
+					const checked = !this.cartList[index].checked
+					const list = this.cartList[index].productInfoList
+					list.forEach(item=>{
+						item.checked = checked
+					})
+					this.cartList[index].checked = checked
+				}else if(type === 'product'){
+					let newList = []
+					this.cartList[index].productInfoList.forEach((item,mn)=>{
+						console.log("item",item)
+						if(mn==mm){
+							item.checked = !item.checked
+						}
+						newList.push(item)
+					})
+					this.cartList[index].productInfoList=newList
+					let itemFlagTrue = false//至少有一个商品选中为true
+					let itemFlagFalse = false//至少有一个商品未选中为true
+					this.cartList[index].productInfoList.forEach((item,mn)=>{
+						console.log("item",item)
+						if(item.checked){
+							itemFlagTrue=true
+						}
+						if(!item.checked){
+							itemFlagFalse=true
+						}
+					})
+					if(!itemFlagTrue){
+						//没有一个商品选中
+						this.cartList[index].checked = false
+					}else{
+						//至少有一个商品选中
+						this.cartList[index].checked = true
+					}
+					console.log("itemFlagFalse",itemFlagFalse)
+					if(itemFlagFalse){
+						//至少有一个未选中
+						this.allChecked = false;
+					}
 				}else{
 					const checked = !this.allChecked
 					const list = this.cartList;
 					list.forEach(item=>{
 						item.checked = checked;
+						let newList = []
+						item.productInfoList.forEach((item,mn)=>{
+							console.log("item",item)
+							item.checked = checked
+							newList.push(item)
+						})
 					})
 					this.allChecked = checked;
 				}
@@ -217,11 +263,11 @@
 			},
 			//数量
 			numberChange(data){
-				this.cartList[data.index].productNum = data.number;
+				this.cartList[data.index].productInfoList[data.mindex].productNum = data.number;
 				// this.$api.loading('请求中...')
 				this.$api.httpPost('shoppingCart/api/update',{
-					id:this.cartList[data.index].id,
-					productNum:this.cartList[data.index].productNum
+					id:this.cartList[data.index].productInfoList[data.mindex].shoppingCartId,
+					productNum:this.cartList[data.index].productInfoList[data.mindex].productNum
 				}).then(r=>{
 					console.log('请求结果：',r)
 					if(r.code==0){
@@ -240,7 +286,7 @@
 			//删除
 			deleteCartItem(item,index){
 				let ids = []
-				ids.push(item.id)
+				ids.push(item.shoppingCartId)
 				this.deleteCart(ids);
 			},
 			deleteCart(ids){
@@ -270,7 +316,9 @@
 						if(e.confirm){
 							let ids = []
 							this.cartList.forEach(e=>{
-								ids.push(e.id)
+								e.forEach(item=>{
+									ids.push(item.shoppingCartId)
+								})
 							})
 							this.deleteCart(ids);
 						}
@@ -287,11 +335,13 @@
 				let total = 0;
 				let checked = true;
 				list.forEach(item=>{
-					if(item.checked === true){
-						total += item.price * item.productNum;
-					}else if(checked === true){
-						checked = false;
-					}
+					item.productInfoList.forEach(product=>{
+						if(product.checked === true){
+							total += product.price * product.productNum;
+						}else if(checked === true){
+							checked = false;
+						}
+					})
 				})
 				this.allChecked = checked;
 				this.total = Number(total.toFixed(2));
@@ -302,7 +352,17 @@
 				let goodsList = [];
 				list.forEach(item=>{
 					if(item.checked){
-						goodsList.push(item)
+						let newItem = item
+						let newProList = []
+						item.productInfoList.forEach(product=>{
+							if(product.checked){
+								let newPro = product
+								delete newPro.introductory
+								newProList.push(newPro)
+							}
+						})
+						newItem.productInfoList=newProList
+						goodsList.push(newItem)
 					}
 				})
 				if(goodsList.length<=0){
@@ -358,58 +418,90 @@
 	.cart-item{
 		display:flex;
 		position:relative;
-		padding:30upx 40upx;
-		.image-wrapper{
-			width: 230upx;
-			height: 230upx;
-			flex-shrink: 0;
-			position:relative;
-			image{
-				border-radius:8upx;
+		flex-direction: column;
+		background: #FFFFFF;
+		margin-bottom: 20rpx;
+		.g-header {
+			display: flex;
+			align-items: center;
+			height: 84upx;
+			padding: 30rpx 20rpx;
+			position: relative;
+			background: #FFFFFF;
+			.checkbox{
+				position:absolute;
+				left:4upx;
+				top: 20upx;
+				z-index: 8;
+				font-size: 44upx;
+				line-height: 1;
+				padding: 4upx;
+				color: $font-color-disabled;
+				background: #FFFFFF;
+				border-radius: 50px;
+			}
+			.name{
+				text-indent: 45rpx;
 			}
 		}
-		.checkbox{
-			position:absolute;
-			left:-16upx;
-			top: -16upx;
-			z-index: 8;
-			font-size: 44upx;
-			line-height: 1;
-			padding: 4upx;
-			color: $font-color-disabled;
-			background:#fff;
-			border-radius: 50px;
-		}
-		.item-right{
-			display:flex;
-			flex-direction: column;
-			flex: 1;
-			overflow: hidden;
-			position:relative;
-			padding-left: 30upx;
-			.title,.price{
-				font-size:$font-base + 2upx;
-				color: $font-color-dark;
-				height: 40upx;
-				line-height: 40upx;
+		.product-info{
+			background: #FFFFFF;
+			padding: 20rpx;
+			display: flex;
+			.image-wrapper{
+				width: 230upx;
+				height: 230upx;
+				flex-shrink: 0;
+				position:relative;
+				image{
+					border-radius:8upx;
+					opacity: 1;
+				}
 			}
-			.attr{
-				font-size: $font-sm + 2upx;
+			.checkbox{
+				position:absolute;
+				left:-16upx;
+				top: -16upx;
+				z-index: 8;
+				font-size: 44upx;
+				line-height: 1;
+				padding: 4upx;
+				color: $font-color-disabled;
+				background:#fff;
+				border-radius: 50px;
+			}
+			.item-right{
+				display:flex;
+				flex-direction: column;
+				flex: 1;
+				overflow: hidden;
+				position:relative;
+				padding-left: 30upx;
+				.title,.price{
+					font-size:$font-base + 2upx;
+					color: $font-color-dark;
+					height: 40upx;
+					line-height: 40upx;
+				}
+				.attr{
+					font-size: $font-sm + 2upx;
+					color: $font-color-light;
+					height: 50upx;
+					line-height: 50upx;
+				}
+				.price{
+					height: 50upx;
+					line-height:50upx;
+				}
+			}
+			.del-btn{
+				padding:4upx 10upx;
+				font-size:34upx; 
+				height: 50upx;
 				color: $font-color-light;
-				height: 50upx;
-				line-height: 50upx;
-			}
-			.price{
-				height: 50upx;
-				line-height:50upx;
 			}
 		}
-		.del-btn{
-			padding:4upx 10upx;
-			font-size:34upx; 
-			height: 50upx;
-			color: $font-color-light;
-		}
+		
 	}
 	
 	/* 底部栏 */

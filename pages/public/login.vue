@@ -119,9 +119,9 @@
 					}
 					uni.hideLoading();
 				}).catch(e=>{
+					uni.hideLoading();
 					console.log("登录请求错误：",e)
 					this.$api.msg(e.msg||'网络异常请重试')
-					uni.hideLoading();
 				})
 			},
 			changeTabBar(tag){
@@ -138,6 +138,13 @@
 					  text: '业绩',
 					  iconPath: "static/tab-achieve.png",
 					  selectedIconPath: "static/tab-achieve-current.png",
+					})
+				}else if([1,4].indexOf(tag)>-1){
+					uni.setTabBarItem({
+					  index: 2,
+					  text: '购物车',
+					  iconPath: "static/tab-cart.png",
+					  selectedIconPath: "static/tab-cart-current.png",
 					})
 				}
 			},

@@ -26,25 +26,49 @@
 							@click="deleteOrder(index)"
 						></text> -->
 					</view>
-					
-					<scroll-view v-if="item.orderChildInfoList.length > 1" class="goods-box" scroll-x>
-						<view
-							v-for="(goodsItem, goodsIndex) in item.orderChildInfoList" :key="goodsIndex"
-							class="goods-item"
-						>
-							<image class="goods-img" :src="goodsItem.productInfo.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
-						</view>
-					</scroll-view>
 					<view
-						v-if="item.orderChildInfoList.length === 1" 
-						class="goods-box-single"
-						v-for="(goodsItem, goodsIndex) in item.orderChildInfoList" :key="goodsIndex"
+						class="goods-box-factory"
+						v-for="(group, groupIndex) in item.groupList" :key="groupIndex"
 					>
-						<image class="goods-img" :src="goodsItem.productInfo.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
-						<view class="right">
-							<text class="title clamp">{{goodsItem.productName}}</text>
-							<text class="attr-box">{{goodsItem.productInfo.color}}  x {{goodsItem.productNum}}</text>
-							<text class="price">{{goodsItem.totalPrice}}</text>
+						<view class="b-b"></view>
+						<view class="g-header" v-if="group.factoryShortName">
+							<!-- <image class="logo" src="http://duoduo.qibukj.cn/./Upload/Images/20190321/201903211727515.png"></image> -->
+							<text class="name">{{group.factoryShortName}}</text>
+						</view>
+						<scroll-view v-if="group.orderChildInfoList.length > 1" class="goods-box" scroll-x>
+							<view
+								v-for="(goodsItem, goodsIndex) in group.orderChildInfoList" :key="goodsIndex"
+								class="goods-item"
+							>
+								<image class="goods-img" :src="goodsItem.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
+							</view>
+						</scroll-view>
+						<view
+							v-if="group.orderChildInfoList.length === 1" 
+							class="goods-box-single"
+							v-for="(goodsItem, goodsIndex) in group.orderChildInfoList" :key="goodsIndex"
+						>
+							<image class="goods-img" :src="goodsItem.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
+							<view class="right">
+								<text class="title clamp">{{goodsItem.productName}}</text>
+								<text class="attr-box">{{goodsItem.color}}  x {{goodsItem.productNum}}</text>
+								<text class="price">{{goodsItem.totalPrice}}</text>
+							</view>
+						</view>
+						<!-- <view class="action-box b-t" v-if="item.orderState != 0"> -->
+							<!-- <button class="action-btn" v-if="[3,4].indexOf(item.orderState)>-1" @tap.stop="gotowl(item.id)">查看物流</button> -->
+						<!-- </view> -->
+						<view class="wuliu-box b-t" v-if="[3,4].indexOf(item.orderState)>-1" @tap.stop="gotowl(item.id,group.factoryNo)">
+							<view class="left-box">
+								<text class="left">配送</text>
+							</view>
+							<view class="middle-box">
+								<text class="top middle" >快递运输</text>
+								<text class="bottom middle" >工作日、双休日与节假日均可送货</text>
+							</view>
+							<view class="right-box">
+								<text class="yticon icon-you" ></text>
+							</view>
 						</view>
 					</view>
 					
@@ -56,7 +80,7 @@
 					</view>
 					<view class="action-box b-t" v-if="item.orderState != 0">
 						<button class="action-btn" v-if="[2,5].indexOf(item.orderState)>-1" :disabled="item.submitDisabled" @tap.stop="gotoRefund(item.id)">申请退款</button>
-						<button class="action-btn" v-if="[3,4].indexOf(item.orderState)>-1" @tap.stop="gotowl(item.id)">查看物流</button>
+						<!-- <button class="action-btn" v-if="[3,4].indexOf(item.orderState)>-1" @tap.stop="gotowl(item.id)">查看物流</button> -->
 						<button class="action-btn" v-if="item.orderState==1" :disabled="item.submitDisabled" @tap.stop="cancelOrder(item)">取消订单</button>
 						<button class="action-btn" v-if="item.orderState==3" :disabled="item.submitDisabled" @tap.stop="confirmReceipt(item)">确认收货</button>
 						<button class="action-btn" v-if="item.orderState==4" :disabled="item.submitDisabled" @tap.stop="feedback(item)">售后反馈</button>
@@ -218,9 +242,9 @@
 				})
 			},
 			// 物流
-			gotowl(id){
+			gotowl(id,factoryNo){
 				uni.navigateTo({
-					url:`/pages/customer/goodsliu?orderId=${id}`
+					url:`/pages/customer/goodsliu?orderId=${id}&factoryNo=${factoryNo}`
 				})
 			},
 			//确认收货
@@ -326,6 +350,8 @@
 						stateTip = '待收货'; break;
 					case 4:
 						stateTip = '已完成'; break;
+					case 5:
+						stateTip = '待确认'; break;
 					case 9:
 						stateTip = '订单已关闭'; 
 						stateTipColor = '#909399';
@@ -424,6 +450,42 @@
 					left: 20upx;
 					top: 50%;
 					transform: translateY(-50%);
+				}
+			}
+		}
+		.goods-box-factory{
+			display:flex;
+			position:relative;
+			flex-direction: column;
+			.g-header {
+				display: flex;
+				align-items: center;
+				height: 84upx;
+				padding: 30rpx 20rpx;
+				position: relative;
+				background: #FFFFFF;
+			}
+			.wuliu-box{
+				display:flex;
+				justify-content: space-between;
+				padding: 20rpx 20rpx 20rpx 0;
+				color: #505256;
+				font-size: 28rpx;
+				.left-box{
+					display:flex;
+					justify-content: space-between;
+				}
+				.middle-box{
+					display:flex;
+					flex-direction: column;
+					text-align: right;
+					flex: 1;
+				}
+				.right-box{
+					text-align: right;
+					line-height: 40rpx;
+					padding-top: 14rpx;
+					padding-left: 10rpx;
 				}
 			}
 		}

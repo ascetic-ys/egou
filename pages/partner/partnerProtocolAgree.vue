@@ -146,7 +146,7 @@
 					if(r.code==0){
 						this.$api.msg(r.msg||'保存成功')
 						uni.navigateTo({
-							url:`/pages/partner/partnerPay?price=${this.protocol.fee}&parentId=${this.partner.id}`
+							url:`/pages/partner/partnerPay?price=${this.protocol.fee}&parentId=${this.partner.id}&protocolRecordId=${r.data.id}`
 						})
 					}else{
 						this.$api.msg(r.msg||'网络异常请重试')

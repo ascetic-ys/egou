@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<StaticalOrder ref='staticalOrder' v-if='userInfo.tag==0'></StaticalOrder>
-		<Cart ref='cart' :tag='userInfo.tag' v-if='!userInfo.id||userInfo.tag==1'></Cart>
+		<Cart ref='cart' :tag='userInfo.tag' v-if='!userInfo.id||[1,4].indexOf(userInfo.tag)>-1'></Cart>
 		<MyOrder ref='myOrder' v-if='userInfo.tag==2'></MyOrder>
 		<MyAchievement ref='myAchievement' v-if='userInfo.tag==3'></MyAchievement>
 	</view>
@@ -35,7 +35,16 @@
 		},
 		methods: {
 			initPageTitle(){
-				if(!this.userInfo.id||this.userInfo.tag==1){
+				if(!this.userInfo.id||[1,4].indexOf(this.userInfo.tag)>-1){
+					uni.setNavigationBarTitle({
+					    title: '购物车'
+					});
+					uni.setTabBarItem({
+					  index: 2,
+					  text: '购物车',
+					  iconPath: "static/tab-cart.png",
+					  selectedIconPath: "static/tab-cart-current.png",
+					})
 					this.$nextTick(() => {
 						this.$refs.cart.initData()
 					})

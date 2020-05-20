@@ -55,9 +55,10 @@
 			<view class="c-row b-b" @click="toggleSpec">
 				<text class="tit">购买类型</text>
 				<view class="con">
-					<text class="selected-text" v-for="(sItem, sIndex) in specSelected" :key="sIndex">
-						{{sItem.name}}
-					</text>
+					<view class="selected-box" v-for="(sItem, sIndex) in specSelected" :key="sIndex">
+						<image :src="sItem.imgPath" mode="aspectFill"></image>
+						<text class="selected-text">{{sItem.color}}</text>
+					</view>
 				</view>
 				<text class="yticon icon-you"></text>
 			</view>
@@ -82,6 +83,12 @@
 					<text>假一赔十 ·</text>
 				</view>
 			</view> -->
+			<view class="c-row b-b">
+				<text class="tit">厂家:</text>
+				<view class="bz-list con">
+					<text>{{product.factoryShortName}}</text>
+				</view>
+			</view>
 		</view>
 		
 		<!-- 评价 -->
@@ -117,7 +124,7 @@
 		</view>
 		
 		<!-- 底部操作菜单 -->
-		<view class="page-bottom" v-if="userInfo.tag==1">
+		<view class="page-bottom" v-if="[1,4].indexOf(userInfo.tag)>-1">
 			<navigator url="/pages/index/index" open-type="switchTab" class="p-b-btn">
 				<text class="yticon icon-xiatubiao--copy"></text>
 				<text>首页</text>
@@ -149,19 +156,19 @@
 			<view class="mask"></view>
 			<view class="layer attr-content" @click.stop="stopPrevent">
 				<view class="a-t">
-					<image :src="product.imgPath||`https://cbu01.alicdn.com/img/ibank/2017/204/302/4522203402_1844785635.220x220.jpg?_=2020`"></image>
+					<image :src="specSelected[0].imgPath||product.orderProductColorList[0].imgPath||`https://cbu01.alicdn.com/img/ibank/2017/204/302/4522203402_1844785635.220x220.jpg?_=2020`"></image>
 					<view class="right">
 						<text class="price">¥{{product.price}}</text>
 						<!-- <text class="stock">库存：188件</text> -->
 						<view class="selected">
 							已选：
 							<text class="selected-text" v-for="(sItem, sIndex) in specSelected" :key="sIndex">
-								{{sItem.name}}
+								{{sItem.color}}
 							</text>
 						</view>
 					</view>
 				</view>
-				<view class="attr-list">
+				<!-- <view class="attr-list">
 					<text>尺寸</text>
 					<view class="item-list">
 						<text 
@@ -173,18 +180,19 @@
 							{{item.name}}
 						</text>
 					</view>
-				</view>
+				</view> -->
 				<view class="attr-list">
 					<text>颜色</text>
 					<view class="item-list">
-						<text 
-							v-for="(item, index) in colorList" 
-							:key="index" class="tit"
+						<view 
+							v-for="(item, index) in product.orderProductColorList " 
+							:key="index" class="select-box"
 							:class="{selected: item.selected}"
 							@click="selectColor(item)"
 						>
-							{{item.name}}
-						</text>
+							<image :src="item.imgPath" mode="aspectFill"></image>
+							<text class="tit">{{item.color}}</text>
+						</view>
 					</view>
 				</view>
 				<button class="btn" @click="toggleSpec">完成</button>
@@ -229,22 +237,25 @@
 			//接收传值,id里面放的是标题，因为测试数据并没写id 
 			this.id = options.id;
 			this.initData()
-			this.sizeList = await this.$api.json('sizeList')
-			this.colorList = await this.$api.json('colorList')
+			// this.sizeList = await this.$api.json('sizeList')
+			// this.colorList = await this.$api.json('colorList')
 			//规格 默认选中第一条
-			this.$set(this.sizeList[0], 'selected', true);
-			this.$set(this.colorList[0], 'selected', true);
-			this.specSelected.push(this.sizeList[0]);
-			this.specSelected.push(this.colorList[0]);
+			// this.$set(this.sizeList[0], 'selected', true);
+			// this.$set(this.colorList[0], 'selected', true);
+			// this.specSelected.push(this.sizeList[0]);
+			// this.specSelected.push(this.colorList[0]);
 			// this.shareList = await this.$api.json('shareList');
 		},
 		methods:{
 			initData(){
 				this.$api.loading('加载中...')
 				this.$api.httpPost('productInfo/api/detail',{id:this.id}).then(r=>{
-					console.log("请求结果：",r)
+					console.log("请求结果：",r.data)
 					if(r.data){
 						this.product=r.data
+						console.log("orderProductColorList",this.product.orderProductColorList)
+						this.$set(this.product.orderProductColorList[0], 'selected', true);
+						this.specSelected.push(this.product.orderProductColorList[0]);
 						this.favorite=this.product.isFavorite==1
 						this.$refs.article.setContent(this.product.introductory);
 					}else{
@@ -259,21 +270,21 @@
 				})
 			},
 			parse(e) {
-				console.log('parse finish', e);
+				// console.log('parse finish', e);
 			},
 			ready(e) {
-				console.log('ready', e);
-				console.log('api: getText', this.$refs.article.getText());
-				console.log('imgList', this.$refs.article.imgList);
+				// console.log('ready', e);
+				// console.log('api: getText', this.$refs.article.getText());
+				// console.log('imgList', this.$refs.article.imgList);
 			},
 			imgtap(e) {
-				console.log('imgtap', e);
+				// console.log('imgtap', e);
 			},
 			linkpress(e) {
-				console.log('linkpress', e);
+				// console.log('linkpress', e);
 			},
 			error(e) {
-				console.error(e);
+				// console.error(e);
 			},
 			//规格弹窗开关
 			toggleSpec() {
@@ -299,8 +310,9 @@
 			},
 			//选择颜色
 			selectColor(item){
-				this.removeItemSpecSelected('color')
-				this.colorList.forEach(e=>{
+				// this.removeItemSpecSelected('color')
+				this.specSelected=[]
+				this.product.orderProductColorList.forEach(e=>{
 					e.selected=false
 					if(e.id === item.id){
 						this.$set(e, 'selected', true);
@@ -326,8 +338,18 @@
 			share(){
 				this.$refs.share.toggleMask();	
 			},
-			//收藏
 			toFavorite(){
+				if(this.favorite){
+					// this.toFavorite2()
+					//取消收藏接口在这里用不了，暂时不用
+					this.$api.msg('您已收藏')
+					return
+				}else{
+					this.toFavorite1()
+				}
+			},
+			//收藏
+			toFavorite1(){
 				this.$api.loading('请求中...')
 				this.$api.httpPost('footmark/api/save',{
 					productId:this.product.id,
@@ -348,22 +370,22 @@
 				})
 			},
 			//收藏
-			toFavorite(){
+			toFavorite2(){
 				if(this.favorite){
 					this.$api.msg('您已收藏')
 					return
 				}
 				this.$api.loading('请求中...')
-				this.$api.httpPost('footmark/api/save',{
+				this.$api.httpPost('footmark/api/batchDeletee',{
 					productId:this.product.id,
 					userId:this.userInfo.id
 				}).then(r=>{
 					console.log("请求结果：",r)
 					if(r.code==0){
 						this.favorite = !this.favorite;
-						this.$api.msg(r.msg||'收藏成功')
+						this.$api.msg(r.msg||'取消收藏成功')
 					}else{
-						this.$api.msg(r.msg||'收藏失败')
+						this.$api.msg(r.msg||'取消收藏失败')
 					}
 					uni.hideLoading();
 				}).catch(e=>{
@@ -374,10 +396,19 @@
 			},
 			buy(){
 				let goodsList = [];
-				let goods = this.product
-				goods.productNum=1
-				goods.productId=this.product.id
-				delete goods.introductory
+				let goods = {
+					factoryShortName:this.product.factoryShortName,
+					factoryNo:this.product.factoryNo,
+					factoryName:this.product.factoryName,
+					productInfoList:[]
+				}
+				let newPro = this.product
+				newPro.productNum=1
+				newPro.productId=this.product.id
+				newPro.color=this.specSelected.color
+				newPro.imgPath=this.specSelected.imgPath
+				delete newPro.introductory
+				goods.productInfoList.push(newPro)
 				goodsList.push(goods)
 				console.log("goodsList",goodsList)
 				uni.navigateTo({
@@ -392,7 +423,8 @@
 				this.$api.loading('请求中...')
 				this.$api.httpPost('shoppingCart/api/add',{
 					userId:this.userInfo.id,
-					productId:this.product.id
+					productId:this.product.id,
+					productColorId:this.specSelected[0].id
 				}).then(r=>{
 					console.log('请求结果：',r)
 					if(r.code==0){
@@ -574,9 +606,25 @@
 		.con{
 			flex: 1;
 			color: $font-color-dark;
-			.selected-text{
-				margin-right: 10upx;
+			.selected-box{
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: #eee;
+				margin-right: 20upx;
+				border-radius: 10rpx;
+				width: 120rpx;
+				height: 60rpx;
+				image{
+					width: 60rpx;
+					height: 60rpx;
+				}
+				.selected-text{
+					font-size: $font-base;
+					color: $font-color-dark;
+				}
 			}
+			
 		}
 		.bz-list{
 			height: 40upx;
@@ -731,23 +779,31 @@
 			padding: 20upx 0 0;
 			display: flex;
 			flex-wrap: wrap;
-			text{
+			.select-box{
 				display: flex;
 				align-items: center;
 				justify-content: center;
 				background: #eee;
 				margin-right: 20upx;
 				margin-bottom: 20upx;
-				border-radius: 100upx;
-				min-width: 60upx;
-				height: 60upx;
-				padding: 0 20upx;
-				font-size: $font-base;
-				color: $font-color-dark;
+				border-radius: 10rpx;
+				min-width: 120rpx;
+				height: 60rpx;
+				image{
+					width: 60rpx;
+					height: 60rpx;
+				}
+				text{
+					font-size: $font-base;
+					color: $font-color-dark;
+				}
 			}
+			
 			.selected{
 				background: #fbebee;
-				color: $uni-color-primary;
+				text{
+					color: $uni-color-primary;
+				}
 			}
 		}
 	}

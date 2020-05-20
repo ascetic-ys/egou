@@ -4,14 +4,14 @@
 			<text class="cell-tit">个人资料</text>
 			<text class="cell-more yticon icon-you"></text>
 		</view>
-		<view v-if="userInfo.tag==1" class="list-cell b-b" @click="navTo('/pages/address/address')" hover-class="cell-hover" :hover-stay-time="50">
+		<view v-if="[1,4].indexOf(userInfo.tag)>-1" class="list-cell b-b" @click="navTo('/pages/address/address')" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">收货地址</text>
 			<text class="cell-more yticon icon-you"></text>
 		</view>
-		<view v-if="userInfo.tag==1" class="list-cell b-b" @click="navTo('/pages/invoice/invoice')" hover-class="cell-hover" :hover-stay-time="50">
+		<!-- <view v-if="[1,4].indexOf(userInfo.tag)>-1" class="list-cell b-b" @click="navTo('/pages/invoice/invoice')" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">发票信息</text>
 			<text class="cell-more yticon icon-you"></text>
-		</view>
+		</view> -->
 		<!-- <view class="list-cell" @click="navTo('实名认证')" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">实名认证</text>
 			<text class="cell-more yticon icon-you"></text>

@@ -23,34 +23,36 @@
 		</navigator>
 
 		<view class="goods-section">
-			<view class="g-header b-b">
-				<!-- <image class="logo" src="http://duoduo.qibukj.cn/./Upload/Images/20190321/201903211727515.png"></image> -->
-				<text class="name">所选商品</text>
-			</view>
+			
 			<!-- 商品列表 -->
-			<block v-for="(item,index) in goodsList" :key='index'>
-				<view class="g-item">
-					<image :src="item.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`"></image>
+			<view v-for="(item,index) in goodsList" :key='index'>
+				<view style="background: #EEEEEE;height: 20rpx;"></view>
+				<view class="g-header b-b">
+					<!-- <image class="logo" src="http://duoduo.qibukj.cn/./Upload/Images/20190321/201903211727515.png"></image> -->
+					<text class="name">{{item.factoryShortName}}</text>
+				</view>
+				<view class="g-item" v-for="(product,mm) in item.productInfoList" :key='mm'>
+					<image :src="product.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`"></image>
 					<view class="right">
-						<text class="title clamp">{{item.brand}}{{item.productName}}</text>
-						<text class="spec">{{item.color}}</text>
+						<text class="title clamp">{{product.productName}}</text>
+						<text class="spec">{{product.chooseProductColor.color}}</text>
 						<view class="price-box">
-							<text class="price">￥{{item.price}}</text>
-							<text class="number">x {{item.productNum}}</text>
+							<text class="price">￥{{product.price}}</text>
+							<text class="number">x {{product.productNum}}</text>
 						</view>
 					</view>
 				</view>
-			</block>
+			</view>
 		</view>
 		
 		<!-- 发票 -->
-		<navigator url="/pages/invoice/invoice?source=1" class="invoice-section yt-list">
+		<!-- <navigator url="/pages/invoice/invoice?source=1" class="invoice-section yt-list">
 			<view class="yt-list-cell b-b">
 				<text class="cell-tit clamp">发票</text>
 				<text class="cell-tip">{{invoice.companyName||'否'}}</text>
 				<text class="yticon icon-you"></text>
 			</view>
-		</navigator>
+		</navigator> -->
 		
 		<!-- 金额明细 -->
 		<view class="yt-list">
@@ -73,7 +75,7 @@
 		</view>
 		
 		<!-- 行驶证 -->
-		<view class="yt-list-file">
+		<view class="yt-list-file" v-if="isCustomizationFlag">
 			<view class="input-item2">
 				<text class="tit" @tap="uploadCert">上传行驶证</text>
 				<image :src="showImg" mode=""></image>
@@ -109,6 +111,7 @@
 				showImg:'',
 				filePath:'',
 				params:{},
+				isCustomizationFlag:false,//是否有定制化商品
 				submitDisabled:false
 			}
 		},
@@ -126,7 +129,15 @@
 		methods: {
 			initData(){
 				this.initAddressInfo()
-				this.initInvoiceInfo()
+				// this.initInvoiceInfo()
+				this.goodsList.forEach(item=>{
+					item.productInfoList.forEach(e=>{
+						//是否定制（1：是 0：否）
+						if(e.isCustomization==1){
+							this.isCustomizationFlag=true
+						}
+					})
+				})
 			},
 			initAddressInfo(){
 				//获取默认地址
@@ -228,7 +239,8 @@
 					this.$api.msg('请选择收件地址')
 					return false
 				}
-				if(!this.params.filePath){
+				//有定制化商品需要上传行驶证
+				if(this.isCustomizationFlag&&!this.params.filePath){
 					this.$api.msg('请上传行驶证')
 					return false
 				}
@@ -241,17 +253,23 @@
 			getParams(){
 				let productNum = 0
 				let orderChildInfoList = []
-				this.goodsList.forEach(e=>{
-					productNum+=e.productNum
-					let item = {
-						productName:e.productName,//商品名称
-						productNum:e.productNum,//商品数量
-						unitPrice:e.price,//单价
-						totalPrice:Number((e.price*e.productNum).toFixed(2)),//总价
-						productId:e.productId,//商品ID
-						imgPath:e.imgPath
-					}
-					orderChildInfoList.push(item)
+				this.goodsList.forEach(item=>{
+					item.productInfoList.forEach(e=>{
+						productNum+=e.productNum
+						let item = {
+							productName:e.productName,//商品名称
+							productNum:e.productNum,//商品数量
+							unitPrice:e.price,//单价
+							totalPrice:Number((e.price*e.productNum).toFixed(2)),//总价
+							productId:e.id,//商品ID
+							factoryNo:e.factoryNo,
+							factoryName:e.factoryName,
+							factoryShortName:e.factoryShortName,
+							color:e.chooseProductColor.color,
+							imgPath:e.chooseProductColor.imgPath,
+						}
+						orderChildInfoList.push(item)
+					})
 				})
 				this.params={
 					customer:this.userInfo.userName,
