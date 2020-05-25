@@ -13,17 +13,16 @@
 				</view>
 				<text class="yticon icon-you"></text>
 			</view>
-			</navigator>
+		</navigator>
 
-		<view class="goods-section">
-			<!-- 商品列表 -->
+		<!-- 按厂家分组 -->
+		<!-- <view class="goods-section">
 			<view class="g-item" v-for="(group,pi) in orderInfo.groupList" :key='pi'>
 				<view style="background: #EEEEEE;height: 4rpx;"></view>
 				<view class="g-header b-b">
-					<!-- <image class="logo" src="http://duoduo.qibukj.cn/./Upload/Images/20190321/201903211727515.png"></image> -->
 					<text class="name">{{group.factoryShortName}}</text>
 				</view>
-				<view class="goods-box" v-for="(product,pi) in group.orderChildInfoList" :key='pi' @click="navToProductDetailPage(product.productInfo)">
+				<view class="goods-box" v-for="(product,pi) in group.orderChildInfoList" :key='pi' @click="navToProductDetailPage(product.productId)">
 					<image :src="product.imgPath||`https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=298298368,1308836146&fm=26&gp=0.jpg`"></image>
 					<view class="right">
 						<text class="title clamp">{{product.productName}}</text>
@@ -34,7 +33,7 @@
 						</view>
 					</view>
 				</view>
-				<view class="wuliu-box b-t" v-if="[3,4].indexOf(item.orderState)>-1" @tap.stop="gotowl(orderInfo.id,group.factoryNo)">
+				<view class="wuliu-box b-t" @tap.stop="gotowl(orderInfo.id,group.factoryNo)">
 					<view class="left-box">
 						<text class="left">配送</text>
 					</view>
@@ -45,6 +44,36 @@
 					<view class="right-box">
 						<text class="yticon icon-you" ></text>
 					</view>
+				</view>
+			</view>
+		</view> -->
+		
+		<!-- 不按厂家分组 -->
+		<view class="goods-section">
+			<!-- 商品列表 -->
+			<view class="g-item">
+				<view class="goods-box" v-for="(product,pi) in orderInfo.orderChildInfoList" :key='pi' @click="navToProductDetailPage(product.productId)">
+					<image :src="product.imgPath"></image>
+					<view class="right">
+						<text class="title clamp">{{product.productName}}</text>
+						<text class="spec">{{product.color}}</text>
+						<view class="price-box">
+							<text class="price">￥{{product.unitPrice}}</text>
+							<text class="number">x {{product.productNum}}</text>
+						</view>
+					</view>
+				</view>
+			</view>
+			<view class="wuliu-box b-t" @tap.stop="gotowl(orderInfo.id)">
+				<view class="left-box">
+					<text class="left">配送</text>
+				</view>
+				<view class="middle-box">
+					<text class="top middle" >快递运输</text>
+					<text class="bottom middle" >工作日、双休日与节假日均可送货</text>
+				</view>
+				<view class="right-box">
+					<text class="yticon icon-you" ></text>
 				</view>
 			</view>
 		</view>
@@ -130,11 +159,21 @@
 		},
 		methods: {
 			async initData(){
-				this.$api.httpPost('orderMainInfo/api/detail',{id:this.id}).then(r=>{
+				this.$api.httpPost('orderMainInfo/api/detail',{
+					id:this.id
+				}).then(r=>{
 					console.log("请求结果：",r)
 					this.orderInfo=r.data
 					this.showImage=this.orderInfo.filePath?RESOURCE.URL_SHOW+this.orderInfo.filePath:''
 					this.orderInfo = Object.assign(this.orderInfo, this.orderExp(this.orderInfo));
+					let orderChildInfoList = []
+					this.orderInfo.groupList.forEach(e=>{
+						console.log("e：",e)
+						e.orderChildInfoList.forEach(x=>{
+							orderChildInfoList.push(x)
+						})
+					})
+					this.orderInfo.orderChildInfoList=orderChildInfoList
 				}).catch(e=>{
 					console.log("请求错误：",e)
 					this.$api.msg(e.msg||'网络异常请重试')
@@ -182,9 +221,9 @@
 				})
 			},
 			// 物流
-			gotowl(id,factoryNo){
+			gotowl(id){
 				uni.navigateTo({
-					url:`/pages/customer/goodsliu?orderId=${id}&factoryNo=${factoryNo}`
+					url:`/pages/customer/goodsliu?orderId=${id}`
 				})
 			},
 			//申请退款
@@ -239,9 +278,7 @@
 				return {stateTip, stateTipColor,submitDisabled};
 			},
 			//详情
-			navToProductDetailPage(item){
-				//测试数据没有写id，用title代替
-				let id = item.id;
+			navToProductDetailPage(id){
 				uni.navigateTo({
 					url: `/pages/product/product?id=${id}`
 				})
@@ -348,6 +385,8 @@
 			margin: 20upx 30upx;
 			.goods-box{
 				display: flex;
+				margin-top: 10rpx;
+				margin-bottom: 20rpx;
 				image {
 					flex-shrink: 0;
 					display: block;
@@ -393,28 +432,29 @@
 					position: relative;
 				}
 			}
-			.wuliu-box{
+			
+		}
+		.wuliu-box{
+			display:flex;
+			justify-content: space-between;
+			padding: 20rpx;
+			color: #505256;
+			font-size: 28rpx;
+			.left-box{
 				display:flex;
 				justify-content: space-between;
-				padding: 20rpx 20rpx 20rpx 0;
-				color: #505256;
-				font-size: 28rpx;
-				.left-box{
-					display:flex;
-					justify-content: space-between;
-				}
-				.middle-box{
-					display:flex;
-					flex-direction: column;
-					text-align: right;
-					flex: 1;
-				}
-				.right-box{
-					text-align: right;
-					line-height: 40rpx;
-					padding-top: 14rpx;
-					padding-left: 10rpx;
-				}
+			}
+			.middle-box{
+				display:flex;
+				flex-direction: column;
+				text-align: right;
+				flex: 1;
+			}
+			.right-box{
+				text-align: right;
+				line-height: 40rpx;
+				padding-top: 14rpx;
+				padding-left: 10rpx;
 			}
 		}
 	}

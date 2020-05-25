@@ -4,7 +4,7 @@
 			"path": "pages/index/index",
 			"style": {
 				// #ifdef MP
-				"navigationBarTitleText": "生活家车饰",
+				"navigationBarTitleText": "柏福车饰",
 				//"navigationStyle": "custom",
 				// #endif 
 				"app-plus": {
@@ -100,6 +100,12 @@
 			}
 		},
 		{
+			"path": "pages/set/protocolCommon",
+			"style": {
+				"navigationBarTitleText": "协议"
+			}
+		},
+		{
 			"path": "pages/order/favoriteList",
 			"style": {
 				"navigationBarTitleText": "我的收藏"
@@ -162,10 +168,7 @@
 		},{
 			"path": "pages/user/user",
 			"style": {
-				"navigationBarTitleText": "我的",
-				// #ifdef MP
-				"navigationStyle": "custom",
-				// #endif
+				"navigationBarTitleText": "个人中心",
 				"app-plus": {
 					"bounce": "none",
 					"titleNView": {
@@ -306,6 +309,24 @@
 			}
         }
         ,{
+            "path" : "pages/notice/message",
+            "style" : {
+        		"navigationBarTitleText": "通知消息"
+        	}
+        }
+        ,{
+            "path" : "pages/notice/messageList",
+            "style" : {
+        		"navigationBarTitleText": "消息列表"
+        	}
+        }
+        ,{
+            "path" : "pages/notice/messageDetail",
+            "style" : {
+        		"navigationBarTitleText": "消息详情"
+        	}
+        }
+        ,{
             "path" : "pages/category/category",
             "style" : {
 				"navigationBarTitleText": "分类",
@@ -425,9 +446,9 @@
         }
     ],
 	"globalStyle": {
-		"navigationBarTextStyle": "black",
+		"navigationBarTextStyle": "white",
 		"navigationBarTitleText": "uni-app",
-		"navigationBarBackgroundColor": "#FFFFFF",
+		"navigationBarBackgroundColor": "#4F4F4F",
 		"backgroundColor": "#f8f8f8"
 	},
 	"tabBar": {

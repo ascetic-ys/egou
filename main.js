@@ -109,26 +109,35 @@ service.jointParams = (params = {}) => {
 	return urlParams
 }
 
-function httpGet (url,data) {
+function httpGet (url,data,prefix) {
 	console.log("get请求参数：",data)
+	if(!prefix){
+		prefix = "order"
+	}
   return service({
-    url: service.url(url),
+    url: service.url(prefix+"/"+url),
     method: 'GET',
     data
   })
 }
 
-function httpPost (url,data) {
+function httpPost (url,data,prefix) {
 	console.log("post请求参数：",data)
+	if(!prefix){
+		prefix = "order"
+	}
   return service({
-    url: service.url(url),
+    url: service.url(prefix+"/"+url),
     method: 'POST',
     data
   })
 }
 
-function httpGetParams (url,data) {
-	let _url = service.url(url)+service.jointParams(data)
+function httpGetParams (url,data,prefix) {
+	if(!prefix){
+		prefix = "order"
+	}
+	let _url = service.url(prefix+"/"+url)+service.jointParams(data)
 	console.log("get请求地址：",_url)
 	return service({
 		url: _url,
@@ -137,8 +146,11 @@ function httpGetParams (url,data) {
 	})
 }
 
-function httpPostParams (url,data) {
-	let _url = service.url(url)+service.jointParams(data)
+function httpPostParams (url,data,prefix) {
+	if(!prefix){
+		prefix = "order"
+	}
+	let _url = service.url(prefix+"/"+url)+service.jointParams(data)
 	console.log("post请求地址：",_url)
 	return service({
 		url: _url,

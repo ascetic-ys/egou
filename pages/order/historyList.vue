@@ -13,8 +13,8 @@
 					<text class="title clamp">{{item.productInfo.productName}}</text>
 					<view class="price-box">
 						<text class="price">{{item.productInfo.price}}</text>
-						<text @tap.stop='toFavorite(item)' class="yticon icon-shoucang" style="color:#DD524D" v-if="item.favorite"></text>
-						<text @tap.stop='toFavorite(item)' class="yticon icon-shoucang" v-if="!item.favorite"></text>
+						<!-- <text @tap.stop='toFavorite(item)' class="yticon icon-shoucang" style="color:#DD524D" v-if="item.favorite"></text> -->
+						<!-- <text @tap.stop='toFavorite(item)' class="yticon icon-shoucang" v-if="!item.favorite"></text> -->
 					</view>
 				</view>
 			</view>
@@ -134,7 +134,8 @@
 				if(!item.favorite){
 					this.addFavorite(item)
 				}else{
-					this.disFavorite(item)
+					this.$api.msg('您已收藏')
+					// this.disFavorite(item)
 				}
 			},
 			//收藏

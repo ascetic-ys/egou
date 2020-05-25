@@ -12,7 +12,7 @@
 				</view>
 				<view class="input-content">
 					<view class="list-cell m-t">
-						<text class="cell-tit" :class="[tag==4?'':'typeDis']">普通用户</text>
+						<text class="cell-tit" :class="[tag==4?'':'typeDis']">个人用户</text>
 						<switch color="#fa436a" @change="switchTypeChange" />
 						<text class="cell-tit" :class="[tag==1?'':'typeDis']">企业用户</text>
 					</view>

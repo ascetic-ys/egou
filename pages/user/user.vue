@@ -26,7 +26,24 @@
 				<text class="e-m">DCloud Union</text>
 				<text class="e-b">开通会员开发无bug 一测就上线</text>
 			</view> -->
+			
+			<view class="like-list" v-if='[1,4].indexOf(userInfo.tag)>-1'>
+				<view class="like-box" @click="navTo('/pages/order/favoriteList')">
+					<text class="num">{{favoriteNum}}</text>
+					<text class="item yticon icon-shoucang">收藏夹</text>
+				</view>
+				<view class="like-box" @click="navTo('/pages/order/historyList')">
+					<text class="num">{{historyNum}}</text>
+					<text class="item yticon icon-lishijilu">浏览足迹</text>
+				</view>
+			</view>
+			
+			<view class="top-bg-img">
+				<image src="http://img0.imgtn.bdimg.com/it/u=2883970925,4093911839&fm=26&gp=0.jpg" mode="scaleToFill"></image>
+			</view>
 		</view>
+		
+		<view style="height: 320rpx;background: #f5f5f5;"></view>
 		
 		<view 
 			class="cover-container"
@@ -38,7 +55,7 @@
 			@touchmove="coverTouchmove"
 			@touchend="coverTouchend"
 		>
-			<image class="arc" src="/static/arc.png"></image>
+			<!-- <image class="arc" src="/static/arc.png"></image> -->
 			
 			<!-- <view class="tj-sction">
 				<view class="tj-item">
@@ -56,25 +73,57 @@
 			</view> -->
 			<!-- 订单 -->
 			<view class="order-section" v-if='[1,4].indexOf(userInfo.tag)>-1'>
-				<view class="order-item" @click="navTo('/pages/order/order?state=0')" hover-class="common-hover"  :hover-stay-time="50">
-					<text class="yticon icon-shouye"></text>
-					<text>全部订单</text>
+				<view class="info-box">
+					<text class="info-title">我的订单</text>
+					<view class="info-more" @click="navTo('/pages/order/order?state=0')">
+						<text>查看更多</text>
+						<text class="yticon icon-you"></text>
+					</view>
 				</view>
-				<view class="order-item" @click="navTo('/pages/order/order?state=1')"  hover-class="common-hover" :hover-stay-time="50">
-					<text class="yticon icon-daifukuan"></text>
-					<text>待付款</text>
-				</view>
-				<view class="order-item" @click="navTo('/pages/order/order?state=3')" hover-class="common-hover"  :hover-stay-time="50">
-					<text class="yticon icon-yishouhuo"></text>
-					<text>待收货</text>
-				</view>
-				<view class="order-item" @click="navTo('/pages/order/refundList')" hover-class="common-hover"  :hover-stay-time="50">
-					<text class="yticon icon-shouhoutuikuan"></text>
-					<text>退款申请</text>
+				<view class="btn-box">
+					<view class="order-item" @click="navTo('/pages/order/order?state=1')" hover-class="common-hover"  :hover-stay-time="50">
+						<text class="yticon icon-daifukuan"></text>
+						<text>待付款</text>
+					</view>
+					<view class="order-item" @click="navTo('/pages/order/order?state=2')"  hover-class="common-hover" :hover-stay-time="50">
+						<text class="yticon icon-shouye"></text>
+						<text>待确认</text>
+					</view>
+					<view class="order-item" @click="navTo('/pages/order/order?state=4')" hover-class="common-hover"  :hover-stay-time="50">
+						<text class="yticon icon-yishouhuo"></text>
+						<text>待收货</text>
+					</view>
+					<view class="order-item" @click="navTo('/pages/order/refundList')" hover-class="common-hover"  :hover-stay-time="50">
+						<text class="yticon icon-shouhoutuikuan"></text>
+						<text>退款申请</text>
+					</view>
 				</view>
 			</view>
+			<view class="mybtn-section ">
+				<button-cell v-if='!userInfo.id || [1,4].indexOf(userInfo.tag)>-1' icon="icon-icon--" iconColor="#e07472" title="城市合伙人注册" border="" @eventClick="navTo('/pages/partner/partner',true)"></button-cell>
+				<button-cell v-if='[0].indexOf(userInfo.tag)>-1' icon="icon-icon--" iconColor="#e07472" title="城市合伙人信息" tips="查看已注册的合伙人" border="" @eventClick="navTo('/pages/partner/partnerList')"></button-cell>
+				<!-- <button-cell v-if='hasLogin' icon="icon-lishijilu" iconColor="#e07472" title="浏览足迹" border="" tips="查看我最近浏览过的商品" @eventClick="navTo('/pages/order/historyList')"></button-cell> -->
+				<!-- <button-cell v-if='hasLogin' icon="icon-shoucang_xuanzhongzhuangtai" iconColor="#e07472" title="收藏夹" border="" tips="查看我收藏的商品列表" @eventClick="navTo('/pages/order/favoriteList')"></button-cell> -->
+				<button-cell v-if='hasLogin' icon="icon-bianji" iconColor="#e07472" title="意见反馈" border="" tips="查看我反馈的意见" @eventClick="navTo('/pages/order/opinionList')"></button-cell>
+				<button-cell v-if='[1,4].indexOf(userInfo.tag)>-1' icon="icon-dizhi" iconColor="#5fcda2" title="地址管理" border="" tips="查看我录入的地址信息" @eventClick="navTo('/pages/address/address')"></button-cell>
+				<!-- <button-cell v-if='[1,4].indexOf(userInfo.tag)>-1' icon="icon-shouye" iconColor="#54b4ef" title="发票管理" border="" tips="查看我记录的发票信息" @eventClick="navTo('/pages/invoice/invoice')"></button-cell> -->
+				<button-cell v-if='[1,4].indexOf(userInfo.tag)>-1' icon="icon-pingjia" iconColor="#9789f7" title="售后反馈" border="" tips="查看我的售后反馈申请" @eventClick="navTo('/pages/order/serviceList')"></button-cell>
+				<button-cell v-if='userInfo.tag==2' icon="icon-shouye" iconColor="#e07472" title="我的订单" border="" tips="查看我提交的订单" @eventClick="navTo('/pages/myOrder/myOrder')"></button-cell>
+				<button-cell v-if='userInfo.tag==0' icon="icon-share" iconColor="#9789f7" title="订单统计" border="" tips="查看最近订单图表信息" @eventClick="navTo('/pages/orderTj/orderTj?state=0')"></button-cell>
+				<!-- <button-cell v-if='userInfo.tag==0' icon="icon-pinglun-copy" iconColor="#ee883b" title="待办事项" tips="有新的消息" @eventClick="navTo('/pages/notice/notice')"></button-cell> -->
+				<button-cell icon="icon-pinglun-copy" iconColor="#ee883b" title="通知消息" tips="我的消息" @eventClick="navTo('/pages/notice/message')"></button-cell>
+				<button-cell v-if='userInfo.tag==3' icon="icon-tuandui" iconColor="#e07472" title="我的客户" border="" tips="查看我的客户信息" @eventClick="navTo('/pages/myUser/myUser?state=0')"></button-cell>
+				<button-cell v-if='userInfo.tag==3' icon="icon-bianji" iconColor="#e07472" title="合伙人协议" border="" tips="查看曾签订的协议" @eventClick="navTo('/pages/partner/partnerProtocol')"></button-cell>
+				<button-cell v-if='userInfo.tag==3' icon="icon-iconfontweixin" iconColor="#e07472" title="会员费用支付" tips="查看会员续费记录" border="" @eventClick="navTo('/pages/partner/partnerVipPay')"></button-cell>
+				
+				<button-cell icon="icon-shezhi1" iconColor="#e07472" title="设置" border="" @eventClick="navTo('/pages/set/set')"></button-cell>
+				<button-cell icon="icon-iLinkapp-" iconColor="#e07472" title="服务须知" border="" @eventClick="navTo('/pages/set/service')"></button-cell>
+				<button-cell icon="icon-tuijian" iconColor="#e07472" title="关于我们" border="" @eventClick="navTo('/pages/set/aboutUs')"></button-cell>
+				<button-cell icon="icon-weixin" iconColor="#e07472" title="客服聊天" border="" :service="true"></button-cell>
+				
+			</view>
 			<!-- 浏览历史 -->
-			<view class="history-section icon">
+			<view class="history-section icon" v-show="false">
 				<list-cell v-if='!userInfo.id || [1,4].indexOf(userInfo.tag)>-1' icon="icon-icon--" iconColor="#e07472" title="城市合伙人注册" border="" @eventClick="navTo('/pages/partner/partner',true)"></list-cell>
 				<list-cell v-if='[0].indexOf(userInfo.tag)>-1' icon="icon-icon--" iconColor="#e07472" title="城市合伙人信息" tips="查看已注册的合伙人" border="" @eventClick="navTo('/pages/partner/partnerList')"></list-cell>
 				<list-cell v-if='hasLogin' icon="icon-lishijilu" iconColor="#e07472" title="浏览足迹" border="" tips="查看我最近浏览过的商品" @eventClick="navTo('/pages/order/historyList')"></list-cell>
@@ -96,7 +145,29 @@
 				
 			</view>
 			
-			<view class="order-panel" v-if='[0,3].indexOf(userInfo.tag)>-1'>
+			<view class="today-section" v-if='[0,3].indexOf(userInfo.tag)>-1'>
+				<view class="info-box">
+					<text class="info-title">今日数据</text>
+					<view class="info-more">
+						<!-- <text class="yticon icon-you"></text> -->
+					</view>
+				</view>
+				<view class="btn-box">
+					<view class="today-item" v-if='[0,3].indexOf(userInfo.tag)>-1' hover-class="common-hover"  :hover-stay-time="50">
+						<text class="num">{{todayOrderNum}}</text>
+						<text>今日订单数</text>
+					</view>
+					<view class="today-item" v-if='[0,3].indexOf(userInfo.tag)>-1' hover-class="common-hover" :hover-stay-time="50">
+						<text class="num">{{todayOrderPrice}}</text>
+						<text>今日订单额</text>
+					</view>
+					<view class="today-item" v-if='[3].indexOf(userInfo.tag)>-1' hover-class="common-hover"  :hover-stay-time="50">
+						<text class="num">{{todayUser}}</text>
+						<text>今日注册用户</text>
+					</view>
+				</view>
+			</view>
+			<!-- <view class="order-panel" v-if='[0,3].indexOf(userInfo.tag)>-1'>
 				<view class="left blue">
 					<image :src="`/static/images/order-num.png`" mode="scaleToFill"></image>
 				</view>
@@ -125,10 +196,10 @@
 					<text class="num">{{todayUser}}</text>
 					<text class="static">较上日{{yesterdayUser}}{{['减少','持平','增加'][todayUserUp]}}<text v-if="todayUserUp!=1">{{todayUserChange}}</text></text>
 				</view>
-			</view>
-			<view class="ad-1">
+			</view> -->
+			<!-- <view class="ad-1" v-show="false">
 				<image src="http://img0.imgtn.bdimg.com/it/u=2883970925,4093911839&fm=26&gp=0.jpg" mode="scaleToFill"></image>
-			</view>
+			</view> -->
 		</view>
 		
 		<view v-show="false">
@@ -208,11 +279,13 @@
 </template>  
 <script>  
 	import listCell from '@/components/mix-list-cell';
+	import buttonCell from '@/components/mix-button-cell';
     import {mapState} from 'vuex';  
 	let startY = 0, moveY = 0, pageAtTop = true;
     export default {
 		components: {
-			listCell
+			listCell,
+			buttonCell
 		},
 		data(){
 			return {
@@ -233,7 +306,8 @@
 				todayUserUp:0,//	今日新增用户较昨日是否增加-1减少，0持平，1增加
 				todayUserChange:0,//	今日新增用户较昨日变化值
 				yesterdayUser:0,//	昨日新增用户
-				
+				favoriteNum:0,
+				historyNum:0,
 			}
 		},
 		onLoad(){
@@ -274,6 +348,38 @@
 					this.getNewUser()
 					this.getNewOrder()
 				}
+				this.getFavoriteNum()
+				this.getHistoryNum()
+			},
+			getFavoriteNum(){
+				this.$api.httpPost('footmark/api/list',{
+					pageNum:1,
+					pageSize:1,
+					userId:this.userInfo.id,
+					isFavorite:1
+				}).then(r=>{
+					console.log("请求结果：",r)
+					this.favoriteNum=r.total
+				}).catch(e=>{
+					console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+					uni.hideLoading();
+				})
+			},
+			getHistoryNum(){
+				this.$api.httpPost('footmark/api/list',{
+					pageNum:1,
+					pageSize:1,
+					userId:this.userInfo.id,
+					isFavorite:'0'
+				}).then(r=>{
+					console.log("请求结果：",r)
+					this.historyNum=r.total
+				}).catch(e=>{
+					console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+					uni.hideLoading();
+				})
 			},
 			getNewOrder(){
 				let params={}
@@ -450,7 +556,7 @@
 	}
 
 	.user-section{
-		height: 520upx;
+		height: 420upx;
 		padding: 100upx 30upx 0;
 		position:relative;
 		.bg{
@@ -459,8 +565,8 @@
 			top: 0;
 			width: 100%;
 			height: 100%;
-			filter: blur(1px);
-			opacity: .7;
+			/* filter: blur(1px); */
+			/* opacity: .7; */
 		}
 	}
 	.user-info-box{
@@ -571,22 +677,51 @@
 		@extend %section;
 		padding: 28upx 0;
 		margin-top: 20upx;
-		.order-item{
-			@extend %flex-center;
-			width: 120upx;
-			height: 120upx;
-			border-radius: 10upx;
-			font-size: $font-sm;
-			color: $font-color-dark;
+		display: flex;
+		flex-direction: column;
+		.info-box{
+			display: flex;
+			justify-content: space-between;
+			border-bottom: 1rpx solid #F8F6FC;
+			padding: 0 20rpx 10rpx 20rpx;
+			font-size: 28rpx;
+			color: #43494C;
+			.info-more{
+				font-size: 28rpx;
+				color: #43494C;
+			}
 		}
-		.yticon{
-			font-size: 48upx;
-			margin-bottom: 18upx;
-			color: #fa436a;
+		.btn-box{
+			display: flex;
+			justify-content: space-around;
+			padding: 10rpx 10rpx 0 10rpx;
+			.order-item{
+				@extend %flex-center;
+				width: 120upx;
+				height: 120upx;
+				border-radius: 10upx;
+				font-size: $font-sm;
+				color: $font-color-dark;
+			}
+			.yticon{
+				font-size: 48upx;
+				margin-bottom: 18upx;
+				color: #fa436a;
+			}
+			.icon-shouhoutuikuan{
+				font-size:44upx;
+			}
 		}
-		.icon-shouhoutuikuan{
-			font-size:44upx;
-		}
+		
+	}
+	.mybtn-section{
+		padding: 30rpx 20rpx;
+		margin-top: 20upx;
+		background: #fff;
+		border-radius:10upx;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-start;
 	}
 	.history-section{
 		padding: 30upx 0 0;
@@ -616,6 +751,45 @@
 				height: 160upx;
 				margin-right: 20upx;
 				border-radius: 10upx;
+			}
+		}
+		
+	}
+	
+	.today-section{
+		@extend %section;
+		padding: 28upx 0;
+		margin-top: 20upx;
+		display: flex;
+		flex-direction: column;
+		.info-box{
+			display: flex;
+			justify-content: space-between;
+			border-bottom: 1rpx solid #F8F6FC;
+			padding: 0 20rpx 10rpx 20rpx;
+			font-size: 28rpx;
+			color: #43494C;
+			.info-more{
+				font-size: 28rpx;
+				color: #43494C;
+			}
+		}
+		.btn-box{
+			display: flex;
+			justify-content: space-around;
+			padding-top: 20rpx;
+			.today-item{
+				@extend %flex-center;
+				/* width: 120upx; */
+				height: 120upx;
+				border-radius: 10upx;
+				font-size: 24rpx;
+				color: $font-color-dark;
+			}
+			.num{
+				font-size: 24upx;
+				margin: 18upx 0rpx;
+				color: #fa436a;
 			}
 		}
 		
@@ -680,6 +854,39 @@
 			background: #DD524D;
 		}
 		
+	}
+	
+	.like-list{
+		display: flex;
+		justify-content: space-around;
+		z-index: 1;
+		.like-box{
+			display: flex;
+			flex-direction: column;
+			justify-content: space-around;
+			text-align: center;
+			z-index: 1;
+			color: #fa436a;
+			opacity: .8;
+			text{
+				font-size: 26rpx;
+			}
+		}
+	}
+	
+	.top-bg-img{
+		width: 90%;
+		height: 200rpx;
+		position: absolute;
+		bottom: -160rpx;
+		z-index: 1;
+		left: 5%;
+		image{
+			width: 100%;
+			height: 100%;
+			border-radius: 20rpx;
+
+		}
 	}
 	
 </style>

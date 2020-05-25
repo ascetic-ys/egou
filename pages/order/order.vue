@@ -26,13 +26,13 @@
 							@click="deleteOrder(index)"
 						></text> -->
 					</view>
-					<view
+					<!-- 按厂家分组 -->
+					<!-- <view
 						class="goods-box-factory"
 						v-for="(group, groupIndex) in item.groupList" :key="groupIndex"
 					>
 						<view class="b-b"></view>
 						<view class="g-header" v-if="group.factoryShortName">
-							<!-- <image class="logo" src="http://duoduo.qibukj.cn/./Upload/Images/20190321/201903211727515.png"></image> -->
 							<text class="name">{{group.factoryShortName}}</text>
 						</view>
 						<scroll-view v-if="group.orderChildInfoList.length > 1" class="goods-box" scroll-x>
@@ -55,9 +55,6 @@
 								<text class="price">{{goodsItem.totalPrice}}</text>
 							</view>
 						</view>
-						<!-- <view class="action-box b-t" v-if="item.orderState != 0"> -->
-							<!-- <button class="action-btn" v-if="[3,4].indexOf(item.orderState)>-1" @tap.stop="gotowl(item.id)">查看物流</button> -->
-						<!-- </view> -->
 						<view class="wuliu-box b-t" v-if="[3,4].indexOf(item.orderState)>-1" @tap.stop="gotowl(item.id,group.factoryNo)">
 							<view class="left-box">
 								<text class="left">配送</text>
@@ -70,6 +67,32 @@
 								<text class="yticon icon-you" ></text>
 							</view>
 						</view>
+					</view> -->
+					
+					<!-- 不按厂家分组 -->
+					<view
+						class="goods-box-factory"
+					>
+						<scroll-view v-if="item.orderChildInfoList.length > 1" class="goods-box" scroll-x>
+							<view
+								v-for="(goodsItem, goodsIndex) in item.orderChildInfoList" :key="goodsIndex"
+								class="goods-item"
+							>
+								<image class="goods-img" :src="goodsItem.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
+							</view>
+						</scroll-view>
+						<view
+							v-if="item.orderChildInfoList.length === 1" 
+							class="goods-box-single"
+							v-for="(goodsItem, goodsIndex) in item.orderChildInfoList" :key="goodsIndex"
+						>
+							<image class="goods-img" :src="goodsItem.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
+							<view class="right">
+								<text class="title clamp">{{goodsItem.productName}}</text>
+								<text class="attr-box">{{goodsItem.color}}  x {{goodsItem.productNum}}</text>
+								<text class="price">{{goodsItem.totalPrice}}</text>
+							</view>
+						</view>
 					</view>
 					
 					<view class="price-box">
@@ -80,7 +103,7 @@
 					</view>
 					<view class="action-box b-t" v-if="item.orderState != 0">
 						<button class="action-btn" v-if="[2,5].indexOf(item.orderState)>-1" :disabled="item.submitDisabled" @tap.stop="gotoRefund(item.id)">申请退款</button>
-						<!-- <button class="action-btn" v-if="[3,4].indexOf(item.orderState)>-1" @tap.stop="gotowl(item.id)">查看物流</button> -->
+						<button class="action-btn" v-if="[3,4].indexOf(item.orderState)>-1" @tap.stop="gotowl(item.id)">查看物流</button>
 						<button class="action-btn" v-if="item.orderState==1" :disabled="item.submitDisabled" @tap.stop="cancelOrder(item)">取消订单</button>
 						<button class="action-btn" v-if="item.orderState==3" :disabled="item.submitDisabled" @tap.stop="confirmReceipt(item)">确认收货</button>
 						<button class="action-btn" v-if="item.orderState==4" :disabled="item.submitDisabled" @tap.stop="feedback(item)">售后反馈</button>
@@ -191,8 +214,17 @@
 					console.log("请求结果：",r)
 					let orderList = r.rows
 					orderList.forEach(item=>{
+						console.log("item：",item)
 						//添加不同状态下订单的表现形式
 						item = Object.assign(item, this.orderExp(item));
+						let orderChildInfoList = []
+						item.groupList.forEach(e=>{
+							console.log("e：",e)
+							e.orderChildInfoList.forEach(x=>{
+								orderChildInfoList.push(x)
+							})
+						})
+						item.orderChildInfoList=orderChildInfoList
 					})
 					console.log('orderList',orderList)
 					if(pageNum===1){
@@ -242,9 +274,9 @@
 				})
 			},
 			// 物流
-			gotowl(id,factoryNo){
+			gotowl(id){
 				uni.navigateTo({
-					url:`/pages/customer/goodsliu?orderId=${id}&factoryNo=${factoryNo}`
+					url:`/pages/customer/goodsliu?orderId=${id}`
 				})
 			},
 			//确认收货

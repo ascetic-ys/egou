@@ -1,13 +1,18 @@
 <template>
 	<view class="container">
 		<view class="left-bottom-sign"></view>
-		<view class="back-btn yticon icon-zuojiantou-up" @click="navBack"></view>
+		<view class="back-btn yticon icon-zuojiantou-up" @click="navBack" v-if="flag!=1"></view>
 		<view class="right-top-sign"></view>
 		<!-- 设置白色背景防止软键盘把下部绝对定位元素顶上来盖住输入框等 -->
 		<view class="wrapper">
-			<view class="left-top-sign">LOGIN</view>
-			<view class="welcome">
-				欢迎回来！
+			<!-- <view class="left-top-sign">LOGIN</view> -->
+			<!-- <view class="welcome"> 欢迎回来！</view> -->
+			<view class="logo-top">
+				<view class="logo-img">
+					<image src="/static/logo.png"></image>
+				</view>
+				<view class="system-tip">柏福车饰网购平台</view>
+				<!-- <view class="login-tip">登录：</view> -->
 			</view>
 			<view class="input-content">
 				<view class="input-item">
@@ -43,6 +48,9 @@
 			<text>还没有账号?</text>
 			<button open-type="getUserInfo" withCredentials="true" lang="zh_CN" @getuserinfo="toRegist">马上注册</button>
 		</view>
+		<view class="company-section">
+			<text>平台技术：北京中和在线科技有限公司</text>
+		</view>
 	</view>
 </template>
 
@@ -54,14 +62,15 @@
 	export default{
 		data(){
 			return {
+				flag:0,
 				form:{
 					phoneNumber: '',
 					userPassword: '',
 				}
 			}
 		},
-		onLoad(){
-			
+		onLoad(e){
+			this.flag=e.flag
 		},
 		methods: {
 			...mapMutations(['login','setWeChat']),
@@ -187,6 +196,32 @@
 		z-index: 90;
 		background: #fff;
 		padding-bottom: 40upx;
+		.logo-top{
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			.logo-img{
+				height: 200rpx;
+				width: 200rpx;
+				image{
+					width: 100%;
+					height: 100%;
+				}
+			}
+			.system-tip{
+				padding: 30rpx;
+				color: #fa436a;
+				font-size: 50rpx;
+				font-weight: 800;
+				letter-spacing: 10rpx;
+				margin-bottom: 40rpx;
+			}
+			.login-tip{
+				width: 100%;
+				padding: 30rpx 70rpx;
+			}
+		}
+		
 	}
 	.back-btn{
 		position:absolute;
@@ -293,10 +328,23 @@
 		text-align: center;
 		margin-top: 40upx;
 	}
+	.company-section{
+		position:absolute;
+		left: 0;
+		bottom: 40upx;
+		width: 100%;
+		font-size: $font-sm+2upx;
+		color: $font-color-base;
+		text-align: center;
+		text{
+			flex: 1;
+			line-height: 80rpx;
+		}
+	}
 	.register-section{
 		position:absolute;
 		left: 0;
-		bottom: 50upx;
+		bottom: 100upx;
 		width: 100%;
 		font-size: $font-sm+2upx;
 		color: $font-color-base;

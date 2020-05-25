@@ -70,7 +70,9 @@
 				    	if(e.confirm){
 				    		this.logout();
 				    		setTimeout(()=>{
-				    			uni.navigateBack();
+				    			uni.navigateTo({
+				    				url:'/pages/public/login?flag=1'
+				    			})
 				    		}, 200)
 				    	}
 				    }

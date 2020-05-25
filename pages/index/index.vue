@@ -8,7 +8,7 @@
 			<view class="titleNview-background" :style="{backgroundColor:titleNViewBackground}"></view>
 			<swiper class="carousel" circular autoplay @change="swiperChange">
 				<swiper-item v-for="(item, index) in carouselList" :key="index" class="carousel-item" @click="navToDetailPage({title: '轮播广告'})">
-					<image :src="item.src" />
+					<image :src="item.filePath" />
 				</swiper-item>
 			</swiper>
 			<!-- 自定义swiper指示器 -->
@@ -49,7 +49,17 @@
 		</view>
 		
 		<view class="ad-1">
-			<image src="http://img0.imgtn.bdimg.com/it/u=2883970925,4093911839&fm=26&gp=0.jpg" mode="scaleToFill"></image>
+			<swiper class="serviceImg" circular autoplay @change="swiperChange2">
+				<swiper-item v-for="(item, index) in serviceImgList" :key="index" class="serviceImg-item" @click="navToDetailPage({title: '轮播服务'})">
+					<image :src="item.filePath" mode="scaleToFill"/>
+				</swiper-item>
+			</swiper>
+			<!-- 自定义swiper指示器 -->
+			<view class="swiper-dots">
+				<text class="num">{{swiperCurrent2+1}}</text>
+				<text class="sign">/</text>
+				<text class="num">{{swiperLength2}}</text>
+			</view>
 		</view>
 		
 		<!-- 秒杀楼层 -->
@@ -78,7 +88,7 @@
 		</view> -->
 		
 		<!-- 厂家简介 -->
-		<view class="f-header m-t">
+		<view class="f-header m-t" v-if="false">
 			<image src="/static/temp/h1.png"></image>
 			<view class="tit-box">
 				<text class="tit">厂家简介</text>
@@ -86,7 +96,7 @@
 			</view>
 			<text class="yticon icon-you"></text>
 		</view>
-		<view class="group-section">
+		<view class="group-section" v-if="false">
 			<swiper class="g-swiper" :duration="500">
 				<swiper-item
 					class="g-swiper-item"
@@ -139,7 +149,7 @@
 			</swiper>
 		</view>
 		<!-- 品牌简介 -->
-		<view class="f-header m-t">
+		<view class="f-header m-t" v-if="false">
 			<image src="/static/temp/h1.png"></image>
 			<view class="tit-box">
 				<text class="tit">品牌简介</text>
@@ -147,7 +157,7 @@
 			</view>
 			<text class="yticon icon-you"></text>
 		</view>
-		<view class="group-section">
+		<view class="group-section" v-if="false">
 			<swiper class="g-swiper" :duration="500">
 				<swiper-item
 					class="g-swiper-item"
@@ -193,7 +203,7 @@
 		
 			</swiper>
 		</view>
-		<view class="f-header m-t">
+		<view class="f-header m-t" v-if="false">
 			<image src="/static/temp/cate6.jpg"></image>
 			<view class="tit-box">
 				<text class="tit">售后服务</text>
@@ -201,7 +211,7 @@
 			</view>
 			<text class="yticon icon-you"></text>		
 		</view>
-		<view class="group-section">
+		<view class="group-section" v-if="false">
 			<view class="shdoc">
 				所有产品均由厂家直接发货、提供发票，去掉其他中间环节确保产品价格与质量，并由本平台提供相应的售后服务，请您放心购买！
 				本平台售后服务电话：400-800-666，优质服务，售后无忧！
@@ -305,7 +315,7 @@
 				<view class="image-wrapper">
 					<image :src="item.image" mode="aspectFill"></image>
 				</view>
-				<text class="title clamp">{{item.brand}}{{item.productName}}</text>
+				<text class="title clamp">{{item.productName}}</text>
 				<text class="price">￥{{item.price}}</text>
 			</view>
 		</view>
@@ -325,15 +335,43 @@
 				titleNViewBackground: '',
 				swiperCurrent: 0,
 				swiperLength: 0,
+				swiperCurrent2: 0,
+				swiperLength2: 0,
 				carouselList: [],
+				serviceImgList: [],
 				goodsList: [],
 				cateList:[],//分类
 				naviCateList:[]//导航分类
 			};
 		},
 
+		computed: {
+			...mapState(['hasLogin','userInfo','weChat'])
+		},
 		created() {
 			this.loadData();
+			if(!this.hasLogin){
+				console.log("created首页跳转登录",this.hasLogin)
+				// uni.reLaunch({
+				// 	url:'/pages/public/login?flag=1'
+				// })
+			}
+		},
+		onLoad() {
+			if(!this.hasLogin){
+				console.log("onLoad首页跳转登录",this.hasLogin)
+				// uni.reLaunch({
+				// 	url:'/pages/public/login?flag=1'
+				// })
+			}
+		},
+		onShow() {
+			if(!this.hasLogin){
+				console.log("onShow首页跳转登录",this.hasLogin)
+				// uni.reLaunch({
+				// 	url:'/pages/public/login?flag=1'
+				// })
+			}
 		},
 		methods: {
 			toProductList(item){
@@ -351,13 +389,36 @@
 			 * 分次请求未作整合
 			 */
 			async loadData() {
-				let carouselList = await this.$api.json('carouselList');
-				this.titleNViewBackground = carouselList[0].background;
-				this.swiperLength = carouselList.length;
-				this.carouselList = carouselList;
-				
+				// let carouselList = await this.$api.json('carouselList');
+				this.initCarouseList()
+				this.initServiceImgList()
 				this.initCateList()
 				this.initRecommendGoodsList()
+			},
+			initCarouseList(){
+				this.$api.httpPost('homePage/api/query',{
+					titleType:1
+				}).then(r=>{
+					console.log("轮播图片请求结果：",r)
+					this.carouselList=r.data.orderFilePathList
+					this.titleNViewBackground = "none";
+					this.swiperLength = this.carouselList.length;
+				}).catch(e=>{
+					console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+				})
+			},
+			initServiceImgList(){
+				this.$api.httpPost('homePage/api/query',{
+					titleType:2
+				}).then(r=>{
+					console.log("服务图片请求结果：",r)
+					this.serviceImgList=r.data.orderFilePathList
+					this.swiperLength2 = this.serviceImgList.length;
+				}).catch(e=>{
+					console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+				})
 			},
 			initCateList(){
 				this.$api.httpGet('largeCategory/api/listAll').then(r=>{
@@ -403,7 +464,12 @@
 			swiperChange(e) {
 				const index = e.detail.current;
 				this.swiperCurrent = index;
-				this.titleNViewBackground = this.carouselList[index].background;
+				// this.titleNViewBackground = this.carouselList[index].background;
+			},
+			//轮播图切换修改背景色
+			swiperChange2(e) {
+				const index = e.detail.current;
+				this.swiperCurrent2 = index;
 			},
 			navTo(url){
 				uni.navigateTo({
@@ -551,9 +617,9 @@
 		image {
 			width: 100%;
 			height: 100%;
-			border-radius: 10upx;
 		}
 	}
+	
 	.swiper-dots {
 		display: flex;
 		position: absolute;
@@ -611,12 +677,21 @@
 	}
 	.ad-1{
 		width: 100%;
-		height: 210upx;
-		padding: 10upx 10upx;
+		height: 200upx;
 		background: #fff;
-		image{
-			width:100%;
-			height: 100%; 
+		position: relative;
+		.serviceImg {
+			width: 100%;
+			height: 200upx;
+			.serviceImg-item {
+				width: 100%;
+				height: 100%;
+				overflow: hidden;
+			}
+			image {
+				width: 100%;
+				height: 100%;
+			}
 		}
 	}
 	/* 秒杀专区 */

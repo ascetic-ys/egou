@@ -29,7 +29,7 @@
 					<text class="title clamp">{{item.productName}}</text>
 					<view class="price-box">
 						<text class="price">{{item.price}}</text>
-						<text>已售 {{item.sales||0}}</text>
+						<!-- <text>已售 {{item.sales||0}}</text> -->
 					</view>
 				</view>
 			</view>

@@ -3,9 +3,7 @@
 	 * vuex管理登陆状态，具体可以参考官方登陆模板示例
 	 */
 	import Vue from 'vue'
-	import {
-		mapMutations
-	} from 'vuex';
+	import {mapMutations} from 'vuex';
 	export default {
 		onLaunch: function() {
 			this.setCustomBar()
@@ -35,6 +33,10 @@
 					  selectedIconPath: "static/tab-achieve-current.png",
 					})
 				}
+			}else{
+				uni.reLaunch({
+					url:'/pages/public/login?flag=1'
+				})
 			}
 			if(weChat.language){
 				//更新微信授权状态
@@ -68,6 +70,13 @@
 		onShow: function() {
 			console.log('App Show')
 			this.checkUpdate()
+			let userInfo = uni.getStorageSync('userInfo') || '';
+			if(!userInfo.id){
+				console.log("app-onShow首页跳转登录",this.hasLogin)
+				uni.reLaunch({
+					url:'/pages/public/login?flag=1'
+				})
+			}
 		},
 		onHide: function() {
 			console.log('App Hide')

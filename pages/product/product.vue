@@ -1,33 +1,57 @@
 <template>
 	<view class="container">
 		<view class="carousel">
-			<!-- <swiper indicator-dots circular=true duration="400">
+			<swiper indicator-dots circular=true duration="400" >
+				<swiper-item class="swiper-item" v-for="(item1,index1) in videoList" :key="index1">
+					<view class="video-wrapper">
+						<video id="myVideo" :src="item1" @error="videoErrorCallback" 
+						controls 
+						show-center-play-btn="true" 
+						enable-play-gesture="true" 
+						show-mute-btn="true" 
+						muted="true" 
+						></video>
+					</view>
+				</swiper-item>
 				<swiper-item class="swiper-item" v-for="(item,index) in imgList" :key="index">
 					<view class="image-wrapper">
 						<image
-							:src="item.src" 
+							:src="item" 
 							class="loaded" 
-							mode="aspectFill"
+							mode="aspectFit"
 						></image>
 					</view>
 				</swiper-item>
-			</swiper> -->
-			<view class="image-wrapper">
+			</swiper>
+			<!-- <view class="image-wrapper">
 				<image
 					:src="product.imgPath||`http://img5.imgtn.bdimg.com/it/u=1957887963,2553893514&fm=26&gp=0.jpg`" 
 					class="loaded" 
 					mode="aspectFill"
 				></image>
-			</view>
+			</view> -->
+			<!-- <view class="video-wrapper">
+				<video id="myVideo" :src="videoSrc" @error="videoErrorCallback" 
+				controls 
+				autoplay='true' 
+				loop="true" 
+				enable-play-gesture="true" 
+				show-mute-btn="true" 
+				muted="true" 
+				></video>
+			</view> -->
 		</view>
 		
 		<view class="introduce-section">
-			<text class="title">{{product.brand}}{{product.color}}{{product.productName}}{{product.largeCategory}}{{product.littleCategory}}</text>
-			<view class="price-box">
-				<text class="price-tip">¥</text>
-				<text class="price">{{product.price}}</text>
-				<!-- <text class="m-price">¥488</text> -->
-				<!-- <text class="coupon-tip">7折</text> -->
+			<text class="title">{{product.productName}}</text>
+			<view class="price-content">
+				<view class="price-box">
+					<text class="price-tip">¥</text>
+					<text class="price">{{product.price}}</text>
+					<!-- <text class="m-price">¥488</text> -->
+					<!-- <text class="coupon-tip">7折</text> -->
+				</view>
+				<view class="image-download"><text class="yticon icon-Group-" @click="downloadImage">素材下载</text></view>
 			</view>
 			<!-- <view class="bot-row">
 				<text>销量: 108</text>
@@ -52,11 +76,11 @@
 		</view> -->
 		
 		<view class="c-list">
-			<view class="c-row b-b" @click="toggleSpec">
-				<text class="tit">购买类型</text>
+			<view class="c-row b-b" @click="toggleSpec" v-if="product.orderProductColorList.length>0">
+				<text class="tit">已选购</text>
 				<view class="con">
 					<view class="selected-box" v-for="(sItem, sIndex) in specSelected" :key="sIndex">
-						<image :src="sItem.imgPath" mode="aspectFill"></image>
+						<image :src="sItem.imgPath" mode="aspectFit"></image>
 						<text class="selected-text">{{sItem.color}}</text>
 					</view>
 				</view>
@@ -83,10 +107,16 @@
 					<text>假一赔十 ·</text>
 				</view>
 			</view> -->
-			<view class="c-row b-b">
+			<!-- <view class="c-row b-b">
 				<text class="tit">厂家:</text>
 				<view class="bz-list con">
 					<text>{{product.factoryShortName}}</text>
+				</view>
+			</view> -->
+			<view class="c-row b-b">
+				<text class="tit">保障:</text>
+				<view class="bz-list con">
+					<text>付款后{{product.guarantee||60}}天内发货</text>
 				</view>
 			</view>
 		</view>
@@ -111,15 +141,69 @@
 				</view>
 			</view>
 		</view> -->
-		
-		<view class="detail-desc">
+		<view class="navbar">
+			<view 
+				v-for="(item, index) in navList" :key="index" 
+				class="nav-item" 
+				:class="{current: tabCurrentIndex === index}"
+				@click="tabClick(index)"
+			>
+				{{item.text}}
+			</view>
+		</view>
+		<view class="detail-desc" v-show="tabCurrentIndex==0">
 			<view class="d-header">
 				<text>图文详情</text>
 			</view>
-			<!-- <rich-text :nodes="desc"></rich-text> -->
-			<!-- <rich-text :nodes="product.introductory"></rich-text> -->
 			<jyf-parser domain="https://6874-html-foe72-1259071903.tcb.qcloud.la" gesture-zoom lazy-load ref="article" selectable
 			 show-with-animation use-anchor @error="error" @imgtap="imgtap" @linkpress="linkpress" @parse="parse" @ready="ready">加载中...</jyf-parser>
+			<view class="d-bottom"></view>
+		</view>
+		<view class="detail-params" v-show="tabCurrentIndex==1">
+			<!-- 商品编号、风格、主要材质、工艺、功能、体积、面料、适用场景 -->
+			<view class="d-data">
+				<text class="title">商品编号</text>
+				<text class="info">{{product.brand||'-'}}</text>
+			</view>
+			<view class="d-data">
+				<text class="title">风格</text>
+				<text class="info">{{product.specification||'-'}}</text>
+			</view>
+			<view class="d-data">
+				<text class="title">主要材质</text>
+				<text class="info">{{product.productModel||'-'}}</text>
+			</view>
+			<view class="d-data">
+				<text class="title">工艺</text>
+				<text class="info">{{product.technology||'-'}}</text>
+			</view>
+			<view class="d-data">
+				<text class="title">功能</text>
+				<text class="info">{{product.function||'-'}}</text>
+			</view>
+			<view class="d-data">
+				<text class="title">体积</text>
+				<text class="info">{{product.volume||'-'}}</text>
+			</view>
+			<view class="d-data">
+				<text class="title">面料</text>
+				<text class="info">{{product.fabric||'-'}}</text>
+			</view>
+			<view class="d-data">
+				<text class="title">适用场景</text>
+				<text class="info">{{product.adapter||'-'}}</text>
+			</view>
+			<view class="d-bottom"></view>
+		</view>
+		<view class="detail-service" v-show="tabCurrentIndex==2">
+			<view class="d-data" @click="navTo('/pages/set/protocolCommon?flag=1')">
+				<text class="title">7天无理由退换货规则</text>
+				<text class="yticon icon-you"></text>
+			</view>
+			<view class="d-data" @click="navTo('/pages/set/protocolCommon?flag=2')">
+				<text class="title">包邮服务及物流费用说明</text>
+				<text class="yticon icon-you"></text>
+			</view>
 			<view class="d-bottom"></view>
 		</view>
 		
@@ -129,6 +213,10 @@
 				<text class="yticon icon-xiatubiao--copy"></text>
 				<text>首页</text>
 			</navigator>
+			<button class="p-b-btn btn-service" open-type="contact" @contact="getContact">
+				<text class="yticon icon-xiaoxi"></text>
+				<text class="btn-name">客服</text>
+			</button>
 			<navigator url="/pages/cart/cart" open-type="switchTab" class="p-b-btn">
 				<text class="yticon icon-gouwuche"></text>
 				<text>购物车</text>
@@ -144,19 +232,17 @@
 			</view>
 		</view>
 		
-		
 		<!-- 规格-模态层弹窗 -->
 		<view 
 			class="popup spec" 
 			:class="specClass"
 			@touchmove.stop.prevent="stopPrevent"
-			@click="toggleSpec"
-		>
+			@click="toggleSpec" >
 			<!-- 遮罩层 -->
 			<view class="mask"></view>
 			<view class="layer attr-content" @click.stop="stopPrevent">
-				<view class="a-t">
-					<image :src="specSelected[0].imgPath||product.orderProductColorList[0].imgPath||`https://cbu01.alicdn.com/img/ibank/2017/204/302/4522203402_1844785635.220x220.jpg?_=2020`"></image>
+				<view class="a-t" v-if="product.orderProductColorList.length>0">
+					<image :src="specSelected[0].imgPath||product.orderProductColorList[0].imgPath" mode="aspectFit"></image>
 					<view class="right">
 						<text class="price">¥{{product.price}}</text>
 						<!-- <text class="stock">库存：188件</text> -->
@@ -181,7 +267,7 @@
 						</text>
 					</view>
 				</view> -->
-				<view class="attr-list">
+				<view class="attr-list" v-if="product.orderProductColorList.length>0">
 					<text>颜色</text>
 					<view class="item-list">
 						<view 
@@ -190,7 +276,7 @@
 							:class="{selected: item.selected}"
 							@click="selectColor(item)"
 						>
-							<image :src="item.imgPath" mode="aspectFill"></image>
+							<image :src="item.imgPath" mode="aspectFit"></image>
 							<text class="tit">{{item.color}}</text>
 						</view>
 					</view>
@@ -219,15 +305,24 @@
 		data() {
 			return {
 				id:null,
+				// videoSrc:'/static/video/banner.mp4',
+				videoSrc:'https://jdvideo.300hu.com/vodtransgzp1251412368/9031868223418300449/v.f30.mp4?dockingId=c59ea11a-f67e-4738-b4c3-2eb105aa528d&storageSource=3',
 				specClass: 'none',
 				specSelected:[],
 				product:{},
 				favorite: true,
 				shareList: [],
 				imgList: [],
+				videoList: [],
 				desc: ``,
 				sizeList:[],
-				colorList:[]
+				colorList:[],
+				tabCurrentIndex:0,
+				navList: [
+					{state: 0,text: '商品介绍'},
+					{state: 1,text: '详细参数'},
+					{state: 2,text: '服务规则'},
+				],
 			};
 		},
 		computed: {
@@ -249,13 +344,27 @@
 		methods:{
 			initData(){
 				this.$api.loading('加载中...')
-				this.$api.httpPost('productInfo/api/detail',{id:this.id}).then(r=>{
+				this.$api.httpPost('productInfo/api/detail',{
+					id:this.id,
+					userId:this.userInfo.id
+				}).then(r=>{
 					console.log("请求结果：",r.data)
 					if(r.data){
 						this.product=r.data
-						console.log("orderProductColorList",this.product.orderProductColorList)
-						this.$set(this.product.orderProductColorList[0], 'selected', true);
-						this.specSelected.push(this.product.orderProductColorList[0]);
+						if(this.product.orderProductColorList&&this.product.orderProductColorList.length>0){
+							console.log("orderProductColorList",this.product.orderProductColorList)
+							this.$set(this.product.orderProductColorList[0], 'selected', true);
+							this.specSelected.push(this.product.orderProductColorList[0]);
+						}
+						if(this.product.filePathList && this.product.filePathList.length>0){
+							this.product.filePathList.forEach(e=>{
+								if(e.type==1){
+									this.imgList.push(e.filePath)
+								}else if(e.type==2){
+									this.videoList.push(e.filePath)
+								}
+							})
+						}
 						this.favorite=this.product.isFavorite==1
 						this.$refs.article.setContent(this.product.introductory);
 					}else{
@@ -267,6 +376,106 @@
 					console.log("请求错误：",e)
 					this.$api.msg(e.msg||'网络异常请重试')
 					uni.hideLoading();
+				})
+			},
+			//tab点击
+			tabClick(index){
+				this.tabCurrentIndex = index;
+			},
+			/**
+			 * 统一跳转接口
+			 * navigator标签现在默认没有转场动画，所以用view
+			 */
+			navTo(url){
+				uni.navigateTo({  
+					url
+				})  
+			},
+			videoErrorCallback: function(e) {
+				uni.showModal({
+					content: e.target.errMsg,
+					showCancel: false
+				})
+			},
+			downloadImage(){
+				console.log("素材下载：",this.imgList)
+				this.$api.loading("正在保存素材...")
+				this.saveVideo()
+				this.saveImage()
+			},
+			saveImage(url){
+				this.imgList.forEach(e=>{
+					const downloadTask = uni.downloadFile({
+						url: e,
+						success: (res) => {
+							if (res.statusCode === 200) {
+								// console.log('下载成功', res);
+								let filePath = res.tempFilePath;
+								console.log("保存图片路径：", filePath)
+								uni.authorize({
+									scope: 'scope.writePhotosAlbum',
+									success: function() {
+										uni.saveImageToPhotosAlbum({
+											filePath: filePath,
+											success: function() {
+												uni.hideLoading();
+												// console.log('save success');
+												// uni.showToast({title: "图片保存成功",icon: "none"});
+											}
+										});
+									}
+								})
+							} else {
+								uni.showToast({title: '获取图片失败！',icon: "none"})
+							}
+						},
+						fail:(res) => {
+							uni.hideLoading()
+						}
+					});
+					downloadTask.onProgressUpdate((res) => {
+						console.log('image下载进度' + res.progress);
+						console.log('image已经下载的数据长度' + res.totalBytesWritten);
+						console.log('image预期需要下载的数据总长度' + res.totalBytesExpectedToWrite);
+					});
+				})
+			},
+			saveVideo(){
+				this.videoList.forEach(e=>{
+					const downloadTask = uni.downloadFile({
+						url: e,
+						success: (res) => {
+							if (res.statusCode === 200) {
+								// console.log('下载成功', res);
+								let filePath = res.tempFilePath;
+								console.log("保存视频路径：", filePath)
+								uni.authorize({
+									scope: 'scope.writePhotosAlbum',
+									success: function() {
+										uni.saveVideoToPhotosAlbum({
+											filePath: filePath,
+											success: function() {
+												uni.hideLoading();
+												// console.log('save success');
+												// uni.showToast({title: "视频保存成功",icon: "none"});
+											}
+										});
+									}
+								})
+							} else {
+								uni.showToast({title: '获取视频失败！',icon: "none"})
+							}
+					
+						},
+						fail:(res) => {
+							uni.hideLoading()
+						}
+					});
+					downloadTask.onProgressUpdate((res) => {
+						console.log('video下载进度' + res.progress);
+						console.log('video已经下载的数据长度' + res.totalBytesWritten);
+						console.log('video预期需要下载的数据总长度' + res.totalBytesExpectedToWrite);
+					})
 				})
 			},
 			parse(e) {
@@ -458,7 +667,8 @@
 		color: #888;
 	}
 	.carousel {
-		height: 722upx;
+		height: 432upx;
+/* 		height: 722upx; */
 		position:relative;
 		swiper{
 			height: 100%;
@@ -466,6 +676,14 @@
 		.image-wrapper{
 			width: 100%;
 			height: 100%;
+		}
+		.video-wrapper{
+			width: 100%;
+			height: 100%;
+			video{
+				width: 100%;
+				height: 100%;
+			}
 		}
 		.swiper-item {
 			display: flex;
@@ -483,12 +701,25 @@
 	
 	/* 标题简介 */
 	.introduce-section{
-		background: #fff;
+		background: #636363;
 		padding: 20upx 30upx;
-		
+		color: #FFFFFF;
+		.price-content{
+			display:flex;
+			justify-content: space-between;
+			.image-download{
+				background: #4CD964;
+				padding: 6rpx 20rpx;
+				border-radius: 50rpx;
+				line-height: 50rpx;
+				text{
+					font-size: 26rpx;
+				}
+			}
+		}
 		.title{
 			font-size: 32upx;
-			color: $font-color-dark;
+			color: #FFFFFF;
 			height: 50upx;
 			line-height: 50upx;
 		}
@@ -594,6 +825,7 @@
 		font-size: $font-sm + 2upx;
 		color: $font-color-base;
 		background: #fff;
+		margin-top: 15rpx;
 		.c-row{
 			display:flex;
 			align-items:center;
@@ -609,11 +841,11 @@
 			.selected-box{
 				display: flex;
 				align-items: center;
-				justify-content: center;
-				background: #eee;
+				justify-content: flex-start;
+				/* background: #eee; */
 				margin-right: 20upx;
-				border-radius: 10rpx;
-				width: 120rpx;
+				/* border-radius: 10rpx; */
+				/* width: 120rpx; */
 				height: 60rpx;
 				image{
 					width: 60rpx;
@@ -622,6 +854,7 @@
 				.selected-text{
 					font-size: $font-base;
 					color: $font-color-dark;
+					margin: 20rpx;
 				}
 			}
 			
@@ -703,6 +936,39 @@
 			}
 		}
 	}
+	.navbar{
+		display: flex;
+		height: 40px;
+		padding: 0 5px;
+		background: #fff;
+		box-shadow: 0 1px 5px rgba(0,0,0,.06);
+		position: relative;
+		z-index: 10;
+		margin-top: 15rpx;
+		.nav-item{
+			flex: 1;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 100%;
+			font-size: 15px;
+			color: $font-color-dark;
+			position: relative;
+			&.current{
+				color: $base-color;
+				&:after{
+					content: '';
+					position: absolute;
+					left: 50%;
+					bottom: 0;
+					transform: translateX(-50%);
+					width: 44px;
+					height: 0;
+					border-bottom: 2px solid $base-color;
+				}
+			}
+		}
+	}
 	/*  详情 */
 	.detail-desc{
 		background: #fff;
@@ -732,6 +998,48 @@
 				content: '';
 				border-bottom: 1px solid #ccc; 
 			}
+		}
+		.d-bottom{
+			height: 200rpx;
+		}
+	}
+	/* 详细参数 */
+	.detail-params{
+		background: #fff;
+		display: flex;
+		flex-direction: column;
+		padding: 20rpx;
+		.d-data{
+			display: flex;
+			flex-direction: row;
+			line-height: 80rpx;
+			border-bottom: 1rpx solid #F5F5F5;
+			font-size: 24rpx;
+			.title{
+				flex: 1;
+				float: left;
+			}
+			.info{
+				flex: 3;
+				float: left;
+			}
+		}
+		.d-bottom{
+			height: 200rpx;
+		}
+	}
+	.detail-service{
+		background: #fff;
+		display: flex;
+		flex-direction: column;
+		padding: 20rpx;
+		.d-data{
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			line-height: 80rpx;
+			border-bottom: 1rpx solid #F5F5F5;
+			font-size: 24rpx;
 		}
 		.d-bottom{
 			height: 200rpx;
@@ -794,8 +1102,9 @@
 					height: 60rpx;
 				}
 				text{
-					font-size: $font-base;
+					font-size: 20rpx;
 					color: $font-color-dark;
+					margin: 20rpx;
 				}
 			}
 			
@@ -803,6 +1112,8 @@
 				background: #fbebee;
 				text{
 					color: $uni-color-primary;
+					margin: 20rpx;
+
 				}
 			}
 		}
@@ -936,6 +1247,26 @@
 			.icon-shoucang{
 				font-size: 46upx;
 			}
+			button{
+				line-height: 32rpx;
+				padding: 0;
+				font-size: 24rpx;
+				color: #606266;
+
+			}
+			button::after{
+				border: none;
+			}
+		}
+		.btn-service{
+			padding: 0;
+			background: none;
+			.btn-name{
+				line-height: 32rpx;
+			}
+		}
+		.btn-service::after{
+			border: none;
 		}
 		.action-btn-group{
 			display: flex;

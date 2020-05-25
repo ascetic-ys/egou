@@ -120,6 +120,7 @@
 				this.disabledPay=true
 				console.log("支付请求：",this.orderInfo)
 				let params = this.orderInfo
+				params.tag=this.userInfo.tag
 				params.type=1
 				this.$api.httpPost('wechatPayInfo/api/payMoney',params).then(r=>{
 					console.log("支付结果：",r)
