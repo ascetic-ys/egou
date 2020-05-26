@@ -27,6 +27,7 @@
 							placeholder="请输入手机号码"
 							maxlength="11"
 						/>
+						<button class="sendCode" :disabled='time>0' @tap='sendCode'>{{`${time>0?'已发送('+time+'s)':'发送验证码'}`}}</button>
 					</view>
 					<view class="input-item">
 						<text class="tit">性别</text>
@@ -130,6 +131,7 @@
 		},
 		data(){
 			return {
+				time:-1,
 				form:{
 					sex:0,//性别（0：男 1：女）
 					email:'',
@@ -145,6 +147,7 @@
 					province:'',
 					city:'',
 					district:'',
+					smsCode:'',
 				},
 				showImg1:'',
 				showImg2:'',
@@ -224,6 +227,48 @@
 			},
 			navBack(){
 				uni.navigateBack();
+			},
+			sendCode(){
+				let phone=this.form.partnerPhone
+				if(!isMobile(phone)){
+					this.$api.msg('手机号码格式不正确')
+					return false
+				}
+				//校验手机号是否唯一
+				this.$api.httpPost('userInfo/api/checkPhone',{
+					phoneNumber:phone
+				}).then(r=>{
+					console.log("校验手机号是否唯一请求结果：",r)
+					return wxToAuth()
+				}).then(infoData=>{
+					console.log(infoData)
+					const {userInfo,loginData}=infoData
+					//2.将用户登录code传递到后台置换用户SessionKey、OpenId等信息 
+					return this.$api.httpPost('userInfo/api/sendCode',{
+								code: loginData.code,
+								rawData:userInfo.rawData,
+								signature:userInfo.signature,
+								encrypteData:userInfo.encryptedData,
+								iv:userInfo.iv,
+								phoneNumber:phone
+							})
+				}).then(r=>{
+					//验证码发送成功
+					if(this.time>0){return}
+					this.time=60
+					this.startTimeout()
+				}).catch(e=>{
+					console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+				})
+			},
+			startTimeout(){
+				setTimeout(() => {
+					this.time--
+					if(this.time>0){
+						this.startTimeout()
+					}
+				}, 1000);
 			},
 			toNext(){
 				// 数据验证模块

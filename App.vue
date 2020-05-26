@@ -70,13 +70,13 @@
 		onShow: function() {
 			console.log('App Show')
 			this.checkUpdate()
-			let userInfo = uni.getStorageSync('userInfo') || '';
-			if(!userInfo.id){
-				console.log("app-onShow首页跳转登录",this.hasLogin)
-				uni.reLaunch({
-					url:'/pages/public/login?flag=1'
-				})
-			}
+			// let userInfo = uni.getStorageSync('userInfo') || '';
+			// if(!userInfo.id){
+			// 	console.log("app-onShow首页跳转登录",this.hasLogin)
+			// 	uni.reLaunch({
+			// 		url:'/pages/public/login?flag=1'
+			// 	})
+			// }
 		},
 		onHide: function() {
 			console.log('App Hide')

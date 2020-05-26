@@ -99,6 +99,43 @@
 					</view>
 				</view>
 			</view>
+			<view class="today-section" v-if='[0,3].indexOf(userInfo.tag)>-1'>
+				<view class="info-box">
+					<text class="info-title">今日数据</text>
+					<view class="info-more">
+						<!-- <text class="yticon icon-you"></text> -->
+					</view>
+				</view>
+				<view class="btn-box">
+					<view class="today-item" v-if='[0,3].indexOf(userInfo.tag)>-1' hover-class="common-hover"  :hover-stay-time="50">
+						<text class="num">{{todayOrderNum}}</text>
+						<text>今日订单数</text>
+						<view class="change">较昨日
+							<text :class="[todayOrderNumChange>0?'red':todayOrderNumChange==0?'gray':'green']">
+								{{todayOrderNumChange==0?`+${todayOrderNumChange}`:todayOrderNumChange}}
+							</text>
+						</view>
+					</view>
+					<view class="today-item" v-if='[0,3].indexOf(userInfo.tag)>-1' hover-class="common-hover" :hover-stay-time="50">
+						<text class="num">{{todayOrderPrice}}</text>
+						<text>今日订单额</text>
+						<view class="change">较昨日
+							<text :class="[todayOrderPriceChange>0?'red':todayOrderPriceChange==0?'gray':'green']">
+								{{todayOrderPriceChange==0?`+${todayOrderPriceChange}`:todayOrderPriceChange}}
+							</text>
+						</view>
+					</view>
+					<view class="today-item" v-if='[3].indexOf(userInfo.tag)>-1' hover-class="common-hover"  :hover-stay-time="50">
+						<text class="num">{{todayUser}}</text>
+						<text>今日注册用户</text>
+						<view class="change">较昨日
+							<text :class="[todayUserChange>0?'red':todayUserChange==0?'gray':'green']">
+								{{todayUserChange==0?`+${todayUserChange}`:todayUserChange}}
+							</text>
+						</view>
+					</view>
+				</view>
+			</view>
 			<view class="mybtn-section ">
 				<button-cell v-if='!userInfo.id || [1,4].indexOf(userInfo.tag)>-1' icon="icon-icon--" iconColor="#e07472" title="城市合伙人注册" border="" @eventClick="navTo('/pages/partner/partner',true)"></button-cell>
 				<button-cell v-if='[0].indexOf(userInfo.tag)>-1' icon="icon-icon--" iconColor="#e07472" title="城市合伙人信息" tips="查看已注册的合伙人" border="" @eventClick="navTo('/pages/partner/partnerList')"></button-cell>
@@ -145,28 +182,7 @@
 				
 			</view>
 			
-			<view class="today-section" v-if='[0,3].indexOf(userInfo.tag)>-1'>
-				<view class="info-box">
-					<text class="info-title">今日数据</text>
-					<view class="info-more">
-						<!-- <text class="yticon icon-you"></text> -->
-					</view>
-				</view>
-				<view class="btn-box">
-					<view class="today-item" v-if='[0,3].indexOf(userInfo.tag)>-1' hover-class="common-hover"  :hover-stay-time="50">
-						<text class="num">{{todayOrderNum}}</text>
-						<text>今日订单数</text>
-					</view>
-					<view class="today-item" v-if='[0,3].indexOf(userInfo.tag)>-1' hover-class="common-hover" :hover-stay-time="50">
-						<text class="num">{{todayOrderPrice}}</text>
-						<text>今日订单额</text>
-					</view>
-					<view class="today-item" v-if='[3].indexOf(userInfo.tag)>-1' hover-class="common-hover"  :hover-stay-time="50">
-						<text class="num">{{todayUser}}</text>
-						<text>今日注册用户</text>
-					</view>
-				</view>
-			</view>
+			
 			<!-- <view class="order-panel" v-if='[0,3].indexOf(userInfo.tag)>-1'>
 				<view class="left blue">
 					<image :src="`/static/images/order-num.png`" mode="scaleToFill"></image>
@@ -310,6 +326,15 @@
 				historyNum:0,
 			}
 		},
+		created() {
+			let userInfo = uni.getStorageSync('userInfo') || '';
+			if(!userInfo.id){
+				console.log("created首页跳转登录",userInfo.id)
+				uni.reLaunch({
+					url:'/pages/public/login?flag=1'
+				})
+			}
+		},
 		onLoad(){
 			this.initData()
 		},
@@ -413,8 +438,8 @@
 						this.todayOrderPriceUp=2
 					}
 					
-					this.todayOrderNumChange=Math.abs(this.todayOrderNumChange);
-					this.todayOrderPriceChange=Math.abs(this.todayOrderPriceChange);
+					// this.todayOrderNumChange=Math.abs(this.todayOrderNumChange);
+					// this.todayOrderPriceChange=Math.abs(this.todayOrderPriceChange);
 				}).catch(e=>{
 					console.log("请求错误：",e)
 					this.$api.msg(e.msg||'网络异常请重试')
@@ -435,7 +460,7 @@
 					}else if(this.todayUserChange>0){
 						this.todayUserUp=2
 					}
-					this.todayUserChange=Math.abs(this.todayUserChange);
+					// this.todayUserChange=Math.abs(this.todayUserChange);
 				}).catch(e=>{
 					console.log("请求错误：",e)
 					this.$api.msg(e.msg||'网络异常请重试')
@@ -791,6 +816,18 @@
 				margin: 18upx 0rpx;
 				color: #fa436a;
 			}
+			.change{
+				font-size: 20upx;
+				margin-top: 10rpx;
+				color: #606266;
+			}
+			.red{
+				color: red;
+			}
+			.green{
+				color: green;
+			}
+			
 		}
 		
 	}

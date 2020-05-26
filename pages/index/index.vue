@@ -350,11 +350,12 @@
 		},
 		created() {
 			this.loadData();
-			if(!this.hasLogin){
-				console.log("created首页跳转登录",this.hasLogin)
-				// uni.reLaunch({
-				// 	url:'/pages/public/login?flag=1'
-				// })
+			let userInfo = uni.getStorageSync('userInfo') || '';
+			if(!userInfo.id){
+				console.log("created首页跳转登录",userInfo.id)
+				uni.reLaunch({
+					url:'/pages/public/login?flag=1'
+				})
 			}
 		},
 		onLoad() {

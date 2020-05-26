@@ -25,13 +25,22 @@
 								maxlength="20"
 							/>
 						</view>
-						<view class="input-item">
+						<view class="input-item sendCode-item">
 							<text class="tit">手机号码</text>
 							<input 
 								type="number" 
 								v-model="form.phoneNumber" 
 								placeholder="请输入手机号码"
 								maxlength="11"
+							/>
+							<button class="sendCode" :disabled='time>0' @tap='sendCode'>{{`${time>0?'已发送('+time+'s)':'发送验证码'}`}}</button>
+						</view>
+						<view class="input-item">
+							<text class="tit">验证码</text>
+							<input 
+								v-model="form.smsCode" 
+								placeholder="请输入验证码"
+								maxlength="6"
 							/>
 						</view>
 						<view class="input-item">
@@ -156,13 +165,22 @@
 								maxlength="20"
 							/>
 						</view>
-						<view class="input-item">
+						<view class="input-item sendCode-item">
 							<text class="tit">手机号码</text>
 							<input 
 								type="number" 
 								v-model="generalUser.userPhone" 
 								placeholder="请输入手机号码"
 								maxlength="11"
+							/>
+							<button class="sendCode" :disabled='time>0' @tap='sendCode'>{{`${time>0?'已发送('+time+'s)':'发送验证码'}`}}</button>
+						</view>
+						<view class="input-item">
+							<text class="tit">验证码</text>
+							<input 
+								v-model="generalUser.smsCode" 
+								placeholder="请输入验证码"
+								maxlength="6"
 							/>
 						</view>
 						<view class="input-item">
@@ -255,12 +273,12 @@
 								<image :src="showImg3" mode=""></image>
 							</view>
 						</view>
-						<view class="input-item3">
+						<!-- <view class="input-item3">
 							<text class="tit" @tap="uploadCert(4)">上传身份证反面</text>
 							<view class="image">
 								<image :src="showImg4" mode=""></image>
 							</view>
-						</view>
+						</view> -->
 					</block>
 					
 				</view>
@@ -322,6 +340,7 @@
 		},
 		data(){
 			return {
+				time:-1,
 				showAgreement:true,
 				tag:4,
 				form:{
@@ -341,7 +360,8 @@
 					province:'',
 					city:'',
 					district:'',
-					salesPersonPhoneNumber:''
+					salesPersonPhoneNumber:'',
+					smsCode:'',
 				},
 				generalUser:{
 					userName:'',//	是	string	姓名
@@ -361,6 +381,7 @@
 					province:'',
 					city:'',
 					district:'',
+					smsCode:'',
 				},
 				showImg1:'',
 				showImg2:'',
@@ -399,6 +420,53 @@
 					console.log("请求错误：",e)
 					this.$api.msg(e.msg||'网络异常请重试')
 				})
+			},
+			sendCode(){
+				let phone=""
+				if(this.tag==1){
+					phone=this.form.phoneNumber
+				}else if (this.tag==4){
+					phone=this.generalUser.userPhone
+				}
+				if(!isMobile(phone)){
+					this.$api.msg('手机号码格式不正确')
+					return false
+				}
+				//校验手机号是否唯一
+				this.$api.httpPost('userInfo/api/checkPhone',{
+					phoneNumber:phone
+				}).then(r=>{
+					console.log("校验手机号是否唯一请求结果：",r)
+					return wxToAuth()
+				}).then(infoData=>{
+					console.log(infoData)
+					const {userInfo,loginData}=infoData
+					//2.将用户登录code传递到后台置换用户SessionKey、OpenId等信息 
+					return this.$api.httpPost('userInfo/api/sendCode',{
+								code: loginData.code,
+								rawData:userInfo.rawData,
+								signature:userInfo.signature,
+								encrypteData:userInfo.encryptedData,
+								iv:userInfo.iv,
+								phoneNumber:phone
+							})
+				}).then(r=>{
+					//验证码发送成功
+					if(this.time>0){return}
+					this.time=60
+					this.startTimeout()
+				}).catch(e=>{
+					console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+				})
+			},
+			startTimeout(){
+				setTimeout(() => {
+					this.time--
+					if(this.time>0){
+						this.startTimeout()
+					}
+				}, 1000);
 			},
 			changeAddress(data){
 				console.log('选择省市区',data.data)
@@ -468,7 +536,7 @@
 					if(err){return}
 					const tempFilePaths = res.tempFilePaths;
 					uni.uploadFile({
-						url: RESOURCE.URL_API + 'orderMainInfo/api/uploadImage', //仅为示例，非真实的接口地址
+						url: RESOURCE.URL_API + 'order/orderMainInfo/api/uploadImage', //仅为示例，非真实的接口地址
 						filePath: tempFilePaths[0],
 						name: 'uploadFile',
 						formData: {},
@@ -563,6 +631,10 @@
 						this.$api.msg('手机号码格式不正确')
 						return false
 					}
+					if(!this.form.smsCode){
+						this.$api.msg('请输入验证码')
+						return 
+					}
 					if(!this.form.userPassword){
 						this.$api.msg('请输入密码')
 						return false
@@ -648,6 +720,10 @@
 						this.$api.msg('手机号码格式不正确')
 						return false
 					}
+					if(!this.generalUser.smsCode){
+						this.$api.msg('请输入验证码')
+						return 
+					}
 					if(!this.generalUser.userPassword){
 						this.$api.msg('请输入密码')
 						return false
@@ -696,10 +772,10 @@
 						this.$api.msg('请上传身份证正面')
 						return false
 					}
-					if(!this.generalUser.idCardReverse){
-						this.$api.msg('请上传身份证反面')
-						return false
-					}
+					// if(!this.generalUser.idCardReverse){
+					// 	this.$api.msg('请上传身份证反面')
+					// 	return false
+					// }
 				}
 				return true
 			},
@@ -1049,6 +1125,22 @@
 					border: none;
 				}
 			}
+		}
+	}
+	
+	.sendCode-item{
+		position: relative;
+		button{
+			position: absolute;
+			right: 20rpx;
+			background: #fa436a;
+			color: #FFFFFF;
+			font-size: 26rpx;
+			z-index: 9;
+
+		}
+		button::after{
+			border: none;
 		}
 	}
 </style>
