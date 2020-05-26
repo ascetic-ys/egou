@@ -79,15 +79,7 @@
 								placeholder="请输入销售人员手机号"
 							/>
 						</view>
-						<view class="input-item">
-							<text class="tit">公司名称</text>
-							<input 
-								type="" 
-								v-model="form.companyName" 
-								placeholder="请输入公司名称"
-								maxlength="50"
-							/>
-						</view>
+						
 						<view class="input-item">
 							<text class="tit">联系人</text>
 							<input 
@@ -99,7 +91,7 @@
 						<view class="input-item">
 							<text class="tit">办公电话</text>
 							<input 
-								type="number"
+								
 								v-model="form.officePhone" 
 								placeholder="请输入电话"
 								maxlength="12"
@@ -129,16 +121,39 @@
 							</view>
 						</view>
 						<view class="input-item">
+							<text class="tit">公司名称</text>
+							<input 
+								type="" 
+								v-model="form.companyName" 
+								placeholder="请上传营业执照"
+								maxlength="50"
+								disabled="true"
+							/>
+						</view>
+						<view class="input-item">
 							<text class="tit">公司地址</text>
 							<input 
 								type="" 
 								v-model="form.companyAddress" 
-								placeholder="请输入公司地址"
+								placeholder="请上传营业执照"
 								maxlength="100"
+								disabled="true"
+							/>
+						</view>
+						<view class="input-item">
+							<text class="tit">税号</text>
+							<input 
+								type="" 
+								v-model="form.duty" 
+								placeholder="请上传营业执照"
+								maxlength="50"
+								disabled="true"
 							/>
 						</view>
 						<view class="input-item2">
-							<text class="tit" @tap="uploadCert(1)">上传营业执照</text>
+							<ocr-navigator @onSuccess="businessLicenseSuccess" certificateType="businessLicense" :opposite="false">
+							  <button type="primary" class="ocr-wrapper">营业执照</button>
+							</ocr-navigator>
 							<image :src="showImg1" mode=""></image>
 						</view>
 						<view class="input-item2">
@@ -148,25 +163,26 @@
 					</block>
 					
 					<block v-if="tag==4">
-						<view class="input-item4">
+						<view class="input-item2">
+							<ocr-navigator  @onSuccess="idCardSuccess" certificateType="idCard" :opposite="false">
+							  <button  class="ocr-wrapper">身份证正面识别</button>
+							</ocr-navigator>
+							<image :src="showImg3" mode=""></image>
+						</view>
+						<view class="input-item">
 							<text class="tit">姓名</text>
-							<view class="input-item5">
-								<input 
-									v-model="generalUser.userName" 
-									placeholder="请输入姓名"
-									maxlength="20"
-									disabled="true"
-								/>
-								<ocr-navigator  @onSuccess="idCardSuccess" certificateType="idCard" :opposite="false">
-								  <button  class="ocr-wrapper">身份证正面识别</button>
-								</ocr-navigator>
-							</view>
+							<input 
+								v-model="generalUser.userName" 
+								placeholder="请上传身份证"
+								maxlength="20"
+								disabled="true"
+							/>
 						</view>
 						<view class="input-item">
 							<text class="tit">身份证号码</text>
 							<input 
 								v-model="generalUser.idCardNumber" 
-								placeholder="请输入身份证号码"
+								placeholder="请上传身份证"
 								maxlength="18"
 								disabled="true"
 							/>
@@ -349,7 +365,8 @@
 					province:'',
 					city:'',
 					district:'',
-					salesPersonPhoneNumber:''
+					salesPersonPhoneNumber:'',
+					duty:''
 				},
 				generalUser:{
 					userName:'',//	是	string	姓名
@@ -511,7 +528,6 @@
 				this.generalUser.idCardNumber = res.detail.id.text
 				let filePath=res.detail.image_path
 				let _this = this
-				console.log(filePath)
 				uni.uploadFile({
 					url: RESOURCE.URL_API + 'order/orderMainInfo/api/uploadImage', //仅为示例，非真实的接口地址
 					filePath:filePath ,
@@ -522,6 +538,30 @@
 						if(uploadFileRes.statusCode===200){
 							let r = JSON.parse(uploadFileRes.data);
 							_this.generalUser.idCardFront = r.msg;
+							_this.showImg3=RESOURCE.URL_SHOW+r.msg
+						}else{
+							_this.$api.msg('上传失败')
+						}
+					}
+				});
+			},
+			//营业执照识别
+			businessLicenseSuccess(res){
+				this.form.companyName = res.detail.enterprise_name.text
+				this.form.companyAddress = res.detail.address.text
+				this.form.duty = res.detail.reg_num.text
+				let _this = this
+				uni.uploadFile({
+					url: RESOURCE.URL_API + 'order/orderMainInfo/api/uploadImage', //仅为示例，非真实的接口地址
+					filePath:res.detail.image_path ,
+					name: 'uploadFile',
+					formData: {},
+					success: (uploadFileRes) => {
+						console.log("上传图片结果string：",uploadFileRes);
+						if(uploadFileRes.statusCode===200){
+							let r = JSON.parse(uploadFileRes.data);
+							_this.form.filePath = r.msg;
+							_this.showImg1=RESOURCE.URL_SHOW+r.msg
 						}else{
 							_this.$api.msg('上传失败')
 						}
@@ -849,6 +889,7 @@
 		padding: 0 30upx;
 		background:$page-color-light;
 		height: 220upx;
+		margin-bottom: 50upx;
 		border-radius: 4px;
 		image{
 			width: 30%;
@@ -1120,8 +1161,5 @@
 	  line-height: 30rpx; 
 	  border-radius: 10upx;
 	  color:#303133
-	}
-	.intro {
-		margin: 40rpx;
 	}
 </style>

@@ -12,27 +12,27 @@
 				</view>
 				
 				<view class="input-content">
-					<view class="input-item4">
+					<view class="input-item2">
+						<ocr-navigator  @onSuccess="idCardSuccess" certificateType="idCard" :opposite="false">
+						  <button  class="ocr-wrapper">身份证正面识别</button>
+						</ocr-navigator>
+						<image :src="showImg1" mode=""></image>
+					</view>
+					<view class="input-item">
 						<text class="tit">姓名</text>
-						<view class="input-item5">
-							<input
-								v-model="form.partnername" 
-								placeholder="请输入姓名"
-								maxlength="20"
-								disabled="true"
-							/>
-							<ocr-navigator  @onSuccess="idCardSuccess" certificateType="idCard" :opposite="false">
-							  <button  class="ocr-wrapper">身份证正面识别</button>
-							</ocr-navigator>
-						</view>
-						
+						<input
+							v-model="form.partnername" 
+							placeholder="请上传身份证"
+							maxlength="20"
+							disabled="true"
+						/>
 					</view>
 					
 					<view class="input-item">
 						<text class="tit">身份证号码</text>
 						<input 
 							v-model="form.cardNumber" 
-							placeholder="请输入身份证号码"
+							placeholder="请上传身份证"
 							maxlength="18"
 							disabled="true"
 						/>
@@ -323,7 +323,24 @@
 			idCardSuccess(res){
 				this.form.partnername = res.detail.name.text
 				this.form.cardNumber = res.detail.id.text
-				this.form.cardFront = res.detail.image_path
+				let filePath=res.detail.image_path
+				let _this = this
+				uni.uploadFile({
+					url: RESOURCE.URL_API + 'order/orderMainInfo/api/uploadImage', //仅为示例，非真实的接口地址
+					filePath:filePath ,
+					name: 'uploadFile',
+					formData: {},
+					success: (uploadFileRes) => {
+						console.log("上传图片结果string：",uploadFileRes);
+						if(uploadFileRes.statusCode===200){
+							let r = JSON.parse(uploadFileRes.data);
+							_this.form.cardFront = r.msg;
+							_this.showImg1=RESOURCE.URL_SHOW+r.msg
+						}else{
+							_this.$api.msg('上传失败')
+						}
+					}
+				});
 			},
 			//校验参数
 			verifyForm(){
