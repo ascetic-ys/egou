@@ -37,7 +37,7 @@
 							disabled="true"
 						/>
 					</view>
-					<view class="input-item">
+					<view class="input-item sendCode-item">
 						<text class="tit">手机号码</text>
 						<input 
 							type="number" 
