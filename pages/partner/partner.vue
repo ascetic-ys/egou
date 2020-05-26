@@ -252,7 +252,7 @@
 						if(r.code==0){
 							this.partner=r.data
 							// this.$api.msg(r.msg||'注册成功')
-							uni.navigateTo({								url:`/pages/partner/partnerProtocolAgree?parentId=${this.partner.id}`							})
+							uni.navigateTo({url:`/pages/partner/partnerProtocolAgree?parentId=${this.partner.id}`})
 						}else{
 							this.regBtnDisabled=false
 							this.$api.msg(r.msg||'网络异常请重试')
@@ -278,7 +278,7 @@
 					}
 					const tempFilePaths = res.tempFilePaths;
 					uni.uploadFile({
-						url: RESOURCE.URL_API + 'orderMainInfo/api/uploadImage', //仅为示例，非真实的接口地址
+						url: RESOURCE.URL_API + 'order/orderMainInfo/api/uploadImage', //仅为示例，非真实的接口地址
 						filePath: tempFilePaths[0],
 						name: 'uploadFile',
 						formData: {},
