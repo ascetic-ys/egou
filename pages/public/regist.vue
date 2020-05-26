@@ -148,12 +148,27 @@
 					</block>
 					
 					<block v-if="tag==4">
-						<view class="input-item">
+						<view class="input-item4">
 							<text class="tit">姓名</text>
+							<view class="input-item5">
+								<input 
+									v-model="generalUser.userName" 
+									placeholder="请输入姓名"
+									maxlength="20"
+									disabled="true"
+								/>
+								<ocr-navigator  @onSuccess="idCardSuccess" certificateType="idCard" :opposite="false">
+								  <button  class="ocr-wrapper">身份证正面识别</button>
+								</ocr-navigator>
+							</view>
+						</view>
+						<view class="input-item">
+							<text class="tit">身份证号码</text>
 							<input 
-								v-model="generalUser.userName" 
-								placeholder="请输入姓名"
-								maxlength="20"
+								v-model="generalUser.idCardNumber" 
+								placeholder="请输入身份证号码"
+								maxlength="18"
+								disabled="true"
 							/>
 						</view>
 						<view class="input-item">
@@ -235,21 +250,14 @@
 								maxlength="50"
 							/>
 						</view>
-						<view class="input-item">
-							<text class="tit">身份证号码</text>
-							<input 
-								v-model="generalUser.idCardNumber" 
-								placeholder="请输入身份证号码"
-								maxlength="18"
-							/>
-						</view>
+						
 						<view class="input-item">
 							<text class="tit">省市区</text>
 							<view class="input">
 								<pickerAddress @change="changeAddress">{{generalUser.addressName}}</pickerAddress>
 							</view>
 						</view>
-						<view class="input-item3">
+						<!-- <view class="input-item3">
 							<text class="tit" @tap="uploadCert(3)">上传身份证正面</text>
 							<view class="image">
 								<image :src="showImg3" mode=""></image>
@@ -260,7 +268,7 @@
 							<view class="image">
 								<image :src="showImg4" mode=""></image>
 							</view>
-						</view>
+						</view> -->
 					</block>
 					
 				</view>
@@ -497,6 +505,29 @@
 					});
 				})
 			},
+			//身份证识别
+			idCardSuccess(res){
+				this.generalUser.userName = res.detail.name.text
+				this.generalUser.idCardNumber = res.detail.id.text
+				let filePath=res.detail.image_path
+				let _this = this
+				console.log(filePath)
+				uni.uploadFile({
+					url: RESOURCE.URL_API + 'order/orderMainInfo/api/uploadImage', //仅为示例，非真实的接口地址
+					filePath:filePath ,
+					name: 'uploadFile',
+					formData: {},
+					success: (uploadFileRes) => {
+						console.log("上传图片结果string：",uploadFileRes);
+						if(uploadFileRes.statusCode===200){
+							let r = JSON.parse(uploadFileRes.data);
+							_this.generalUser.idCardFront = r.msg;
+						}else{
+							_this.$api.msg('上传失败')
+						}
+					}
+				});
+			},
 			toRegister(){
 				// 数据验证模块
 				if(this.verifyForm()){
@@ -696,10 +727,10 @@
 						this.$api.msg('请上传身份证正面')
 						return false
 					}
-					if(!this.generalUser.idCardReverse){
+					/*if(!this.generalUser.idCardReverse){
 						this.$api.msg('请上传身份证反面')
 						return false
-					}
+					} */
 				}
 				return true
 			},
@@ -857,6 +888,34 @@
 			border-radius: 10upx;
 			color:#303133
 		}
+	}
+	.input-item4{
+		display:flex;
+		flex-direction: column;
+		/* align-items:flex-start;
+		justify-content: center;*/
+		padding: 0 30upx; 
+		background:$page-color-light;
+		height: 120upx;
+		border-radius: 4px;
+		margin-bottom: 50upx;
+		.tit{
+			height: 50upx;
+			line-height: 56upx;
+			font-size: $font-sm+2upx;
+			color: $font-color-base;
+		}
+		input{
+			height: 60upx;
+			font-size: $font-base + 2upx;
+			color: $font-color-dark;
+			width: 100%;
+		}
+	}
+	.input-item5{
+		display:flex;
+		align-items:flex-start;
+		justify-content: center;
 	}
 	.input-item{
 		display:flex;
@@ -1050,5 +1109,19 @@
 				}
 			}
 		}
+	}
+	/* ocr 识别按钮样式 */
+	.ocr-wrapper {
+	  font-size: 24rpx;
+	  background-color: #ccc;
+	  padding: 20upx 0;
+	  height: 60rpx;
+	  width: 180rpx;
+	  line-height: 30rpx; 
+	  border-radius: 10upx;
+	  color:#303133
+	}
+	.intro {
+		margin: 40rpx;
 	}
 </style>

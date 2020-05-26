@@ -10,13 +10,31 @@
 				<view class="welcome">
 					合伙人注册，请填写资料！
 				</view>
+				
 				<view class="input-content">
-					<view class="input-item">
+					<view class="input-item4">
 						<text class="tit">姓名</text>
+						<view class="input-item5">
+							<input
+								v-model="form.partnername" 
+								placeholder="请输入姓名"
+								maxlength="20"
+								disabled="true"
+							/>
+							<ocr-navigator  @onSuccess="idCardSuccess" certificateType="idCard" :opposite="false">
+							  <button  class="ocr-wrapper">身份证正面识别</button>
+							</ocr-navigator>
+						</view>
+						
+					</view>
+					
+					<view class="input-item">
+						<text class="tit">身份证号码</text>
 						<input 
-							v-model="form.partnername" 
-							placeholder="请输入姓名"
-							maxlength="20"
+							v-model="form.cardNumber" 
+							placeholder="请输入身份证号码"
+							maxlength="18"
+							disabled="true"
 						/>
 					</view>
 					<view class="input-item">
@@ -36,12 +54,12 @@
 							<switch color="#fa436a" @change="switchSexChange" />
 						</view>
 					</view>
-					<view class="input-item">
+					<!-- <view class="input-item">
 						<text class="tit">出生日期</text>
 						<picker mode="date" :value="form.birthday" :start="startDate" :end="endDate" @change="bindDateChange">
 							<view class="uni-input">{{form.birthday}}</view>
 						</picker>
-					</view>
+					</view> -->
 					<view class="input-item">
 						<text class="tit">密码</text>
 						<input 
@@ -85,7 +103,7 @@
 							<pickerAddress @change="changeAddress">{{form.addressName}}</pickerAddress>
 						</view>
 					</view>
-					<view class="input-item">
+					<!-- <view class="input-item">
 						<text class="tit">身份证号码</text>
 						<input 
 							v-model="form.cardNumber" 
@@ -104,7 +122,7 @@
 						<view class="image">
 							<image :src="showImg2" mode=""></image>
 						</view>
-					</view>
+					</view> -->
 				</view>
 				<button class='confirm-btn' open-type="getUserInfo" withCredentials="true" lang="zh_CN" @getuserinfo="toNext" :disabled="regBtnDisabled">注册</button>
 				
@@ -252,7 +270,7 @@
 						if(r.code==0){
 							this.partner=r.data
 							// this.$api.msg(r.msg||'注册成功')
-							uni.navigateTo({url:`/pages/partner/partnerProtocolAgree?parentId=${this.partner.id}`})
+							uni.navigateTo({								url:`/pages/partner/partnerProtocolAgree?parentId=${this.partner.id}`							})
 						}else{
 							this.regBtnDisabled=false
 							this.$api.msg(r.msg||'网络异常请重试')
@@ -301,6 +319,12 @@
 					});
 				})
 			},
+			//身份证识别
+			idCardSuccess(res){
+				this.form.partnername = res.detail.name.text
+				this.form.cardNumber = res.detail.id.text
+				this.form.cardFront = res.detail.image_path
+			},
 			//校验参数
 			verifyForm(){
 				if(!this.form.partnername){
@@ -315,10 +339,10 @@
 					this.$api.msg('手机号码格式不正确')
 					return false
 				}
-				if(!this.form.birthday){
+				/* if(!this.form.birthday){
 					this.$api.msg('请选择出生日期')
 					return false
-				}
+				} */
 				if(!this.form.password){
 					this.$api.msg('请输入密码')
 					return false
@@ -359,10 +383,10 @@
 					this.$api.msg('请上传身份证正面')
 					return false
 				}
-				if(!this.form.cardReverse){
+				/* if(!this.form.cardReverse){
 					this.$api.msg('请上传身份证反面')
 					return false
-				}
+				} */
 				return true
 			},
 			parse(e) {
@@ -499,6 +523,34 @@
 			border-radius: 10upx;
 			color:#303133
 		}
+	}
+	.input-item4{
+		display:flex;
+		flex-direction: column;
+		/* align-items:flex-start;
+		justify-content: center;*/
+		padding: 0 30upx; 
+		background:$page-color-light;
+		height: 120upx;
+		border-radius: 4px;
+		margin-bottom: 50upx;
+		.tit{
+			height: 50upx;
+			line-height: 56upx;
+			font-size: $font-sm+2upx;
+			color: $font-color-base;
+		}
+		input{
+			height: 60upx;
+			font-size: $font-base + 2upx;
+			color: $font-color-dark;
+			width: 100%;
+		}
+	}
+	.input-item5{
+		display:flex;
+		align-items:flex-start;
+		justify-content: center;
 	}
 	.input-item{
 		display:flex;
@@ -721,5 +773,19 @@
 				}
 			}
 		}
+	}
+	/* ocr 识别按钮样式 */
+	.ocr-wrapper {
+	  font-size: 24rpx;
+	  background-color: #ccc;
+	  padding: 20upx 0;
+	  height: 60rpx;
+	  width: 180rpx;
+	  line-height: 30rpx; 
+	  border-radius: 10upx;
+	  color:#303133
+	}
+	.intro {
+		margin: 40rpx;
 	}
 </style>
