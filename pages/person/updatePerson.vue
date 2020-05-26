@@ -90,7 +90,7 @@
 					// _this.showImg=res.tempFilePaths[0]
 					const tempFilePaths = res.tempFilePaths;
 					uni.uploadFile({
-						url: RESOURCE.URL_API + 'orderMainInfo/api/uploadImage', //仅为示例，非真实的接口地址
+						url: RESOURCE.URL_API + 'order/orderMainInfo/api/uploadImage', //仅为示例，非真实的接口地址
 						filePath: tempFilePaths[0],
 						name: 'uploadFile',
 						formData: {},

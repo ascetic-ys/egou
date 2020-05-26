@@ -449,7 +449,10 @@
 		"navigationBarTextStyle": "white",
 		"navigationBarTitleText": "uni-app",
 		"navigationBarBackgroundColor": "#4F4F4F",
-		"backgroundColor": "#f8f8f8"
+		"backgroundColor": "#f8f8f8",
+		"usingComponents": {
+		    "ocr-navigator": "plugin://ocr-plugin/ocr-navigator"
+		}
 	},
 	"tabBar": {
 		"color": "#C0C4CC",

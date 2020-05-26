@@ -58,7 +58,7 @@
 		<view class="yt-list">
 			<view class="yt-list-cell b-b">
 				<text class="cell-tit clamp">订单金额</text>
-				<text class="cell-tip">￥{{totalMoney}}</text>
+				<text class="cell-tip">{{totalMoney}}</text>
 			</view>
 			<!-- <view class="yt-list-cell b-b">
 				<text class="cell-tit clamp">优惠金额</text>
@@ -74,10 +74,20 @@
 			</view> -->
 		</view>
 		
+		<view class="yt-list" v-if="isCustomizationFlag">
+			<view class="yt-list-cell b-b">
+				<text class="cell-tit clamp">车辆品牌</text>
+				<text class="cell-tip">￥{{model}}</text>
+			</view>
+		</view>
+		
 		<!-- 行驶证 -->
 		<view class="yt-list-file" v-if="isCustomizationFlag">
 			<view class="input-item2">
-				<text class="tit" @tap="uploadCert">上传行驶证</text>
+				<!-- <text class="tit" @tap="uploadCert">上传行驶证</text> -->
+				<ocr-navigator  @onSuccess="driverSuccess" certificateType="drivingLicense" >
+				  <button  class="ocr-wrapper">行驶证</button>
+				</ocr-navigator>
 				<image :src="showImg" mode=""></image>
 			</view>
 		</view>
@@ -112,7 +122,10 @@
 				filePath:'',
 				params:{},
 				isCustomizationFlag:false,//是否有定制化商品
-				submitDisabled:false
+				submitDisabled:false,
+				model:'',//品牌型号
+				vin:'',//车辆识别码
+				vehicleType:''//车辆类型
 			}
 		},
 		onLoad(option){
@@ -186,7 +199,7 @@
 					// _this.showImg=res.tempFilePaths[0]
 					const tempFilePaths = res.tempFilePaths;
 					uni.uploadFile({
-						url: RESOURCE.URL_API + 'orderMainInfo/api/uploadImage', //仅为示例，非真实的接口地址
+						url: RESOURCE.URL_API + 'order/orderMainInfo/api/uploadImage', //仅为示例，非真实的接口地址
 						filePath: tempFilePaths[0],
 						name: 'uploadFile',
 						formData: {},
@@ -203,6 +216,30 @@
 						}
 					});
 				})
+			},
+			//行驶证识别
+			driverSuccess(res){
+				console.log(res)
+				this.model = res.detail.model.text
+				this.vin = res.detail.vin.text
+				this.vehicleType = res.detail.vehicle_type.text
+				let _this = this
+				uni.uploadFile({
+					url: RESOURCE.URL_API + 'order/orderMainInfo/api/uploadImage', //仅为示例，非真实的接口地址
+					filePath:res.detail.image_path,
+					name: 'uploadFile',
+					formData: {},
+					success: (uploadFileRes) => {
+						console.log("上传图片结果string：",uploadFileRes);
+						if(uploadFileRes.statusCode===200){
+							let r = JSON.parse(uploadFileRes.data);
+							_this.filePath = r.msg;
+							_this.showImg=RESOURCE.URL_SHOW+r.msg
+						}else{
+							_this.$api.msg('上传失败')
+						}
+					}
+				});
 			},
 			//提交订单
 			submit(){
@@ -289,7 +326,10 @@
 					account:this.invoice.account,//账户
 					userId:this.userInfo.id,//用户ID
 					filePath:this.filePath,//附件路径
-					orderChildInfoList:orderChildInfoList//商品信息
+					orderChildInfoList:orderChildInfoList,//商品信息
+					model:this.model,//品牌型号
+					vin:this.vin,//车辆识别码
+					vehicleType:this.vehicleType//车辆类型
 				}
 			},
 			stopPrevent(){}
@@ -734,5 +774,15 @@
 			}
 		}
 	}
-
+	/* ocr 识别按钮样式 */
+	.ocr-wrapper {
+	  font-size: 24rpx;
+	  background-color: #ccc;
+	  padding: 20upx 0;
+	  height: 60rpx;
+	  width: 180rpx;
+	  line-height: 30rpx; 
+	  border-radius: 10upx;
+	  color:#303133
+	}
 </style>
