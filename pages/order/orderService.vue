@@ -116,7 +116,7 @@
 			uploadImageOne(url){
 				return new Promise((resolve, reject) => {  
 					uni.uploadFile({
-						url: RESOURCE.URL_API + 'orderMainInfo/api/uploadImage', //仅为示例，非真实的接口地址
+						url: RESOURCE.URL_API + 'order/orderMainInfo/api/uploadImage', //仅为示例，非真实的接口地址
 						filePath: url,
 						name: 'uploadFile',
 						success: (uploadFileRes) => { 

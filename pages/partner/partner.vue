@@ -10,13 +10,31 @@
 				<view class="welcome">
 					合伙人注册，请填写资料！
 				</view>
+				
 				<view class="input-content">
+					<view class="input-item2">
+						<ocr-navigator  @onSuccess="idCardSuccess" certificateType="idCard" :opposite="false">
+						  <button  class="ocr-wrapper">身份证正面识别</button>
+						</ocr-navigator>
+						<image :src="showImg1" mode=""></image>
+					</view>
 					<view class="input-item">
 						<text class="tit">姓名</text>
-						<input 
+						<input
 							v-model="form.partnername" 
-							placeholder="请输入姓名"
+							placeholder="请上传身份证"
 							maxlength="20"
+							disabled="true"
+						/>
+					</view>
+					
+					<view class="input-item">
+						<text class="tit">身份证号码</text>
+						<input 
+							v-model="form.cardNumber" 
+							placeholder="请上传身份证"
+							maxlength="18"
+							disabled="true"
 						/>
 					</view>
 					<view class="input-item">
@@ -37,12 +55,12 @@
 							<switch color="#fa436a" @change="switchSexChange" />
 						</view>
 					</view>
-					<view class="input-item">
+					<!-- <view class="input-item">
 						<text class="tit">出生日期</text>
 						<picker mode="date" :value="form.birthday" :start="startDate" :end="endDate" @change="bindDateChange">
 							<view class="uni-input">{{form.birthday}}</view>
 						</picker>
-					</view>
+					</view> -->
 					<view class="input-item">
 						<text class="tit">密码</text>
 						<input 
@@ -86,7 +104,7 @@
 							<pickerAddress @change="changeAddress">{{form.addressName}}</pickerAddress>
 						</view>
 					</view>
-					<view class="input-item">
+					<!-- <view class="input-item">
 						<text class="tit">身份证号码</text>
 						<input 
 							v-model="form.cardNumber" 
@@ -105,7 +123,7 @@
 						<view class="image">
 							<image :src="showImg2" mode=""></image>
 						</view>
-					</view>
+					</view> -->
 				</view>
 				<button class='confirm-btn' open-type="getUserInfo" withCredentials="true" lang="zh_CN" @getuserinfo="toNext" :disabled="regBtnDisabled">注册</button>
 				
@@ -323,7 +341,7 @@
 					}
 					const tempFilePaths = res.tempFilePaths;
 					uni.uploadFile({
-						url: RESOURCE.URL_API + 'orderMainInfo/api/uploadImage', //仅为示例，非真实的接口地址
+						url: RESOURCE.URL_API + 'order/orderMainInfo/api/uploadImage', //仅为示例，非真实的接口地址
 						filePath: tempFilePaths[0],
 						name: 'uploadFile',
 						formData: {},
@@ -346,6 +364,29 @@
 					});
 				})
 			},
+			//身份证识别
+			idCardSuccess(res){
+				this.form.partnername = res.detail.name.text
+				this.form.cardNumber = res.detail.id.text
+				let filePath=res.detail.image_path
+				let _this = this
+				uni.uploadFile({
+					url: RESOURCE.URL_API + 'order/orderMainInfo/api/uploadImage', //仅为示例，非真实的接口地址
+					filePath:filePath ,
+					name: 'uploadFile',
+					formData: {},
+					success: (uploadFileRes) => {
+						console.log("上传图片结果string：",uploadFileRes);
+						if(uploadFileRes.statusCode===200){
+							let r = JSON.parse(uploadFileRes.data);
+							_this.form.cardFront = r.msg;
+							_this.showImg1=RESOURCE.URL_SHOW+r.msg
+						}else{
+							_this.$api.msg('上传失败')
+						}
+					}
+				});
+			},
 			//校验参数
 			verifyForm(){
 				if(!this.form.partnername){
@@ -360,10 +401,10 @@
 					this.$api.msg('手机号码格式不正确')
 					return false
 				}
-				if(!this.form.birthday){
+				/* if(!this.form.birthday){
 					this.$api.msg('请选择出生日期')
 					return false
-				}
+				} */
 				if(!this.form.password){
 					this.$api.msg('请输入密码')
 					return false
@@ -404,10 +445,10 @@
 					this.$api.msg('请上传身份证正面')
 					return false
 				}
-				if(!this.form.cardReverse){
+				/* if(!this.form.cardReverse){
 					this.$api.msg('请上传身份证反面')
 					return false
-				}
+				} */
 				return true
 			},
 			parse(e) {
@@ -544,6 +585,34 @@
 			border-radius: 10upx;
 			color:#303133
 		}
+	}
+	.input-item4{
+		display:flex;
+		flex-direction: column;
+		/* align-items:flex-start;
+		justify-content: center;*/
+		padding: 0 30upx; 
+		background:$page-color-light;
+		height: 120upx;
+		border-radius: 4px;
+		margin-bottom: 50upx;
+		.tit{
+			height: 50upx;
+			line-height: 56upx;
+			font-size: $font-sm+2upx;
+			color: $font-color-base;
+		}
+		input{
+			height: 60upx;
+			font-size: $font-base + 2upx;
+			color: $font-color-dark;
+			width: 100%;
+		}
+	}
+	.input-item5{
+		display:flex;
+		align-items:flex-start;
+		justify-content: center;
 	}
 	.input-item{
 		display:flex;
@@ -765,6 +834,36 @@
 					border: none;
 				}
 			}
+		}
+	}
+	/* ocr 识别按钮样式 */
+	.ocr-wrapper {
+	  font-size: 24rpx;
+	  background-color: #ccc;
+	  padding: 20upx 0;
+	  height: 60rpx;
+	  width: 180rpx;
+	  line-height: 30rpx; 
+	  border-radius: 10upx;
+	  color:#303133
+	}
+	.intro {
+		margin: 40rpx;
+	}
+	
+	.sendCode-item{
+		position: relative;
+		button{
+			position: absolute;
+			right: 20rpx;
+			background: #fa436a;
+			color: #FFFFFF;
+			font-size: 26rpx;
+			z-index: 9;
+	
+		}
+		button::after{
+			border: none;
 		}
 	}
 </style>
