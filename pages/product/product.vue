@@ -614,6 +614,7 @@
 				let newPro = this.product
 				newPro.productNum=1
 				newPro.productId=this.product.id
+				newPro.chooseProductColor=this.specSelected
 				newPro.color=this.specSelected.color
 				newPro.imgPath=this.specSelected.imgPath
 				delete newPro.introductory
