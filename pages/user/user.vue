@@ -556,8 +556,8 @@
 	}
 
 	.user-section{
-		height: 420upx;
-		padding: 100upx 30upx 0;
+		height: 340upx;
+		padding: 30upx 30upx 0;
 		position:relative;
 		.bg{
 			position:absolute;

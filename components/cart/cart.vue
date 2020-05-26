@@ -41,7 +41,7 @@
 							<view class="item-right">
 								<text class="clamp title">{{product.productName}}</text>
 								<text class="attr">{{product.chooseProductColor.color}}</text>
-								<text class="price">¥{{product.price}}</text>
+								<text class="price">¥{{product.chooseProductColor.price}}</text>
 								<uni-number-box 
 									class="step"
 									:min="1" 
@@ -337,7 +337,7 @@
 				list.forEach(item=>{
 					item.productInfoList.forEach(product=>{
 						if(product.checked === true){
-							total += product.price * product.productNum;
+							total += product.chooseProductColor.price * product.productNum;
 						}else if(checked === true){
 							checked = false;
 						}

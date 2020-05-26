@@ -37,7 +37,7 @@
 						<text class="title clamp">{{product.productName}}</text>
 						<text class="spec">{{product.chooseProductColor.color}}</text>
 						<view class="price-box">
-							<text class="price">￥{{product.price}}</text>
+							<text class="price">￥{{product.chooseProductColor.price}}</text>
 							<text class="number">x {{product.productNum}}</text>
 						</view>
 					</view>
@@ -259,8 +259,8 @@
 						let item = {
 							productName:e.productName,//商品名称
 							productNum:e.productNum,//商品数量
-							unitPrice:e.price,//单价
-							totalPrice:Number((e.price*e.productNum).toFixed(2)),//总价
+							unitPrice:e.chooseProductColor.price,//单价
+							totalPrice:Number((e.chooseProductColor.price*e.productNum).toFixed(2)),//总价
 							productId:e.id,//商品ID
 							factoryNo:e.factoryNo,
 							factoryName:e.factoryName,

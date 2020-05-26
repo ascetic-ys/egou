@@ -84,7 +84,7 @@
 				<text class="cell-tit clamp">订单状态</text>
 				<text class="cell-tip red">{{orderInfo.stateTip}}</text>
 			</view>
-			<view class="yt-list-cell b-b" v-if="orderInfo.orderState != 0">
+			<view class="yt-list-cell b-b">
 				<text class="cell-tit clamp">订单金额</text>
 				<text class="cell-tip red">￥{{orderInfo.orderPrice}}</text>
 			</view>
@@ -108,7 +108,7 @@
 				<text class="cell-tit clamp">物流单号</text>
 				<text class="cell-tip">45612644646</text>
 			</view> -->
-			<view class="yt-list-cell b-b" v-if="orderInfo.orderState != 0">
+			<view class="yt-list-cell b-b" v-if="this.orderInfo.filePath">
 				<text class="cell-tit clamp">行驶证</text>
 				<view class="cell-img2" @tap.stop="previewImg(showImage)">
 					<image :src="showImage" mode=""></image>

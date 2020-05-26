@@ -5,7 +5,10 @@
 				<text class="yticon icon-comment"></text>
 			</view>
 			<view class="title">
-				<text class="info">公告信息</text>
+				<view class="info">
+					<text class="info-desc">公告信息</text>
+					<text class="info-num">总计{{num1||0}}条信息</text>
+				</view>
 				<text class="more-icon yticon icon-you"></text>
 			</view>
 		</view>
@@ -14,7 +17,10 @@
 				<text class="yticon icon-zuanshi"></text>
 			</view>
 			<view class="title">
-				<text class="info">预售信息</text>
+				<view class="info">
+					<text class="info-desc">预售信息</text>
+					<text class="info-num">总计{{num2||0}}条信息</text>
+				</view>
 				<text class="more-icon yticon icon-you"></text>
 			</view>
 		</view>
@@ -23,7 +29,10 @@
 				<text class="yticon icon-xiaoxi"></text>
 			</view>
 			<view class="title">
-				<text class="info">系统信息</text>
+				<view class="info">
+					<text class="info-desc">系统信息</text>
+					<text class="info-num">总计{{num3||0}}条信息</text>
+				</view>
 				<text class="more-icon yticon icon-you"></text>
 			</view>
 		</view>
@@ -32,7 +41,10 @@
 				<text class="yticon icon-icon-test1"></text>
 			</view>
 			<view class="title">
-				<text class="info">客服信息</text>
+				<view class="info">
+					<text class="info-desc">客服信息</text>
+					<text class="info-num">总计{{num4||0}}条信息</text>
+				</view>
 				<text class="more-icon yticon icon-you"></text>
 			</view>
 		</view>
@@ -44,10 +56,62 @@
 	export default {
 		data() {
 			return {
-
+				num1:0,
+				num2:0,
+				num3:0,
+				num4:0,
 			}
 		},
+		onLoad() {
+			this.initData()
+		},
 		methods: {
+			initData(){
+				this.$api.httpPost('notice/api/list',{
+					pageNum:1,
+					pageSize:1,
+					noticeType:1
+				},'system').then(r=>{
+					console.log("请求结果：",r)
+					this.num1=r.total
+				}).catch(e=>{
+					console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+				})
+				this.$api.httpPost('notice/api/list',{
+					pageNum:1,
+					pageSize:1,
+					noticeType:2
+				},'system').then(r=>{
+					console.log("请求结果：",r)
+					this.num2=r.total
+				}).catch(e=>{
+					console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+				})
+				this.$api.httpPost('notice/api/list',{
+					pageNum:1,
+					pageSize:1,
+					noticeType:3
+				},'system').then(r=>{
+					console.log("请求结果：",r)
+					this.num3=r.total
+				}).catch(e=>{
+					console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+				})
+				this.$api.httpPost('notice/api/list',{
+					pageNum:1,
+					pageSize:1,
+					noticeType:4
+				},'system').then(r=>{
+					console.log("请求结果：",r)
+					this.num4=r.total
+				}).catch(e=>{
+					console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+				})
+			},
 			navTo(url){
 				uni.navigateTo({  
 					url
@@ -107,10 +171,20 @@
 				line-height: 100rpx;
 				padding-left: 10px;
 				.info{
-					
+					display: flex;
+					flex-direction: column;
+					line-height: 50rpx;
+
+					.info-desc{
+						
+					}
+					.info-num{
+						font-size: 26rpx;
+						color: #606266;
+					}
 				}
 				.more-icon{
-					
+					line-height: 100rpx;
 				}
 			}
 		}

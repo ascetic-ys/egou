@@ -47,7 +47,7 @@
 			<view class="price-content">
 				<view class="price-box">
 					<text class="price-tip">¥</text>
-					<text class="price">{{product.price}}</text>
+					<text class="price">{{specSelected.price}}</text>
 					<!-- <text class="m-price">¥488</text> -->
 					<!-- <text class="coupon-tip">7折</text> -->
 				</view>
@@ -79,9 +79,9 @@
 			<view class="c-row b-b" @click="toggleSpec" v-if="product.orderProductColorList.length>0">
 				<text class="tit">已选购</text>
 				<view class="con">
-					<view class="selected-box" v-for="(sItem, sIndex) in specSelected" :key="sIndex">
-						<image :src="sItem.imgPath" mode="aspectFit"></image>
-						<text class="selected-text">{{sItem.color}}</text>
+					<view class="selected-box">
+						<image :src="specSelected.imgPath" mode="aspectFit"></image>
+						<text class="selected-text">{{specSelected.color}}</text>
 					</view>
 				</view>
 				<text class="yticon icon-you"></text>
@@ -242,14 +242,14 @@
 			<view class="mask"></view>
 			<view class="layer attr-content" @click.stop="stopPrevent">
 				<view class="a-t" v-if="product.orderProductColorList.length>0">
-					<image :src="specSelected[0].imgPath||product.orderProductColorList[0].imgPath" mode="aspectFit"></image>
+					<image :src="specSelected.imgPath||product.orderProductColorList[0].imgPath" mode="aspectFit"></image>
 					<view class="right">
-						<text class="price">¥{{product.price}}</text>
+						<text class="price">¥{{specSelected.price}}</text>
 						<!-- <text class="stock">库存：188件</text> -->
 						<view class="selected">
 							已选：
-							<text class="selected-text" v-for="(sItem, sIndex) in specSelected" :key="sIndex">
-								{{sItem.color}}
+							<text class="selected-text">
+								{{specSelected.color}}
 							</text>
 						</view>
 					</view>
@@ -308,7 +308,7 @@
 				// videoSrc:'/static/video/banner.mp4',
 				videoSrc:'https://jdvideo.300hu.com/vodtransgzp1251412368/9031868223418300449/v.f30.mp4?dockingId=c59ea11a-f67e-4738-b4c3-2eb105aa528d&storageSource=3',
 				specClass: 'none',
-				specSelected:[],
+				specSelected:{},
 				product:{},
 				favorite: true,
 				shareList: [],
@@ -354,7 +354,7 @@
 						if(this.product.orderProductColorList&&this.product.orderProductColorList.length>0){
 							console.log("orderProductColorList",this.product.orderProductColorList)
 							this.$set(this.product.orderProductColorList[0], 'selected', true);
-							this.specSelected.push(this.product.orderProductColorList[0]);
+							this.specSelected=this.product.orderProductColorList[0];
 						}
 						if(this.product.filePathList && this.product.filePathList.length>0){
 							this.product.filePathList.forEach(e=>{
@@ -520,12 +520,12 @@
 			//选择颜色
 			selectColor(item){
 				// this.removeItemSpecSelected('color')
-				this.specSelected=[]
+				this.specSelected={}
 				this.product.orderProductColorList.forEach(e=>{
 					e.selected=false
 					if(e.id === item.id){
 						this.$set(e, 'selected', true);
-						this.specSelected.push(item); 
+						this.specSelected=item; 
 					}
 				})
 			},
@@ -623,7 +623,7 @@
 				uni.navigateTo({
 					url: `/pages/order/createOrder?data=${JSON.stringify({
 						goodsList: goodsList,
-						totalMoney: this.product.price
+						totalMoney: this.specSelected.price
 					})}`
 				})
 			},
@@ -633,7 +633,7 @@
 				this.$api.httpPost('shoppingCart/api/add',{
 					userId:this.userInfo.id,
 					productId:this.product.id,
-					productColorId:this.specSelected[0].id
+					productColorId:this.specSelected.id
 				}).then(r=>{
 					console.log('请求结果：',r)
 					if(r.code==0){
