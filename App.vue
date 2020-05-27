@@ -451,7 +451,7 @@
 	swiper,
 	swiper-item,
 	cover-view,
-	cover-image,
+	/* cover-image, */
 	icon,
 	text,
 	rich-text,
@@ -468,10 +468,11 @@
 	navigator,
 	audio,
 	camera,
-	image,
-	video {
+	video, 
+	image
+	{
 		box-sizing: border-box;
-	}
+	} 
 	/* 骨架屏替代方案 */
 	.Skeleton {
 		background: #f3f3f3;
