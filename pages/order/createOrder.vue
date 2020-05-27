@@ -209,7 +209,7 @@
 								let r = JSON.parse(uploadFileRes.data);
 								console.log("上传图片：",r);
 								_this.filePath = r.msg;
-								_this.showImg=RESOURCE.URL_SHOW+r.msg
+								_this.showImg=r.msg
 							}else{
 								_this.$api.msg('上传失败')
 							}
@@ -234,7 +234,7 @@
 						if(uploadFileRes.statusCode===200){
 							let r = JSON.parse(uploadFileRes.data);
 							_this.filePath = r.msg;
-							_this.showImg=RESOURCE.URL_SHOW+r.msg
+							_this.showImg=r.msg
 						}else{
 							_this.$api.msg('上传失败')
 						}

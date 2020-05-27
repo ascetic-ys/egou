@@ -58,13 +58,13 @@
     "mp-weixin" : {
         /* 小程序特有相关 */
         "usingComponents" : true,
-		"plugins": {
-		   "ocr-plugin": {
-		        "version": "3.0.2",
-		        "provider": "wx4418e3e031e551be"
-		    }
-		},
-        "appid" : "wx2b13999266897202",
+        "plugins" : {
+            "ocr-plugin" : {
+                "version" : "3.0.2",
+                "provider" : "wx4418e3e031e551be"
+            }
+        },
+        "appid" : "wx576bb7768aca84d3",
         "setting" : {
             "urlCheck" : false
         },

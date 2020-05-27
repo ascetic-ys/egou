@@ -320,7 +320,7 @@
 						if(r.code==0){
 							this.partner=r.data
 							// this.$api.msg(r.msg||'注册成功')
-							uni.navigateTo({								url:`/pages/partner/partnerProtocolAgree?parentId=${this.partner.id}`							})
+							uni.navigateTo({								url:`/pages/partner/partnerProtocolAgree?parentId=${this.partner.id}`							})
 						}else{
 							this.regBtnDisabled=false
 							this.$api.msg(r.msg||'网络异常请重试')
@@ -357,10 +357,10 @@
 								console.log("上传图片：",r);
 								if(tag==1){
 									_this.form.cardFront = r.msg;
-									_this.showImg1=RESOURCE.URL_SHOW+r.msg
+									_this.showImg1=r.msg
 								}else{
 									_this.form.cardReverse = r.msg;
-									_this.showImg2=RESOURCE.URL_SHOW+r.msg
+									_this.showImg2=r.msg
 								}
 							}else{
 								_this.$api.msg('上传失败')
@@ -385,7 +385,7 @@
 						if(uploadFileRes.statusCode===200){
 							let r = JSON.parse(uploadFileRes.data);
 							_this.form.cardFront = r.msg;
-							_this.showImg1=RESOURCE.URL_SHOW+r.msg
+							_this.showImg1=r.msg
 						}else{
 							_this.$api.msg('上传失败')
 						}

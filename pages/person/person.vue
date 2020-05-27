@@ -67,7 +67,7 @@
 			...mapState(['hasLogin','userInfo','weChat'])
 		},
 		onLoad() {
-			this.showImage=this.userInfo.filePath?RESOURCE.URL_SHOW+this.userInfo.filePath:''
+			this.showImage=this.userInfo.filePath?this.userInfo.filePath:''
 		},
 		methods:{
 			...mapMutations(['login','logout']),
