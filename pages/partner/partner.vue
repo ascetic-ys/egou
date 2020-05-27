@@ -583,7 +583,7 @@
 			}
 		}
 		.upCarm{
-			height: 140rpx;
+			height: 180rpx;
 			width: 300rpx;
 			padding: 20rpx;
 			display: flex;

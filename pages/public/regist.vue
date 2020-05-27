@@ -17,6 +17,47 @@
 						<text class="cell-tit" :class="[tag==1?'':'typeDis']">企业用户</text>
 					</view>
 					<block v-if="tag==1">
+						<view class="input-item2">
+							<ocr-navigator @onSuccess="businessLicenseSuccess" certificateType="businessLicense" :opposite="false">
+							  <!-- <button class="ocr-wrapper">营业执照</button> -->
+								<view class="upCarm">
+									<image src="../../static/carm.png" mode=""></image>
+									<text>营业执照</text>
+								</view>
+							</ocr-navigator>
+							<image :src="showImg1" mode=""></image>
+						</view>
+						<view class="input-item">
+							<text class="tit">公司名称</text>
+							<input 
+								type="" 
+								v-model="form.companyName" 
+								placeholder="请输入公司名称"
+								maxlength="50"
+								disabled="true"
+							/>
+						</view>
+						<view class="input-item">
+							<text class="tit">公司地址</text>
+							<input 
+								type="" 
+								v-model="form.companyAddress" 
+								placeholder="请输入公司地址"
+								maxlength="100"
+								disabled="true"
+							/>
+						</view>
+						<view class="input-item">
+							<text class="tit">税号</text>
+							<input 
+								type="" 
+								v-model="form.duty" 
+								placeholder="请输入税号"
+								maxlength="50"
+								disabled="true"
+							/>
+						</view>
+						
 						<view class="input-item">
 							<text class="tit">姓名</text>
 							<input 
@@ -129,53 +170,20 @@
 								<pickerAddress @change="changeAddress">{{form.addressName}}</pickerAddress>
 							</view>
 						</view>
-						<view class="input-item">
-							<text class="tit">公司名称</text>
-							<input 
-								type="" 
-								v-model="form.companyName" 
-								placeholder="请输入公司名称"
-								maxlength="50"
-								disabled="true"
-							/>
-						</view>
-						<view class="input-item">
-							<text class="tit">公司地址</text>
-							<input 
-								type="" 
-								v-model="form.companyAddress" 
-								placeholder="请输入公司地址"
-								maxlength="100"
-								disabled="true"
-							/>
-						</view>
-						<view class="input-item">
-							<text class="tit">税号</text>
-							<input 
-								type="" 
-								v-model="form.duty" 
-								placeholder="请输入税号"
-								maxlength="50"
-								disabled="true"
-							/>
-						</view>
-						<view class="input-item2">
+						
+						<!-- <view class="input-item2">
 							<ocr-navigator @onSuccess="businessLicenseSuccess" certificateType="businessLicense" :opposite="false">
-							  <!-- <button class="ocr-wrapper">营业执照</button> -->
-								<view class="upCarm">
-									<image src="../../static/carm.png" mode=""></image>
-									<text>营业执照</text>
-								</view>
+							  <button class="ocr-wrapper">营业执照</button>
 							</ocr-navigator>
 							<image :src="showImg1" mode=""></image>
-						</view>
+						</view> -->
+						
 						<view class="input-item2">
 							<!-- <text class="tit" @tap="uploadCert(2)">上传门头照片</text> -->
 							<view class="upCarm" @tap="uploadCert(2)">
 								<image src="../../static/carm.png" mode=""></image>
 								<text>上传门头照片</text>
 							</view>
-							<image :src="showImg2" mode=""></image>
 						</view>
 					</block>
 					
@@ -303,18 +311,7 @@
 								<pickerAddress @change="changeAddress">{{generalUser.addressName}}</pickerAddress>
 							</view>
 						</view>
-						<!-- <view class="input-item3">
-							<text class="tit" @tap="uploadCert(3)">上传身份证正面</text>
-							<view class="image">
-								<image :src="showImg3" mode=""></image>
-							</view>
-						</view>
-						<!-- <view class="input-item3">
-							<text class="tit" @tap="uploadCert(4)">上传身份证反面</text>
-							<view class="image">
-								<image :src="showImg4" mode=""></image>
-							</view>
-						</view> -->
+						
 					</block>
 					
 				</view>
@@ -986,7 +983,7 @@
 			height: 100%;
 		}
 		.upCarm{
-			height: 140rpx;
+			height: 180rpx;
 			width: 300rpx;
 			padding: 20rpx;
 			display: flex;
@@ -1009,6 +1006,13 @@
 		}
 		.tit{
 			font-size: $font-lg;
+			background-color: #ccc;
+			padding: 20upx;
+			border-radius: 10upx;
+			color:#303133
+		}
+		.tit2{
+			font-size: 24rpx;
 			background-color: #ccc;
 			padding: 20upx;
 			border-radius: 10upx;

@@ -455,7 +455,7 @@
 	icon,
 	text,
 	rich-text,
-	progress,
+	progress,c 
 	button,
 	checkbox,
 	form,
@@ -468,10 +468,11 @@
 	navigator,
 	audio,
 	camera,
-	image,
-	video {
+	video, 
+	image
+	{
 		box-sizing: border-box;
-	}
+	} 
 	/* 骨架屏替代方案 */
 	.Skeleton {
 		background: #f3f3f3;
