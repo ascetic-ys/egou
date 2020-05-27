@@ -451,7 +451,7 @@
 	swiper,
 	swiper-item,
 	cover-view,
-	cover-image,
+	/* cover-image, */
 	icon,
 	text,
 	rich-text,
