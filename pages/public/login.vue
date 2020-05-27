@@ -1,10 +1,10 @@
 <template>
-	<view class="container">
+	<view class="container paddingno">
 		<view class="left-bottom-sign"></view>
 		<view class="back-btn yticon icon-zuojiantou-up" @click="navBack" v-if="flag!=1"></view>
 		<view class="right-top-sign"></view>
 		<!-- 设置白色背景防止软键盘把下部绝对定位元素顶上来盖住输入框等 -->
-		<view class="wrapper">
+		<view class="wrapper padding170">
 			<!-- <view class="left-top-sign">LOGIN</view> -->
 			<!-- <view class="welcome"> 欢迎回来！</view> -->
 			<view class="logo-top">
@@ -367,5 +367,12 @@
 		button::after{
 			border: none;
 		}
+		
+	}
+	.paddingno{
+		padding-top: 0rpx !important;
+	}
+	.padding170{
+		padding-top:170rpx ;
 	}
 </style>
