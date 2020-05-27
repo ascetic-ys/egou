@@ -14,7 +14,10 @@
 				<view class="input-content">
 					<view class="input-item2">
 						<ocr-navigator  @onSuccess="idCardSuccess" certificateType="idCard" :opposite="false">
-						  <button  class="ocr-wrapper">身份证正面识别</button>
+							<view class="upCarm">
+								<image src="../../static/carm.png" mode=""></image>
+								<text>身份证正面识别</text>
+							</view>
 						</ocr-navigator>
 						<image :src="showImg1" mode=""></image>
 					</view>
@@ -578,6 +581,28 @@
 				width: 100%;
 				height: 100%;
 			}
+		}
+		.upCarm{
+			height: 140rpx;
+			width: 300rpx;
+			padding: 20rpx;
+			display: flex;
+			border-radius: 12rpx;
+			flex-direction: column;
+			align-items: center;
+			justify-content: flex-start;
+			border: 1rpx dashed #4CD964;
+			
+			image{
+				width: 90rpx;
+				height: 90rpx;
+			}
+			text{
+				color: #909399;
+				padding-top: 20rpx;
+				font-size: 24rpx;
+			}
+			
 		}
 		.tit{
 			flex: 3;
