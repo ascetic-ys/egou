@@ -19,7 +19,11 @@
 					<block v-if="tag==1">
 						<view class="input-item2">
 							<ocr-navigator @onSuccess="businessLicenseSuccess" certificateType="businessLicense" :opposite="false">
-							  <button class="ocr-wrapper">营业执照</button>
+							  <!-- <button class="ocr-wrapper">营业执照</button> -->
+								<view class="upCarm">
+									<image src="../../static/carm.png" mode=""></image>
+									<text>营业执照</text>
+								</view>
 							</ocr-navigator>
 							<image :src="showImg1" mode=""></image>
 						</view>
@@ -167,16 +171,31 @@
 							</view>
 						</view>
 						
+						<!-- <view class="input-item2">
+							<ocr-navigator @onSuccess="businessLicenseSuccess" certificateType="businessLicense" :opposite="false">
+							  <button class="ocr-wrapper">营业执照</button>
+							</ocr-navigator>
+							<image :src="showImg1" mode=""></image>
+						</view> -->
+						
 						<view class="input-item2">
-							<text class="tit2" @tap="uploadCert(2)">上传门头照片</text>
-							<image :src="showImg2" mode=""></image>
+							<!-- <text class="tit" @tap="uploadCert(2)">上传门头照片</text> -->
+							<view class="upCarm" @tap="uploadCert(2)">
+								<image src="../../static/carm.png" mode=""></image>
+								<text>上传门头照片</text>
+							</view>
 						</view>
 					</block>
 					
 					<block v-if="tag==4">
 						<view class="input-item2">
 							<ocr-navigator  @onSuccess="idCardSuccess" certificateType="idCard" :opposite="false">
-							  <button  class="ocr-wrapper">身份证正面识别</button>
+							  <!-- <button  class="ocr-wrapper">身份证正面识别</button> -->
+								<view class="upCarm">
+									<image src="../../static/carm.png" mode=""></image>
+									<text>身份证正面识别</text>
+								</view>
+								
 							</ocr-navigator>
 							<image :src="showImg3" mode=""></image>
 						</view>
@@ -292,18 +311,7 @@
 								<pickerAddress @change="changeAddress">{{generalUser.addressName}}</pickerAddress>
 							</view>
 						</view>
-						<!-- <view class="input-item3">
-							<text class="tit" @tap="uploadCert(3)">上传身份证正面</text>
-							<view class="image">
-								<image :src="showImg3" mode=""></image>
-							</view>
-						</view>
-						<!-- <view class="input-item3">
-							<text class="tit" @tap="uploadCert(4)">上传身份证反面</text>
-							<view class="image">
-								<image :src="showImg4" mode=""></image>
-							</view>
-						</view> -->
+						
 					</block>
 					
 				</view>
@@ -974,6 +982,28 @@
 			width: 30%;
 			height: 100%;
 		}
+		.upCarm{
+			height: 140rpx;
+			width: 300rpx;
+			padding: 20rpx;
+			display: flex;
+			border-radius: 12rpx;
+			flex-direction: column;
+			align-items: center;
+			justify-content: flex-start;
+			border: 1rpx dashed #4CD964;
+			
+			image{
+				width: 90rpx;
+				height: 90rpx;
+			}
+			text{
+				color: #909399;
+				padding-top: 20rpx;
+				font-size: 24rpx;
+			}
+			
+		}
 		.tit{
 			font-size: $font-lg;
 			background-color: #ccc;
@@ -1256,12 +1286,13 @@
 	/* ocr 识别按钮样式 */
 	.ocr-wrapper {
 	  font-size: 24rpx;
-	  background-color: #ccc;
+	  /* background-color: #ccc; */
 	  padding: 20upx 0;
-	  height: 60rpx;
-	  width: 180rpx;
+	  height: 170rpx;
+	  width: 360rpx;
 	  line-height: 30rpx; 
 	  border-radius: 10upx;
+		border: 1rpx dashed #55ff00;
 	  color:#303133
 	}
 </style>

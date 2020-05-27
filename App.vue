@@ -455,7 +455,7 @@
 	icon,
 	text,
 	rich-text,
-	progress,
+	progress,c 
 	button,
 	checkbox,
 	form,
