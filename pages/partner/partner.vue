@@ -275,9 +275,11 @@
 					if(this.time>0){return}
 					this.time=60
 					this.startTimeout()
+					uni.hideLoading();
 				}).catch(e=>{
 					console.log("请求错误：",e)
 					this.$api.msg(e.msg||'网络异常请重试')
+					uni.hideLoading();
 				})
 			},
 			startTimeout(){
