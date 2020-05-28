@@ -63,8 +63,8 @@
 				this.$api.httpPost('partner/api/detail',{id:this.id}).then(r=>{
 					console.log("请求结果：",r)
 					this.partner=r.data
-					// this.showImage1=this.partner.cardFront?RESOURCE.URL_SHOW+this.partner.cardFront:''
-					// this.showImage2=this.partner.cardReverse?RESOURCE.URL_SHOW+this.partner.cardReverse:''
+					// this.showImage1=this.partner.cardFront?this.partner.cardFront:''
+					// this.showImage2=this.partner.cardReverse?this.partner.cardReverse:''
 				}).catch(e=>{
 					console.log("请求错误：",e)
 					this.$api.msg(e.msg||'网络异常请重试')

@@ -46,7 +46,7 @@
 					console.log("请求结果：",r)
 					this.dataInfo=r.data
 					this.dataInfo.uploadFiles.forEach(e=>{
-						this.showImgArr.push(RESOURCE.URL_SHOW+e)
+						this.showImgArr.push(e)
 					})
 				}).catch(e=>{
 					console.log("请求错误：",e)

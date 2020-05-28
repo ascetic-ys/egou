@@ -61,7 +61,7 @@
 			...mapState(['hasLogin','userInfo','weChat'])
 		},
 		onLoad() {
-			this.showImg=this.userInfo.filePath?RESOURCE.URL_SHOW+this.userInfo.filePath:''
+			this.showImg=this.userInfo.filePath?this.userInfo.filePath:''
 		},
 		methods:{
 			...mapMutations(['login','logout']),
@@ -100,7 +100,7 @@
 								let r = JSON.parse(uploadFileRes.data);
 								console.log("上传图片：",r);
 								_this.userInfo.filePath = r.msg;
-								_this.showImg=RESOURCE.URL_SHOW+r.msg
+								_this.showImg=r.msg
 							}else{
 								_this.$api.msg('上传失败')
 							}

@@ -105,7 +105,7 @@
 								console.log("上传图片：",r);
 								if(tag==1){
 									_this.memberPayRecord.payImgPath = r.msg;
-									_this.showImg=RESOURCE.URL_SHOW+r.msg
+									_this.showImg=r.msg
 								}
 							}else{
 								_this.$api.msg('上传失败')

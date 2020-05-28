@@ -583,16 +583,16 @@
 								console.log("上传图片：",r);
 								if(type==1){
 									_this.form.filePath = r.msg;
-									_this.showImg1=RESOURCE.URL_SHOW+r.msg
+									_this.showImg1=r.msg
 								}else if(type==2){
 									_this.form.imgPath = r.msg;
-									_this.showImg2=RESOURCE.URL_SHOW+r.msg
+									_this.showImg2=r.msg
 								}else if(type==3){
 									_this.generalUser.idCardFront = r.msg;
-									_this.showImg3=RESOURCE.URL_SHOW+r.msg
+									_this.showImg3=r.msg
 								}else if(type==4){
 									_this.generalUser.idCardReverse = r.msg;
-									_this.showImg4=RESOURCE.URL_SHOW+r.msg
+									_this.showImg4=r.msg
 								}
 							}else{
 								_this.$api.msg('上传失败')
@@ -617,7 +617,7 @@
 						if(uploadFileRes.statusCode===200){
 							let r = JSON.parse(uploadFileRes.data);
 							_this.generalUser.idCardFront = r.msg;
-							_this.showImg3=RESOURCE.URL_SHOW+r.msg
+							_this.showImg3=r.msg
 						}else{
 							_this.$api.msg('上传失败')
 						}
@@ -640,7 +640,7 @@
 						if(uploadFileRes.statusCode===200){
 							let r = JSON.parse(uploadFileRes.data);
 							_this.form.filePath = r.msg;
-							_this.showImg1=RESOURCE.URL_SHOW+r.msg
+							_this.showImg1=r.msg
 						}else{
 							_this.$api.msg('上传失败')
 						}

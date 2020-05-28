@@ -76,7 +76,7 @@
 		},
 		onLoad(options) {
 			this.item=JSON.parse(options.item)
-			this.showImage=RESOURCE.URL_SHOW+this.item.payImgPath
+			this.showImage=this.item.payImgPath
 		},
 		methods:{
 			navTo(url){

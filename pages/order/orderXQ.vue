@@ -164,7 +164,7 @@
 				}).then(r=>{
 					console.log("请求结果：",r)
 					this.orderInfo=r.data
-					this.showImage=this.orderInfo.filePath?RESOURCE.URL_SHOW+this.orderInfo.filePath:''
+					this.showImage=this.orderInfo.filePath?this.orderInfo.filePath:''
 					this.orderInfo = Object.assign(this.orderInfo, this.orderExp(this.orderInfo));
 					let orderChildInfoList = []
 					this.orderInfo.groupList.forEach(e=>{

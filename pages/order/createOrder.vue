@@ -77,7 +77,7 @@
 		<view class="yt-list" v-if="isCustomizationFlag">
 			<view class="yt-list-cell b-b">
 				<text class="cell-tit clamp">车辆品牌</text>
-				<text class="cell-tip">￥{{model}}</text>
+				<text class="cell-tip">{{model}}</text>
 			</view>
 		</view>
 		
@@ -85,8 +85,15 @@
 		<view class="yt-list-file" v-if="isCustomizationFlag">
 			<view class="input-item2">
 				<!-- <text class="tit" @tap="uploadCert">上传行驶证</text> -->
-				<ocr-navigator  @onSuccess="driverSuccess" certificateType="drivingLicense" >
+				<!-- <ocr-navigator  @onSuccess="driverSuccess" certificateType="drivingLicense" >
 				  <button  class="ocr-wrapper">行驶证</button>
+				</ocr-navigator> -->
+				<ocr-navigator @onSuccess="driverSuccess" certificateType="drivingLicense" :opposite="false">
+				  <!-- <button class="ocr-wrapper">营业执照</button> -->
+					<view class="upCarm">
+						<image src="../../static/carm.png" mode=""></image>
+						<text>行驶证</text>
+					</view>
 				</ocr-navigator>
 				<image :src="showImg" mode=""></image>
 			</view>
@@ -209,7 +216,7 @@
 								let r = JSON.parse(uploadFileRes.data);
 								console.log("上传图片：",r);
 								_this.filePath = r.msg;
-								_this.showImg=RESOURCE.URL_SHOW+r.msg
+								_this.showImg=r.msg
 							}else{
 								_this.$api.msg('上传失败')
 							}
@@ -234,7 +241,7 @@
 						if(uploadFileRes.statusCode===200){
 							let r = JSON.parse(uploadFileRes.data);
 							_this.filePath = r.msg;
-							_this.showImg=RESOURCE.URL_SHOW+r.msg
+							_this.showImg=r.msg
 						}else{
 							_this.$api.msg('上传失败')
 						}
@@ -582,6 +589,28 @@
 				padding: 20upx;
 				border-radius: 10upx;
 				color:#303133
+			}
+			.upCarm{
+				height: 180rpx;
+				width: 300rpx;
+				padding: 20rpx;
+				display: flex;
+				border-radius: 12rpx;
+				flex-direction: column;
+				align-items: center;
+				justify-content: flex-start;
+				border: 1rpx dashed #4CD964;
+				
+				image{
+					width: 90rpx;
+					height: 90rpx;
+				}
+				text{
+					color: #909399;
+					padding-top: 20rpx;
+					font-size: 24rpx;
+				}
+				
 			}
 		}
 	}

@@ -450,7 +450,7 @@
 	scroll-view,
 	swiper,
 	swiper-item,
-	cover-view,
+	/* cover-view, */
 	/* cover-image, */
 	icon,
 	text,
