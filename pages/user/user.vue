@@ -9,6 +9,7 @@
 				</view>
 				<view class="info-box">
 					<text class="username">{{userInfo.userName || '游客'}}</text>
+					<text class="address">{{userInfo.province||''}}{{userInfo.city||''}}{{userInfo.district||''}}</text>
 				</view>
 				<view class="code-box" v-if="hasLogin && userInfo.tag==3" @tap.stop="toMyQrCode">
 					<image src="/static/images/qr-code.png"></image>
@@ -581,8 +582,8 @@
 	}
 
 	.user-section{
-		height: 340upx;
-		padding: 30upx 30upx 0;
+		height: 270upx;
+		padding: 10upx 30upx 0;
 		position:relative;
 		.bg{
 			position:absolute;
@@ -595,7 +596,7 @@
 		}
 	}
 	.user-info-box{
-		height: 180upx;
+		height: 140upx;
 		display:flex;
 		align-items:center;
 		position:relative;
@@ -606,11 +607,22 @@
 			border:5upx solid #fff;
 			border-radius: 50%;
 		}
-		.username{
-			font-size: $font-lg + 6upx;
-			color: $font-color-dark;
-			margin-left: 20upx;
+		.info-box{
+			display: flex;
+			flex-direction: column;
+			.username{
+				font-size: $font-lg + 6upx;
+				color: $font-color-dark;
+				margin-left: 20upx;
+			}
+			.address{
+				font-size: 22rpx;
+				color: #DCDFE6;
+				margin-left: 20rpx;
+				margin-top: 10rpx;
+			}
 		}
+		
 		.code-box{
 			flex: 1;
 			text-align: right;

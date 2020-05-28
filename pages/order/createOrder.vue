@@ -25,12 +25,14 @@
 		<view class="goods-section">
 			
 			<!-- 商品列表 -->
+			<view class="g-header b-b">
+				<text class="name">柏福车饰</text>
+			</view>
 			<view v-for="(item,index) in goodsList" :key='index'>
-				<view style="background: #EEEEEE;height: 20rpx;"></view>
-				<view class="g-header b-b">
-					<!-- <image class="logo" src="http://duoduo.qibukj.cn/./Upload/Images/20190321/201903211727515.png"></image> -->
+				<!-- <view style="background: #EEEEEE;height: 20rpx;"></view> -->
+				<!-- <view class="g-header b-b">
 					<text class="name">{{item.factoryShortName}}</text>
-				</view>
+				</view> -->
 				<view class="g-item" v-for="(product,mm) in item.productInfoList" :key='mm'>
 					<image :src="product.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`"></image>
 					<view class="right">
@@ -58,7 +60,7 @@
 		<view class="yt-list">
 			<view class="yt-list-cell b-b">
 				<text class="cell-tit clamp">订单金额</text>
-				<text class="cell-tip">{{totalMoney}}</text>
+				<text class="cell-tip">￥{{totalMoney}}</text>
 			</view>
 			<!-- <view class="yt-list-cell b-b">
 				<text class="cell-tit clamp">优惠金额</text>
