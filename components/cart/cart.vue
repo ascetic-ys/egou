@@ -15,20 +15,27 @@
 		<view v-else>
 			<!-- 列表 -->
 			<view class="cart-list">
+				<view class="g-header">
+					<view
+						class="yticon icon-xuanzhong2 checkbox"
+						:class="{checked: allChecked}"
+						@click="check('all')"
+					></view>
+					<text class="name">柏福车饰</text>
+				</view>
 				<block v-for="(item, index) in cartList" :key="index">
 					<view
 						class="cart-item" 
 						:class="{'b-b': index!==cartList.length-1}"
 					>
-						<view class="g-header">
+						<!-- <view class="g-header">
 							<view
 								class="yticon icon-xuanzhong2 checkbox"
 								:class="{checked: item.checked}"
 								@click="check('item',index)"
 							></view>
-							<text class="name">柏福车饰</text>
-<!-- 							<text class="name">{{item.factoryShortName}}</text> -->
-						</view>
+							<text class="name">{{item.factoryShortName}}</text>
+						</view> -->
 						<view class="product-info" v-for="(product, m) in item.productInfoList" :key="m">
 							<view class="image-wrapper">
 								<image :src="product.imgPath" mode="aspectFill" ></image>
@@ -414,6 +421,29 @@
 			}
 		}
 	}
+	.g-header {
+		display: flex;
+		align-items: center;
+		height: 84upx;
+		padding: 30rpx 20rpx;
+		position: relative;
+		background: #FFFFFF;
+		.checkbox{
+			position:absolute;
+			left:4upx;
+			top: 20upx;
+			z-index: 8;
+			font-size: 44upx;
+			line-height: 1;
+			padding: 4upx;
+			color: $font-color-disabled;
+			background: #FFFFFF;
+			border-radius: 50px;
+		}
+		.name{
+			text-indent: 45rpx;
+		}
+	}
 	/* 购物车列表项 */
 	.cart-item{
 		display:flex;
@@ -421,29 +451,7 @@
 		flex-direction: column;
 		background: #FFFFFF;
 		margin-bottom: 20rpx;
-		.g-header {
-			display: flex;
-			align-items: center;
-			height: 84upx;
-			padding: 30rpx 20rpx;
-			position: relative;
-			background: #FFFFFF;
-			.checkbox{
-				position:absolute;
-				left:4upx;
-				top: 20upx;
-				z-index: 8;
-				font-size: 44upx;
-				line-height: 1;
-				padding: 4upx;
-				color: $font-color-disabled;
-				background: #FFFFFF;
-				border-radius: 50px;
-			}
-			.name{
-				text-indent: 45rpx;
-			}
-		}
+		
 		.product-info{
 			background: #FFFFFF;
 			padding: 20rpx;
@@ -582,6 +590,7 @@
 	}
 	/* 复选框选中状态 */
 	.action-section .checkbox.checked,
+	.g-header .checkbox.checked,
 	.cart-item .checkbox.checked{
 		color: $uni-color-primary;
 	}
