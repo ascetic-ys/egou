@@ -26,8 +26,8 @@
 								:class="{checked: item.checked}"
 								@click="check('item',index)"
 							></view>
-							<!-- <image class="logo" src="http://duoduo.qibukj.cn/./Upload/Images/20190321/201903211727515.png"></image> -->
-							<text class="name">{{item.factoryShortName}}</text>
+							<text class="name">柏福车饰</text>
+<!-- 							<text class="name">{{item.factoryShortName}}</text> -->
 						</view>
 						<view class="product-info" v-for="(product, m) in item.productInfoList" :key="m">
 							<view class="image-wrapper">
