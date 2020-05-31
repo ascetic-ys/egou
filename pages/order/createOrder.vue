@@ -78,7 +78,7 @@
 		
 		<view class="yt-list" v-if="isCustomizationFlag">
 			<view class="yt-list-cell b-b">
-				<text class="cell-tit clamp">车辆品牌</text>
+				<text class="cell-tit clamp">品牌型号</text>
 				<text class="cell-tip">{{model}}</text>
 			</view>
 		</view>
