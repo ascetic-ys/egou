@@ -709,12 +709,14 @@
 			display:flex;
 			justify-content: space-between;
 			.image-download{
-				background: #4CD964;
+				/* background: #4CD964; */
+				background: #808080;
 				padding: 6rpx 20rpx;
 				border-radius: 50rpx;
 				line-height: 50rpx;
 				text{
 					font-size: 26rpx;
+					/* color: #ffff00; */
 				}
 			}
 		}
