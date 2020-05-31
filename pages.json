@@ -202,6 +202,31 @@
 				"navigationBarTitleText": "二维码名片"
 			}
 		}, {
+			"path": "pages/user/membershipCenter",
+			"style": {
+				"navigationBarTitleText": "会员中心"
+			}
+		}, {
+			"path": "pages/user/memberProtocol",
+			"style": {
+				"navigationBarTitleText": "成为会员"
+			}
+		}, {
+			"path": "pages/user/memberPay",
+			"style": {
+				"navigationBarTitleText": "支付会员费用"
+			}
+		}, {
+			"path": "pages/user/memberInfo",
+			"style": {
+				"navigationBarTitleText": "会员信息"
+			}
+		}, {
+			"path": "pages/user/memberRenewal",
+			"style": {
+				"navigationBarTitleText": "会员续费"
+			}
+		}, {
 			"path": "pages/detail/detail",
 			"style": {
 				"navigationBarTitleText": "",
@@ -341,32 +366,32 @@
 				"enablePullDownRefresh": true,
 				"navigationBarTitleText": "商品列表"
 			}
-        }
-       ,{
+        },{
             "path" : "pages/orderTj/orderTj",
             "style" : {
 				"navigationBarTitleText": "订单统计"
 			}
-        }
-        ,{
+        },{
             "path" : "pages/customer/customer",
             "style" : {
 				"navigationBarTitleText": "售后服务"
 			}
-        }
-		,{
+        },{
 			"path" : "pages/customer/goodsliu",
 			"style" : {
 				"navigationBarTitleText": "物流信息"
 			}
-		}
-        ,{
+		},{
             "path" : "pages/myUser/myUser",
             "style" : {
 				"navigationBarTitleText": "我的客户"
 			}
-        }
-        ,{
+        },{
+            "path" : "pages/myUser/myBUser",
+            "style" : {
+        		"navigationBarTitleText": "我的B端用户"
+        	}
+        },{
             "path" : "pages/myAchievement/myAchievement",
             "style" : {
 				"navigationBarTitleText": "我的业绩"

@@ -13,12 +13,19 @@
 					<view class="phone">{{userInfo.phoneNumber}}</view>
 				</view>
 			</view>
-			<view class="qr-code-img">
-				<image :src='qrCodeImage'></image>
+			<view class="qr-code-img" v-if="type==1">
+				<image :src='qrCodeImage1'></image>
+			</view>
+			<view class="qr-code-img" v-if="type==2">
+				<image :src='qrCodeImage2'></image>
 			</view>
 			<view class="note-info">
 				<text>扫一扫上面的二维码图案，绑定注册</text>
 			</view>
+		</view>
+		<view class="change-qrcode">
+			<button class="code-img img-left" :class="[type==1?'show':'hide']" @click="changeType(1)">用户注册二维码</button>
+			<button class="code-img img-right" :class="[type==2?'show':'hide']" @click="changeType(2)">B端用户注册二维码</button>
 		</view>
 	</view>
 </template>
@@ -29,7 +36,9 @@
 	export default {
 		data(){
 			return {
-				qrCodeImage: '/static/or6mJ5SdnzMS6O6v3P8fouvhBiT4.jpg',
+				type:1,
+				qrCodeImage1: '/static/or6mJ5SdnzMS6O6v3P8fouvhBiT4.jpg',
+				qrCodeImage2: '/static/or6mJ5SdnzMS6O6v3P8fouvhBiT4.jpg',
 				access_token:'',
 				expires_in:0,
 			}
@@ -41,38 +50,68 @@
 			...mapState(['hasLogin','userInfo','weChat'])
 		},
 		methods: {
+			changeType(type){
+				this.type=type
+			},
 			async createQrCode(){
 				this.$api.httpPost('wechatPayInfo/api/getAccessToken').then(r=>{
 					console.log("请求结果：",r)
 					this.access_token=r.data.access_token
 					this.expires_in=r.data.expires_in
-					var that = this;
-					let url = 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token='+this.access_token
-					// 生成页面的二维码
-					uni.request({
-						//注意：下面的access_token值可以不可以直接复制使用，需要自己请求获取
-						url: url,
-						data: {
-							width: 600,
-							scene: 'pUserId='+that.userInfo.id+'&phoneNumber='+that.userInfo.phoneNumber,
-							page: "pages/public/regist"  //这里按照需求设置值和参数   
-						},
-						method: "POST",
-						responseType: 'arraybuffer',  //设置响应类型
-						success(res) {
-							console.log(res)
-							that.qrCodeImage = 'data:image/png;base64,'+uni.arrayBufferToBase64(res.data);  //对数据进行转换操作
-						},
-						fail(e) {
-							console.log(e)
-						}
-					})
+					this.createUserRegQrcode()
+					this.createBUserRegQrcode()
 				}).catch(e=>{
 					console.log("请求错误：",e)
 					this.$api.msg(e.msg||'网络异常请重试')
 				})
 				
-			}
+			},
+			createUserRegQrcode(){
+				var that = this;
+				let url = 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token='+this.access_token
+				// 生成页面的二维码
+				uni.request({
+					//注意：下面的access_token值可以不可以直接复制使用，需要自己请求获取
+					url: url,
+					data: {
+						width: 600,
+						scene: 'pUserId='+that.userInfo.id+'&phoneNumber='+that.userInfo.phoneNumber,
+						page: "pages/public/regist"  //这里按照需求设置值和参数   
+					},
+					method: "POST",
+					responseType: 'arraybuffer',  //设置响应类型
+					success(res) {
+						console.log(res)
+						that.qrCodeImage1 = 'data:image/png;base64,'+uni.arrayBufferToBase64(res.data);  //对数据进行转换操作
+					},
+					fail(e) {
+						console.log(e)
+					}
+				})
+			},
+			createBUserRegQrcode(){
+				var that = this;
+				let url = 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token='+this.access_token
+				// 生成页面的二维码
+				uni.request({
+					//注意：下面的access_token值可以不可以直接复制使用，需要自己请求获取
+					url: url,
+					data: {
+						width: 600,
+						scene: 'pUserId='+that.userInfo.id+'&phoneNumber='+that.userInfo.phoneNumber+'&isB=2',
+						page: "pages/partner/partner"  //这里按照需求设置值和参数   
+					},
+					method: "POST",
+					responseType: 'arraybuffer',  //设置响应类型
+					success(res) {
+						console.log(res)
+						that.qrCodeImage2 = 'data:image/png;base64,'+uni.arrayBufferToBase64(res.data);  //对数据进行转换操作
+					},
+					fail(e) {
+						console.log(e)
+					}
+				})
+			},
 		}
 	}
 </script>
@@ -147,6 +186,37 @@
 				line-height: 28rpx;
 				font-size: 28rpx;
 				color: #606266;
+			}
+		}
+		.change-qrcode{
+			margin-top: 20rpx;
+			display: flex;
+			justify-content: space-between;
+			background: #FFFFFF;
+			border-radius: 10rpx;
+			.code-img{
+				width: 50%;
+				margin: 0;
+				border-radius: 0;
+				font-size: 28rpx;
+			}
+			.hide{
+				background: none;
+			}
+			.show{
+				background: #fa436a;
+				color: #FFFFFF;
+			}
+			.img-left{
+				border-top-left-radius: 10rpx;
+				border-bottom-left-radius: 10rpx;
+			}
+			.img-right{
+				border-top-right-radius: 10rpx;
+				border-bottom-right-radius: 10rpx;
+			}
+			button::after{
+				border: none;
 			}
 		}
 	}

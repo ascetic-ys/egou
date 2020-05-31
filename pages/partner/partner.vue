@@ -8,7 +8,7 @@
 			<view class="wrapper" style="padding-top: 115px;">
 				<!-- <view class="left-top-sign">LOGIN</view> -->
 				<view class="welcome">
-					合伙人注册，请填写资料！
+					{{form.isB==1?"合伙人":"B端用户"}}注册，请填写资料！
 				</view>
 				
 				<view class="input-content">
@@ -169,6 +169,7 @@
 					city:'',
 					district:'',
 					smsCode:'',
+					isB:1,
 				},
 				showImg1:'',
 				showImg2:'',
@@ -188,6 +189,20 @@
 			}
 		},
 		onLoad(query){
+			// scene 需要使用 decodeURIComponent 才能获取到生成二维码时传入的 scene
+			if(query.scene){//通过扫描进入页面
+				const scene = decodeURIComponent(query.scene)
+				console.log("scence:",scence)
+				// this.form.salesPersonPhoneNumber = scence.phoneNumber
+				this.form.isB = scence.isB
+			}else if(options.isB){
+				this.form.isB=options.isB
+			}
+			if(this.form.isB==2){
+				uni.setNavigationBarTitle({
+				    title: "B端用户注册"
+				});
+			}
 			this.form.sex=this.weChat.gender==0?1:0
 			this.form.birthday=this.getDate()
 			this.partnerForm.signDate=this.getDate()
