@@ -1,521 +1,228 @@
 <template>
 	<view class="container">
-		<view class="agree">
-			<!-- 弹出层 -->
-			<!-- 做黑色阴影颜色 -->
-			<view class="uni-mask">
-				<view class="uni-banner">
-					<view class="agreement">
-						<view class="content-box">
-							<view class="title">城市合伙人协议</view>
-							
-							<scroll-view class="content">
-								<view class="user-info">
-									<text class="text-title">甲方：中和在线</text>
-									<view class="text-title">
-										<text class="text-desc" style="margin-right: 40rpx;">乙方：{{partner.partnername}}</text>
-										<text class="text-desc">身份证号码：{{partner.cardNumber}}</text>
-									</view>
-								</view>
-								<view class="text-box">
-									<jyf-parser domain="https://6874-html-foe72-1259071903.tcb.qcloud.la" gesture-zoom lazy-load ref="article" selectable
-									 show-with-animation use-anchor @error="error" @imgtap="imgtap" @linkpress="linkpress" @parse="parse" @ready="ready">加载中...</jyf-parser>
-								</view>
-								 <view class="user-info user-info-bottom">
-								 	<text class="text-title">甲方：中和在线</text>
-								 	<text class="text-title">乙方：{{partner.partnername}}</text>
-								 	<text class="text-title">日期：{{partnerForm.signDate}}</text>
-								 </view>
-							</scroll-view>
-							
-							<view class="notice">
-								<text class="text-box">点击同意即表示您已经阅读并同意</text>
-								<text class="touch-box">《城市合伙人协议》</text>
-							</view>
-							<view class="btn-box">
-								<button class="cancel" @tap.stop="agreeNo">不同意</button>
-								<button class="confirm" @tap.stop="agreeYes">同意</button>
-							</view>
-						</view>
-					</view>
+		<view class="pay-box">
+			<view class="order-info-box">
+				<view class="order-info">
+					<text class="title">会员费用：</text>
+					<text class="info" style="color: #fa436a;">¥{{params.price||0}}元</text>
+				</view>
+				<view class="order-info">
+					<text class="title">会员起始日期：</text>
+					<text class="info">{{params.startDate}}</text>
+				</view>
+				<view class="order-info">
+					<text class="title">会员终止日期：</text>
+					<text class="info">{{params.endDate}}</text>
 				</view>
 			</view>
-			<!-- 弹出层 -->
 		</view>
+		<button class="mix-btn" :disabled='disabledPay' @click="paySubmit">立即支付</button>
 	</view>
 </template>
 
 <script>
-	import {mapMutations,mapState} from 'vuex'
-	import {wxToAuth} from '@/api/login.js'
+	import {mapState} from 'vuex';
 	import {RESOURCE } from '@/api/resource.js'
-	import {isMobile,isPwd,isAccount,isPhone,isEmail,isIdCard} from '@/api/validate.js'
-	import pickerAddress from '@/components/pickerAddress/pickerAddress.vue'
-	import jyfParser from '@/components/jyf-parser/jyf-parser'; // HBuilderX 2.5.5 及以上可以不需要
-	
-	export default{
-		components:{
-			jyfParser,
-			pickerAddress
-		},
-		data(){
+	export default {
+		data() {
 			return {
-				regBtnDisabled:false,
-				parentId:'',
-				partnerForm:{
-					aName:'',//甲方
-					bName:'',//乙方
-					bCard:'',//乙方身份证号
-					content:'',//协议内容
-					signDate:'',//签字日期（yyyy-mm-dd）
-					parentId:'',//合伙人ID（销售员）
+				id:'',
+				params: {
+					parentId:'',
+					price:'',
+					startDate:'',
+					endDate:'',
+					protocolRecordId:''
 				},
-				protocol:{},
-				partner:{}//注册成功后合作伙伴的信息
-			}
+				showImg:'',
+				disabledPay:false
+			};
 		},
-		onLoad(options){
-			this.parentId=options.parentId
-			this.partnerForm.signDate=this.getDate()
-			this.initArguement()
-			this.initPartner()
+		onLoad(options) {
+			console.log("options:",options)
+			this.params.parentId=options.parentId
+			this.params.price=options.price
+			this.params.protocolRecordId=options.protocolRecordId
+			if(options.startDate){
+				this.params.startDate=options.startDate
+			}else{
+				this.params.startDate=this.getDate()
+			}
+			if(options.endDate){
+				this.params.endDate=options.endDate
+			}else{
+				this.params.endDate=this.getDate('year')
+			}
+			if(options.validDate){
+				this.params.startDate=this.getDate('start',options.validDate)
+				this.params.endDate=this.getDate('year',options.validDate)
+			}
 		},
 		computed: {
 			...mapState(['hasLogin','userInfo','weChat'])
 		},
 		methods: {
-			initArguement(){
-				this.$api.httpPost('protocol/api/list',{
-					protocolType:'1'
-				}).then(r=>{
-					console.log("合伙人协议请求结果：",r)
-					this.protocol=r.data
-					this.$refs.article.setContent(this.protocol.content);
-				}).catch(e=>{
-					console.log("请求错误：",e)
-					this.$api.msg(e.msg||'网络异常请重试')
-				})
-			},
-			initPartner(){
-				this.$api.httpPost('partner/api/detail',{
-					id:this.parentId
-				}).then(r=>{
-					console.log("合伙人详情请求结果：",r)
-					this.partner=r.data
-				}).catch(e=>{
-					console.log("请求错误：",e)
-					this.$api.msg(e.msg||'网络异常请重试')
-				})
-			},
-			getDate(type) {
-				const date = new Date();
+			getDate(type,strDate) {
+				let date = new Date();
+				if(strDate){
+					strDate=strDate.replace(/-/g,"/")
+					date=new Date(strDate)
+					date.setDate(date.getDate()+1);
+				}
 				let year = date.getFullYear();
 				let month = date.getMonth() + 1;
 				let day = date.getDate();
+					
 				if (type === 'start') {
-					year = year - 60;
+					// year = year - 60;
 				} else if (type === 'end') {
 					year = year + 2;
 				}else if (type === 'lastmouth') {
 					month = month - 1;
+				}else if(type === 'year'){
+					date.setFullYear(date.getFullYear()+1);
+					date.setDate(date.getDate()-1);
+					year = date.getFullYear();
+					month = date.getMonth() + 1;
+					day = date.getDate();
 				}
 				month = month > 9 ? month : '0' + month;;
 				day = day > 9 ? day : '0' + day;
-				return `${year}-${month}-${day}`;
+				return `${year}年${month}月${day}日`;
 			},
-			agreeNo(){
-				uni.navigateBack();
-			},
-			initPartnerParams(){
-				this.partnerForm={
-					aName:'中和在线',//甲方
-					bName:this.partner.partnername,//乙方
-					bCard:this.partner.cardNumber,//乙方身份证号
-					content:this.protocol.content,//协议内容
-					signDate:this.getDate(),//签字日期（yyyy-mm-dd）
-					parentId:this.partner.id,//合伙人ID（销售员）
-				}
-			},
-			agreeYes(){
-				this.initPartnerParams()
-				console.log("`/pages/partner/partnerPay?price=${this.protocol.fee}&parentId=${this.partner.id}`")
-				this.$api.httpPost('protocolRecord/api/save',{
-					...this.partnerForm
-				}).then(r=>{
-					console.log('协议记录保存请求响应：',r)
+			//确认支付
+			paySubmit: async function() {
+				this.disabledPay=true
+				console.log("支付请求：",this.params)
+				this.$api.httpPost('userInfoPayRecord/api/reg',this.params).then(r=>{
+					console.log("支付结果：",r)
 					if(r.code==0){
-						this.$api.msg(r.msg||'保存成功')
-						uni.navigateTo({
-							url:`/pages/partner/partnerPay?price=${this.protocol.fee}&parentId=${this.partner.id}&protocolRecordId=${r.data.id}`
-						})
+						let _this = this
+						uni.requestPayment({
+							provider: 'wxpay',
+							timeStamp: r.data.resp.timeStamp,
+							nonceStr: r.data.resp.nonceStr,
+							package: r.data.resp.package,
+							signType: r.data.resp.signType,
+							paySign: r.data.resp.sign,
+							success: function (res) {
+								console.log('success:' + JSON.stringify(res));
+								// this.$api.msg(r.msg||'支付成功')
+								//跳转至支付结果
+								uni.redirectTo({
+									url: `/pages/partner/paySuccess`
+								})
+							},
+							fail: function (err) {
+								console.log('fail:' + JSON.stringify(err));
+								_this.$api.msg(err||'网络异常请重试')
+								_this.disabledPay=false;
+							}
+						});
 					}else{
 						this.$api.msg(r.msg||'网络异常请重试')
+						this.disabledPay=false;
 					}
-					uni.hideLoading();
+					uni.hideLoading()
 				}).catch(e=>{
-					console.log("注册请求错误：",e)
+					console.log("请求错误：",e)
+					uni.hideLoading()
+					this.disabledPay=false;
 					this.$api.msg(e.msg||'网络异常请重试')
-					uni.hideLoading();
 				})
 			},
-			parse(e) {
-				console.log('parse finish', e);
-			},
-			ready(e) {
-				console.log('ready', e);
-				// console.log('api: getText', this.$refs.article.getText());
-				console.log('imgList', this.$refs.article.imgList);
-			},
-			imgtap(e) {
-				console.log('imgtap', e);
-			},
-			linkpress(e) {
-				console.log('linkpress', e);
-			},
-			error(e) {
-				console.error(e);
-			},
-		},
+		}
 	}
 </script>
 
 <style lang='scss'>
-	page{
-		background: #fff;
+	.container {
+		width: 100%;
 	}
-	.container{
-		/* padding-top: 115px; */
-		position:relative;
-		width: 100vw;
-		
-		overflow: hidden;
-		background: #fff;
-	}
-	.wrapper{
-		position:relative;
-		z-index: 90;
-		background: #fff;
-		padding-bottom: 40upx;
-	}
-	.back-btn{
-		position:absolute;
-		left: 40upx;
-		z-index: 9999;
-		padding-top: var(--status-bar-height);
-		top: 40upx;
-		font-size: 40upx;
-		color: $font-color-dark;
-	}
-	.left-top-sign{
-		font-size: 120upx;
-		color: $page-color-base;
-		position:relative;
-		left: -16upx;
-	}
-	.right-top-sign{
-		position:absolute;
-		top: 80upx;
-		right: -30upx;
-		z-index: 95;
-		&:before, &:after{
-			display:block;
-			content:"";
-			width: 400upx;
-			height: 80upx;
-			background: #b4f3e2;
-		}
-		&:before{
-			transform: rotate(50deg);
-			border-radius: 0 50px 0 0;
-		}
-		&:after{
-			position: absolute;
-			right: -198upx;
-			top: 0;
-			transform: rotate(-50deg);
-			border-radius: 50px 0 0 0;
-			/* background: pink; */
-		}
-	}
-	.left-bottom-sign{
-		position:absolute;
-		left: -270upx;
-		bottom: -320upx;
-		border: 100upx solid #d0d1fd;
-		border-radius: 50%;
-		padding: 180upx;
-	}
-	.welcome{
-		position:relative;
-		left: 50upx;
-		top: -90upx;
-		font-size: 46upx;
-		color: #555;
-		text-shadow: 1px 0px 1px rgba(0,0,0,.3);
-	}
-	.input-content{
-		padding: 0 60upx;
-		.list-cell{
-			margin-bottom: 50rpx;
-			display: flex;
-			justify-content: space-around;
-			.typeDis{
-				color: #C0C4CC;
-			}
-		}
-	}
-	.input-item2{
-		display:flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 20rpx 30upx;
-		background:$page-color-light;
-		height: 220upx;
-		border-radius: 4px;
-		margin-bottom: 40rpx;
-		.image{
-			flex:5;
-			margin-left: 20rpx;
-			height: 100%;
-			image{
-				width: 100%;
-				height: 100%;
-			}
-		}
-		.tit{
-			flex: 3;
-			font-size: $font-lg;
-			background-color: #ccc;
-			padding: 20upx;
-			border-radius: 10upx;
-			color:#303133
-		}
-	}
-	.input-item{
-		display:flex;
-		flex-direction: column;
-		align-items:flex-start;
-		justify-content: center;
-		padding: 0 30upx;
-		background:$page-color-light;
-		height: 120upx;
-		border-radius: 4px;
-		margin-bottom: 50upx;
-		&:last-child{
-			margin-bottom: 0;
-		}
-		.tit{
-			height: 50upx;
-			line-height: 56upx;
-			font-size: $font-sm+2upx;
-			color: $font-color-base;
-		}
-		input{
-			height: 60upx;
-			font-size: $font-base + 2upx;
-			color: $font-color-dark;
-			width: 100%;
-		}
-		.input{
-			height: 60upx;
-			font-size: $font-base + 2upx;
-			color: $font-color-dark;
-			width: 100%;
-			picker{
-				height: 60upx;
-				font-size: $font-base + 2upx;
-				color: $font-color-dark;
-				width: 100%;
-			}
-		}
-		.content{
-			display: flex;
-			justify-content: space-between;
-			width: 100%;
-			text{
-				flex: 1;
-				text-align: left;
-			}
-			switch{
-				flex: 1;
-				text-align: right;
-			}
-		}
-		picker{
-			height: 60upx;
-			line-height: 60rpx;
-			font-size: $font-base + 2upx;
-			color: $font-color-dark;
-			width: 100%;
-			view{
-				line-height: 60rpx;
-			}
-		}
-	}
+	.order-state{
+		margin: 100rpx;
+		text-align: center;
 
-	.confirm-btn{
-		width: 630upx;
-		height: 76upx;
-		line-height: 76upx;
-		border-radius: 50px;
-		margin-top: 70upx;
-		background: $uni-color-primary;
-		color: #fff;
-		font-size: $font-lg;
-		&:after{
-			border-radius: 100px;
-		}
-	}
-	.forget-section{
-		font-size: $font-sm+2upx;
-		color: $font-color-spec;
-		text-align: center;
-		margin-top: 40upx;
-	}
-	.register-section{
-		z-index: 999;
-		padding-bottom: 30upx;
-		width: 100%;
-		font-size: $font-sm+2upx;
-		color: $font-color-base;
-		text-align: center;
-		text{
-			color: $font-color-spec;
-			margin-left: 10upx;
-		}
 	}
 	
-	.agree {
-		width: 100%;
-		height: 100%;
-	}
-	.uni-banner {
-		width: 100%;
-		height: 100%;
-		/* position: fixed; */
-		/* left: 5%; */
-		z-index: 2001;
-		/* margin-top: 20%; */
-		background: #ffffff;
-		/* border-radius: 10rpx; */
-		.title {
-			height: 100rpx;
-			text-align: center;
-			line-height: 100rpx;
-			font-size: 36rpx;
-			font-weight: 600;
-		}
-		.content {
-			padding: 0 30rpx;
-			/* font-size: 28rpx; */
-			color: #555555;
-			line-height: 40rpx;
-			.user-info{
-				display: flex;
-				flex-direction:column;
-				margin-bottom: 20rpx;
-				height: 15%;
-				
-				.text-title{
-					color: #232323;
-					line-height: 60rpx;
-					font-size: 26rpx;
-				}
-				.text-desc{
-					
-				}
-			}
-			.user-info-bottom{
-				height: 20%;
-				.text-title{
-					margin-left: 50%;
-				}
-			}
-			.text-box{
-				height: 63%;
-			}
-		}
-		.btn {
-			border: none;
-			margin-top: 30rpx;
-			button {
-				width: 95%;
-				background: #ffffff;
-				border: 1px solid #c0c0c0;
-				color: green;
-			}
-		}
-	}
-	.uni-mask {
-		width: 100%;
-		height: 100%;
-		position: fixed;
-		top: 0;
-		left: 0;
-		z-index: 2100;
-		background: rgba(0, 0, 0, 0.6);
-	}
-	view {
-		display: block;
-		line-height: 1.2;
-		overflow: hidden;
-		white-space: normal;
-		pointer-events: auto;
-		font-family: -apple-system;
-	}
-	
-	.agreement{
-		width: 100%;
-		height: 100%;
-			
-		.content-box{
-			width: 100%;
-			height: 100%;
-			.title{
-				height: 10%;
-			}
-			.content{
-				height: 77%;
-				jyf-parser{
-					height: 100%;
-				}
-			}
-			.notice{
-				height: 5%;
-				background: #DCDFE6;
-				padding: 5rpx 20rpx;
-				line-height: 42rpx;
-				.text-box{
-					font-size: $font-base;
-					color: #999999;
-				}
-				.touch-box{
-					font-size: $font-base;
-					color: #4399FC;
-				}
-			}
-			.btn-box{
-				height: 8%;
+	.pay-box{
+		padding: 40rpx;
+		white-space: nowrap;
+		background: #F8F8F8;
+		margin: 40rpx;
+		border-radius: 40rpx;
+		box-shadow: 0 2rpx 10rpx #dcdcdc;
+		white-space: nowrap;
+		.order-info-box{
+			margin: 40rpx 0;
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+			.order-info{
+				flex: 2;
 				display: flex;
 				justify-content: space-between;
-				.cancel{
-					width: 50%;
-					height: 100%;
-					font-size: $font-lg;
-					color: #999999;
+				line-height: 70rpx;
+				.info{
+					
+					font-size: 26rpx;
+					color: #606266;
 				}
-				.confirm{
-					width: 50%;
-					height: 100%;
-					font-size: $font-lg;
-					color: #FFFFFF;
-					background: #fa436a;
-					border-radius: 0;
+				.price-box{
+					display: flex;
+					input{
+						line-height: 70rpx;
+						height: 70rpx;
+						text-align: center;
+						border: 1rpx solid #ccc;
+						border-radius: 20rpx;
+						margin: 0 10rpx;
+					}
 				}
-				button::after{
-					border: none;
+			}
+			.input-item2{
+				display:flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: 20rpx 30upx;
+				background:$page-color-light;
+				height: 220upx;
+				border-radius: 4px;
+				margin-bottom: 40rpx;
+				margin-top: 40rpx;
+				.image{
+					flex:5;
+					margin-left: 20rpx;
+					height: 100%;
+					image{
+						width: 100%;
+						height: 100%;
+					}
+				}
+				.tit{
+					flex: 3;
+					font-size: $font-lg;
+					background-color: #ccc;
+					padding: 20upx;
+					border-radius: 10upx;
+					color:#303133
 				}
 			}
 		}
 	}
+	
+	.mix-btn {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 630upx;
+		height: 80upx;
+		margin: 80upx auto 30upx;
+		font-size: $font-lg;
+		color: #fff;
+		background-color: $base-color;
+		border-radius: 10upx;
+		box-shadow: 1px 2px 5px rgba(219, 63, 96, 0.4);
+	}
+
 </style>

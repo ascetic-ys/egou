@@ -23,7 +23,7 @@
 				<text>扫一扫上面的二维码图案，绑定注册</text>
 			</view>
 		</view>
-		<view class="change-qrcode">
+		<view class="change-qrcode" v-if="userInfo.isB!=2">
 			<button class="code-img img-left" :class="[type==1?'show':'hide']" @click="changeType(1)">用户注册二维码</button>
 			<button class="code-img img-right" :class="[type==2?'show':'hide']" @click="changeType(2)">B端用户注册二维码</button>
 		</view>
@@ -45,6 +45,10 @@
 		},
 		onLoad(){
 			this.createQrCode()
+			if(this.userInfo.isB==2){
+				//是b端用户,只显示一个二维码
+				this.type=1
+			}
 		},
 		computed: {
 			...mapState(['hasLogin','userInfo','weChat'])
