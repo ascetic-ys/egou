@@ -1,27 +1,30 @@
 <template>
 	<view class="container">
-		<view class="list-cell b-b m-t" @click="navTo('/pages/user/memberProtocol')" hover-class="cell-hover" :hover-stay-time="50">
+		<view class="list-cell b-b m-t" v-if="userInfo.ifVip!=2" @click="navTo('/pages/user/memberProtocol')" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-icon icon1 yticon icon-zuanshi"></text>
 			<text class="cell-tit">成为会员</text>
 			<text class="cell-more yticon icon-you"></text>
 		</view>
-		<view class="list-cell b-b" @click="navTo('/pages/user/memberInfo')" hover-class="cell-hover" :hover-stay-time="50">
+		<view class="list-cell b-b" v-if="userInfo.ifVip!=1" @click="navTo('/pages/user/memberInfo')" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-icon icon2 yticon icon-iLinkapp-"></text>
 			<text class="cell-tit">会员信息</text>
 			<text class="cell-more yticon icon-you"></text>
 		</view>
-		<view class="list-cell b-b" @click="navTo('/pages/user/protocolSecret')" hover-class="cell-hover" :hover-stay-time="50">
+		<view class="list-cell b-b" v-if="userInfo.ifVip!=1" @click="navTo('/pages/user/memberRenewal')" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-icon icon3 yticon icon-iconfontweixin"></text>
 			<text class="cell-tit">会员续费</text>
+			<text class="cell-more yticon icon-you"></text>
+		</view>
+		<view class="list-cell b-b" v-if="userInfo.ifVip==1" @click="navTo('/pages/product/list?ifVip=2')" hover-class="cell-hover" :hover-stay-time="50">
+			<text class="cell-icon icon3 yticon icon-pingjia"></text>
+			<text class="cell-tit">会员特权商品</text>
 			<text class="cell-more yticon icon-you"></text>
 		</view>
 	</view>
 </template>
 
 <script>
-	import {  
-	    mapState 
-	} from 'vuex';
+	import {mapState} from 'vuex';
 	export default {
 		data() {
 			return {

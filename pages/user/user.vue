@@ -221,7 +221,7 @@
 			</view> -->
 		</view>
 		
-		<view v-show="true">
+		<view v-show="false">
 			<list-cell icon="icon-yiguoqi1" title="icon-yiguoqi1"></list-cell>
 			<list-cell icon="icon-iconfontshanchu1" title="icon-iconfontshanchu1"></list-cell>
 			<list-cell icon="icon-iconfontweixin" title="icon-iconfontweixin"></list-cell>

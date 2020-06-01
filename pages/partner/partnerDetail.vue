@@ -21,6 +21,10 @@
 			<text class="cell-tip">{{partner.referrer||''}}</text>
 		</view>
 		<view class="list-cell b-b" hover-class="cell-hover" :hover-stay-time="50">
+			<text class="cell-tit">推荐人手机号</text>
+			<text class="cell-tip">{{partner.referrerPhone||''}}</text>
+		</view>
+		<view class="list-cell b-b" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-tit">出生日期</text>
 			<text class="cell-tip">{{partner.birthday||''}}</text>
 		</view>

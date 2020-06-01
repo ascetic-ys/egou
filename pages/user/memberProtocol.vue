@@ -7,14 +7,14 @@
 				<view class="uni-banner">
 					<view class="agreement">
 						<view class="content-box">
-							<view class="title">城市合伙人协议</view>
+							<view class="title">注册会员协议</view>
 							
 							<scroll-view class="content">
 								<view class="user-info">
-									<text class="text-title">甲方：中和在线</text>
+									<text class="text-title">甲方：{{partnerForm.aName}}</text>
 									<view class="text-title">
-										<text class="text-desc" style="margin-right: 40rpx;">乙方：{{partner.partnername}}</text>
-										<text class="text-desc">身份证号码：{{partner.cardNumber}}</text>
+										<text class="text-desc" style="margin-right: 40rpx;">乙方：{{partnerForm.bName}}</text>
+										<text class="text-desc">身份证号码：{{partnerForm.bCard||''}}</text>
 									</view>
 								</view>
 								<view class="text-box">
@@ -22,15 +22,15 @@
 									 show-with-animation use-anchor @error="error" @imgtap="imgtap" @linkpress="linkpress" @parse="parse" @ready="ready">加载中...</jyf-parser>
 								</view>
 								 <view class="user-info user-info-bottom">
-								 	<text class="text-title">甲方：中和在线</text>
-								 	<text class="text-title">乙方：{{partner.partnername}}</text>
+								 	<text class="text-title">甲方：{{partnerForm.aName}}</text>
+								 	<text class="text-title">乙方：{{partnerForm.bName}}</text>
 								 	<text class="text-title">日期：{{partnerForm.signDate}}</text>
 								 </view>
 							</scroll-view>
 							
 							<view class="notice">
 								<text class="text-box">点击同意即表示您已经阅读并同意</text>
-								<text class="touch-box">《城市合伙人协议》</text>
+								<text class="touch-box">《注册会员协议》</text>
 							</view>
 							<view class="btn-box">
 								<button class="cancel" @tap.stop="agreeNo">不同意</button>
@@ -78,7 +78,7 @@
 			this.parentId=options.parentId
 			this.partnerForm.signDate=this.getDate()
 			this.initArguement()
-			this.initPartner()
+			this.initPartnerParams()
 		},
 		computed: {
 			...mapState(['hasLogin','userInfo','weChat'])
@@ -86,22 +86,11 @@
 		methods: {
 			initArguement(){
 				this.$api.httpPost('protocol/api/list',{
-					protocolType:'1'
+					protocolType:'7'
 				}).then(r=>{
-					console.log("合伙人协议请求结果：",r)
+					console.log("公司用户会员协议请求结果：",r)
 					this.protocol=r.data
 					this.$refs.article.setContent(this.protocol.content);
-				}).catch(e=>{
-					console.log("请求错误：",e)
-					this.$api.msg(e.msg||'网络异常请重试')
-				})
-			},
-			initPartner(){
-				this.$api.httpPost('partner/api/detail',{
-					id:this.parentId
-				}).then(r=>{
-					console.log("合伙人详情请求结果：",r)
-					this.partner=r.data
 				}).catch(e=>{
 					console.log("请求错误：",e)
 					this.$api.msg(e.msg||'网络异常请重试')
@@ -128,17 +117,17 @@
 			},
 			initPartnerParams(){
 				this.partnerForm={
-					aName:'中和在线',//甲方
-					bName:this.partner.partnername,//乙方
-					bCard:this.partner.cardNumber,//乙方身份证号
+					aName:RESOURCE.COMPANY_NAME,//甲方
+					bName:this.userInfo.userName,//乙方
+					bCard:this.userInfo.cardNumber,//乙方身份证号
 					content:this.protocol.content,//协议内容
 					signDate:this.getDate(),//签字日期（yyyy-mm-dd）
-					parentId:this.partner.id,//合伙人ID（销售员）
+					parentId:this.userInfo.id,//合伙人ID（销售员）
 				}
 			},
 			agreeYes(){
 				this.initPartnerParams()
-				console.log("`/pages/partner/partnerPay?price=${this.protocol.fee}&parentId=${this.partner.id}`")
+				console.log("`/pages/user/memberPay?price=${this.protocol.fee}&parentId=${this.userInfo.id}`")
 				this.$api.httpPost('protocolRecord/api/save',{
 					...this.partnerForm
 				}).then(r=>{
@@ -146,7 +135,7 @@
 					if(r.code==0){
 						this.$api.msg(r.msg||'保存成功')
 						uni.navigateTo({
-							url:`/pages/partner/partnerPay?price=${this.protocol.fee}&parentId=${this.partner.id}&protocolRecordId=${r.data.id}`
+							url:`/pages/user/memberPay?price=${this.protocol.fee}&parentId=${this.userInfo.id}&protocolRecordId=${r.data.id}`
 						})
 					}else{
 						this.$api.msg(r.msg||'网络异常请重试')

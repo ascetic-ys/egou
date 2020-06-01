@@ -116,6 +116,7 @@
 				headerTop:"0px",
 				cateList: [],
 				goodsList: [],
+				ifVip:1,//是否会员商品（1：否、2：是）
 				params:{},
 				sizeList:[],
 				colorList:[]
@@ -129,7 +130,10 @@
 			// #endif
 			this.params.largeCategory=options.largeCategory
 			this.params.littleCategory=options.littleCategory
-			
+			if(options.ifVip){
+				this.ifVip=options.ifVip
+			}
+			this.params.ifVip=this.ifVip
 			this.sizeList = await this.$api.json('sizeList')
 			this.colorList = await this.$api.json('colorList')
 			this.loadCateList()
@@ -152,7 +156,7 @@
 					orderByColumn:'',
 					isAsc:'',
 					color:'',
-					size:'',
+					ifVip:this.ifVip,
 					lowPrice:'',
 					highPrice:''
 				}

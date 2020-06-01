@@ -7,7 +7,7 @@
 				<view class="uni-banner">
 					<view class="agreement">
 						<view class="content-box">
-							<view class="title">城市合伙人协议</view>
+							<view class="title">{{isB==1?'城市合伙人':'B端用户'}}协议</view>
 							
 							<scroll-view class="content">
 								<view class="user-info">
@@ -53,11 +53,15 @@
 		data(){
 			return {
 				id:'',
+				isB:1,
 				partner:{},
 			}
 		},
 		onLoad(option){
 			this.id=option.id
+			if(options.isB){
+				this.isB=options.isB
+			}
 			this.initData()
 		},
 		computed: {
@@ -77,7 +81,7 @@
 			//协议续签
 			continueProtocol(){
 				uni.navigateTo({
-					url:`/pages/partner/partnerProtocolAgree?parentId=${this.partner.parentId}`
+					url:`/pages/partner/partnerProtocolAgree?parentId=${this.partner.parentId}&isB=${this.userInfo.isB}`
 				})
 			},
 			parse(e) {

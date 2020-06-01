@@ -110,14 +110,14 @@
 			//协议续签
 			continueProtocol(){
 				uni.navigateTo({
-					url:`/pages/partner/partnerProtocolAgree?parentId=${this.userInfo.id}`
+					url:`/pages/partner/partnerProtocolAgree?parentId=${this.userInfo.id}&isB=${this.userInfo.isB}`
 				})
 			},
 			// 跳转详情
 			toProtocolDetail(item){
 				console.log(item)
 				uni.navigateTo({
-					url: `/pages/partner/partnerProtocolDetail?id=${item.id}`
+					url: `/pages/partner/partnerProtocolDetail?id=${item.id}&isB=${this.userInfo.isB}`
 				})
 			},
 		},

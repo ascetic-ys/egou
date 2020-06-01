@@ -101,6 +101,16 @@
 						/>
 					</view>
 					<view class="input-item">
+						<text class="tit">推荐人手机号</text>
+						<input 
+							type="number" 
+							v-model="form.referrerPhone" 
+							placeholder="请输入推荐人手机号"
+							maxlength="11"
+							:disabled="phoneDisabled"
+						/>
+					</view>
+					<view class="input-item">
 						<text class="tit">省市区</text>
 						<view class="input">
 							<!-- {{form.addressName}} -->
@@ -184,6 +194,7 @@
 					signDate:'',//签字日期（yyyy-mm-dd）
 					parentId:'',//合伙人ID（销售员）
 				},
+				phoneDisabled:false,
 				protocol:{},
 				partner:{}//注册成功后合作伙伴的信息
 			}
@@ -193,10 +204,13 @@
 			if(query.scene){//通过扫描进入页面
 				const scene = decodeURIComponent(query.scene)
 				console.log("scence:",scence)
-				// this.form.salesPersonPhoneNumber = scence.phoneNumber
+				this.form.referrerPhone = scence.phoneNumber
+				if(isMobile(scence.phoneNumber)){
+					this.phoneDisabled=true
+				}
 				this.form.isB = scence.isB
-			}else if(options.isB){
-				this.form.isB=options.isB
+			}else if(query.isB){
+				this.form.isB=query.isB
 			}
 			if(this.form.isB==2){
 				uni.setNavigationBarTitle({
@@ -335,7 +349,9 @@
 						if(r.code==0){
 							this.partner=r.data
 							// this.$api.msg(r.msg||'注册成功')
-							uni.navigateTo({								url:`/pages/partner/partnerProtocolAgree?parentId=${this.partner.id}`							})
+							uni.navigateTo({								
+								url:`/pages/partner/partnerProtocolAgree?parentId=${this.partner.id}&isB=${this.form.isB}`,
+							})
 						}else{
 							this.regBtnDisabled=false
 							this.$api.msg(r.msg||'网络异常请重试')
@@ -445,8 +461,12 @@
 				// 	this.$api.msg('邮箱格式错误')
 				// 	return 
 				// }
-				if(!this.form.referrer){
-					this.$api.msg('请输入推荐人')
+				// if(!this.form.referrer){
+				// 	this.$api.msg('请输入推荐人')
+				// 	return false
+				// }
+				if(this.form.referrerPhone && !isMobile(this.form.referrerPhone)){
+					this.$api.msg('推荐人手机号码格式不正确')
 					return false
 				}
 				if(!this.form.address){

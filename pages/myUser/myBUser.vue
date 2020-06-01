@@ -1,9 +1,18 @@
 <template>
 	<view class="content">
-		<view class="navbar">
+		<view class="navbar-date">
+			<view class="search-date">
+				<picker mode="date" :value="date1" :start="startDate" :end="endDate" @change="bindDateChange1">
+						<view class="uni-input">起始：{{date1}}</view>
+				</picker>
+				<text style="line-height: 70upx;">--</text>
+				<picker mode="date" :value="date2" :start="startDate" :end="endDate" @change="bindDateChange2">
+						<view class="uni-input">结束：{{date2}}</view>
+				</picker>
+			</view>
 			<view class="order-numb">
 				<text>今日新增：<text class="num">{{newUsers||0}}</text></text>
-				<text>客户总量：<text class="num">{{totalUsers||0}}</text></text>
+				<text>用户总量：<text class="num">{{totalUsers||0}}</text></text>
 			</view>
 		</view>
 
@@ -14,18 +23,18 @@
 			<!-- 订单列表 -->
 			<view v-for="(item,index) in list" :key="index" class="order-item">
 				<view class="i-top b-b">
-					<text class="time">客户名称：{{item.user.userName}}</text>
+					<text class="time">姓名：{{item.partnername}}</text>
 				</view>
 				<view class="goods-box-single">
 					<view class="right">
 						<view class="orderLItem">
-							<text>联系人：{{item.user.linkMan}}</text>
+							<text>身份证号：{{item.cardNumber}}</text>
 						</view>
 						<view class="orderLItem">
-							<text>联系电话：{{item.user.phoneNumber}}</text>
+							<text>电话：{{item.partnerPhone}}</text>
 						</view>
 						<view class="orderLItem">
-							<text>公司地址：{{item.user.companyAddress}}</text>
+							<text>注册日期：{{item.regdate}}</text>
 						</view>
 					</view>
 				</view>
@@ -55,7 +64,9 @@
 				params:{},
 				newUsers:0,
 				totalUsers:0,
-				list:[]
+				list:[],
+				date1: 0,
+				date2: 0,
 			};
 		},
 		onLoad(options){
@@ -63,10 +74,18 @@
 			this.loadData()
 		},
 		computed: {
+			startDate() {
+				return this.getDate('start');
+			},
+			endDate() {
+				return this.getDate('end');
+			},
 			...mapState(['hasLogin','userInfo','weChat'])
 		},
 		methods: {
 			initParams(){
+				this.date1 = this.getDate('lastmouth')
+				this.date2 = this.getDate()
 				this.params={
 					orderByColumn:"",
 					isAsc:"",
@@ -116,12 +135,14 @@
 					delete this.params.orderByColumn
 					delete this.params.isAsc
 				}
-				return this.$api.httpPost('userInfo/api/myCustomer',{
+				this.params.regdateStart=this.date1
+				this.params.regdateEnd=this.date2
+				return this.$api.httpPost('partner/api/myB',{
 					pageNum,
 					pageSize,
 					...this.params
 				}).then(r=>{
-					console.log("请求结果：",r)
+					console.log("我的B端用户请求结果：",r)
 					if(pageNum===1){
 						this.list=r.data.rows
 					}else{
@@ -134,7 +155,33 @@
 					console.log("请求错误：",e)
 					this.$api.msg(e.msg||'网络异常请重试')
 				})
-			}
+			},
+			bindDateChange1(e) {
+				this.date1 = e.target.value
+				this.loadData()
+			},
+			bindDateChange2(e) {
+				this.date2 = e.target.value
+				this.loadData()
+			},
+			getDate(type) {
+				const date = new Date();
+				let year = date.getFullYear();
+				let month = date.getMonth() + 1;
+				let day = date.getDate();
+					
+				if (type === 'start') {
+						year = year - 60;
+				} else if (type === 'end') {
+						year = year + 2;
+				}else if (type === 'lastmouth') {
+						month = month - 1;
+				}
+				month = month > 9 ? month : '0' + month;;
+				day = day > 9 ? day : '0' + day;
+				return `${year}-${month}-${day}`;
+			},
+			
 		}
 	}
 </script>
@@ -155,6 +202,37 @@
 	page, .content{
 		background: $page-color-base;
 		height: 100%;
+	}
+	
+	.navbar-date{
+		display: flex;
+		flex-direction: column;
+		padding: 0 5px;
+		background: #fff;
+		box-shadow: 0 1px 5px rgba(0,0,0,.06);
+		position: relative;
+		z-index: 10;
+		.search-date {
+			width: 100%;
+			background-color: #fffefc;
+			font-size: $font-base;
+			display: flex;
+			justify-content: space-between;
+			padding: 20upx 30upx;
+			.uni-input{
+				background-color: #d6dfdf;
+				padding:20upx;
+				border-radius: 10upx;
+			}
+			.num{
+				font-size: $font-lg;
+				color:$font-color-red ;
+			}
+			.money{
+				font-size: $font-lg;
+				color:$font-color-red ;
+			}
+		}
 	}
 	
 	.swiper-box{

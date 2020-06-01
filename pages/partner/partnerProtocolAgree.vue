@@ -7,14 +7,14 @@
 				<view class="uni-banner">
 					<view class="agreement">
 						<view class="content-box">
-							<view class="title">城市合伙人协议</view>
+							<view class="title">{{isB==1?'城市合伙人':'B端用户'}}协议</view>
 							
 							<scroll-view class="content">
 								<view class="user-info">
-									<text class="text-title">甲方：中和在线</text>
+									<text class="text-title">甲方：{{partnerForm.aName}}</text>
 									<view class="text-title">
 										<text class="text-desc" style="margin-right: 40rpx;">乙方：{{partner.partnername}}</text>
-										<text class="text-desc">身份证号码：{{partner.cardNumber}}</text>
+										<text class="text-desc">身份证号码：{{partner.cardNumber||''}}</text>
 									</view>
 								</view>
 								<view class="text-box">
@@ -22,7 +22,7 @@
 									 show-with-animation use-anchor @error="error" @imgtap="imgtap" @linkpress="linkpress" @parse="parse" @ready="ready">加载中...</jyf-parser>
 								</view>
 								 <view class="user-info user-info-bottom">
-								 	<text class="text-title">甲方：中和在线</text>
+								 	<text class="text-title">甲方：{{partnerForm.aName}}</text>
 								 	<text class="text-title">乙方：{{partner.partnername}}</text>
 								 	<text class="text-title">日期：{{partnerForm.signDate}}</text>
 								 </view>
@@ -30,7 +30,7 @@
 							
 							<view class="notice">
 								<text class="text-box">点击同意即表示您已经阅读并同意</text>
-								<text class="touch-box">《城市合伙人协议》</text>
+								<text class="touch-box">《{{isB==1?'城市合伙人':'B端用户'}}协议》</text>
 							</view>
 							<view class="btn-box">
 								<button class="cancel" @tap.stop="agreeNo">不同意</button>
@@ -62,6 +62,8 @@
 			return {
 				regBtnDisabled:false,
 				parentId:'',
+				protocolType:1,
+				isB:1,
 				partnerForm:{
 					aName:'',//甲方
 					bName:'',//乙方
@@ -76,17 +78,24 @@
 		},
 		onLoad(options){
 			this.parentId=options.parentId
+			if(options.isB){
+				this.isB=options.isB
+			}
 			this.partnerForm.signDate=this.getDate()
 			this.initArguement()
 			this.initPartner()
+			this.initPartnerParams()
 		},
 		computed: {
 			...mapState(['hasLogin','userInfo','weChat'])
 		},
 		methods: {
 			initArguement(){
+				if(this.isB==2){
+					this.protocolType=8
+				}
 				this.$api.httpPost('protocol/api/list',{
-					protocolType:'1'
+					protocolType:this.protocolType
 				}).then(r=>{
 					console.log("合伙人协议请求结果：",r)
 					this.protocol=r.data
@@ -128,7 +137,7 @@
 			},
 			initPartnerParams(){
 				this.partnerForm={
-					aName:'中和在线',//甲方
+					aName:RESOURCE.COMPANY_NAME,//甲方
 					bName:this.partner.partnername,//乙方
 					bCard:this.partner.cardNumber,//乙方身份证号
 					content:this.protocol.content,//协议内容
