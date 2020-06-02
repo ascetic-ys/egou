@@ -9,6 +9,7 @@
 				}]"
 				:class="icon"
 			></text>
+			<!-- <image :src="image" v-if="image" class="cell-img" mode="aspectFill"></image> -->
 			<text class="cell-tit clamp">{{title}}</text>
 		</view>
 		<button v-if="service" class="mix-button-cell btn-service" open-type="contact" @contact="getContact">
@@ -20,6 +21,7 @@
 				}]"
 				:class="icon"
 			></text>
+			<!-- <image :src="image" v-if="image" class="cell-img" mode="aspectFill"></image> -->
 			<text class="cell-tit clamp">{{title}}</text>
 		</button>
 
@@ -74,7 +76,11 @@
 			iconColor: {
 				type: String,
 				default: '#333'
-			}
+			},
+			image: {
+				type: String,
+				default: ''
+			},
 		},
 		methods: {
 			eventClick(){
@@ -118,7 +124,11 @@
 		&.b-b:after{
 			left: 30upx;
 		}
-
+		.cell-img{
+			align-self:center;
+			width:56upx;
+			max-height:56upx;
+		}
 		.cell-icon{
 			align-self:center;
 			width:56upx;

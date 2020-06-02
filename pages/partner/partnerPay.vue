@@ -131,6 +131,14 @@
 			},
 			//提交支付记录
 			paySubmitImage(){
+				if(!this.memberPayRecord.price){
+					this.$api.msg('请输入会员费用')
+					return false
+				}
+				if(!this.memberPayRecord.payImgPath){
+					this.$api.msg('请上传转账记录图片')
+					return false
+				}
 				this.disabledPay=true
 				this.memberPayRecord.userId==this.userInfo.id
 				this.$api.loading('请求中...')
