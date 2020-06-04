@@ -51,6 +51,14 @@
 						<button class="sendCode" :disabled='time>0' @tap='sendCode'>{{`${time>0?'已发送('+time+'s)':'发送验证码'}`}}</button>
 					</view>
 					<view class="input-item">
+						<text class="tit">验证码</text>
+						<input 
+							v-model="form.smsCode" 
+							placeholder="请输入验证码"
+							maxlength="6"
+						/>
+					</view>
+					<view class="input-item">
 						<text class="tit">性别</text>
 						<view class="content">
 							<text class="cell-tit" v-if="form.sex==0">男</text>

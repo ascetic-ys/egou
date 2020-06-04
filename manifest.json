@@ -64,9 +64,10 @@
                 "provider" : "wx4418e3e031e551be"
             }
         },
-        "appid" : "wx576bb7768aca84d3",
+        "appid" : "wx2b13999266897202",
         "setting" : {
-            "urlCheck" : false
+            "urlCheck" : false,
+            "postcss" : false
         },
         "permission" : {}
     }
