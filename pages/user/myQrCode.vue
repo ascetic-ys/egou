@@ -44,11 +44,13 @@
 			}
 		},
 		onLoad(){
-			this.createQrCode()
+			// this.createQrCode()
 			if(this.userInfo.isB==2){
 				//是b端用户,只显示一个二维码
 				this.type=1
 			}
+			this.qrCodeImage1=this.userInfo.userQrCode
+			this.qrCodeImage2=this.userInfo.partnerQrCode
 		},
 		computed: {
 			...mapState(['hasLogin','userInfo','weChat'])

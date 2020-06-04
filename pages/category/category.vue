@@ -1,7 +1,7 @@
 <template>
 	<view class="content">
 		<scroll-view scroll-y class="left-aside">
-			<view v-for="item in cateLit" :key="item.id" class="f-item b-b" :class="{active: item.id === currentId}" @click="tabtap(item)">
+			<view v-for="(item,index) in cateLit" :key="item.id" class="f-item b-b" :class="{active: item.id === currentId}" @click="tabtap(item,index)">
 				{{item.largeCategory}}
 			</view>
 		</scroll-view>
@@ -67,12 +67,12 @@
 				})
 			},
 			//一级分类点击
-			tabtap(item){
+			tabtap(item,index){
 				if(!this.sizeCalcState){
 					this.calcSize();
 				}
 				this.currentId = item.id;
-				let index = this.cateLit.findIndex(sitem=>sitem.id === item.id);
+				// let index = this.cateLit.findIndex(sitem=>sitem.id === item.id);
 				this.tabScrollTop = this.cateLit[index].top;
 			},
 			//右侧栏滚动
@@ -81,7 +81,8 @@
 					this.calcSize();
 				}
 				let scrollTop = e.detail.scrollTop;
-				let tabs = this.cateLit.filter(item=>item.top <= scrollTop).reverse();
+				console.log('scrollTop:',scrollTop,e)
+				let tabs = this.cateLit.filter(item=>(item.top-20) <= scrollTop).reverse();
 				if(tabs.length > 0){
 					this.currentId = tabs[0].id;
 				}
@@ -96,10 +97,10 @@
 						size: true,
 						scrollOffset: true
 					}, data => {
-						console.log('data:',data)
 						item.top = h;
 						h += data.height;
 						item.bottom = h;
+						console.log('data:',item)
 					}).exec();
 				})
 				this.sizeCalcState = true;
