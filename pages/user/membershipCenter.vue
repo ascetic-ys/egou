@@ -5,12 +5,12 @@
 			<text class="cell-tit">成为会员</text>
 			<text class="cell-more yticon icon-you"></text>
 		</view>
-		<view class="list-cell b-b" v-if="userInfo.ifVip!=1" @click="navTo('/pages/user/memberInfo')" hover-class="cell-hover" :hover-stay-time="50">
+		<view class="list-cell b-b" v-if="userInfo.ifVip==1" @click="navTo('/pages/user/memberInfo')" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-icon icon2 yticon icon-iLinkapp-"></text>
 			<text class="cell-tit">会员信息</text>
 			<text class="cell-more yticon icon-you"></text>
 		</view>
-		<view class="list-cell b-b" v-if="userInfo.ifVip!=1" @click="navTo('/pages/user/memberRenewal')" hover-class="cell-hover" :hover-stay-time="50">
+		<view class="list-cell b-b" v-if="userInfo.ifVip==1" @click="navTo('/pages/user/memberRenewal')" hover-class="cell-hover" :hover-stay-time="50">
 			<text class="cell-icon icon3 yticon icon-iconfontweixin"></text>
 			<text class="cell-tit">会员续费</text>
 			<text class="cell-more yticon icon-you"></text>
