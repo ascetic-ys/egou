@@ -316,7 +316,7 @@
 					<image :src="item.image" mode="aspectFill"></image>
 				</view>
 				<text class="title clamp">{{item.productName}}</text>
-				<text class="price">￥{{item.price}}</text>
+				<text class="price" v-if="hasLogin">￥{{item.price}}</text>
 			</view>
 		</view>
 		<!-- 底部自定义tabbar -->
@@ -350,37 +350,33 @@
 		},
 		created() {
 			this.loadData();
-			let userInfo = uni.getStorageSync('userInfo') || '';
-			if(!userInfo.id){
-				console.log("created首页跳转登录",userInfo.id)
-				uni.reLaunch({
-					url:'/pages/public/login?flag=1'
-				})
-			}
-		},
-		onLoad() {
-			if(!this.hasLogin){
-				console.log("onLoad首页跳转登录",this.hasLogin)
-				// uni.reLaunch({
-				// 	url:'/pages/public/login?flag=1'
-				// })
-			}
-		},
-		onShow() {
-			if(!this.hasLogin){
-				console.log("onShow首页跳转登录",this.hasLogin)
-				// uni.reLaunch({
-				// 	url:'/pages/public/login?flag=1'
-				// })
-			}
+			// let userInfo = uni.getStorageSync('userInfo') || '';
+			// if(!userInfo.id){
+			// 	console.log("created首页跳转登录",userInfo.id)
+			// 	uni.reLaunch({
+			// 		url:'/pages/public/login?flag=1'
+			// 	})
+			// }
 		},
 		methods: {
 			toProductList(item){
+				if(!this.hasLogin){
+					uni.navigateTo({
+						url:'/pages/public/login'
+					})
+					return
+				}
 				uni.navigateTo({
 					url: `/pages/product/list?largeCategory=${item.largeCategory}&littleCategory=${item.littleCategory}`
 				})
 			},
 			clickTab(item){
+				if(!this.hasLogin){
+					uni.navigateTo({
+						url:'/pages/public/login'
+					})
+					return
+				}
 				uni.navigateTo({
 					url:item.pagePath
 				})
@@ -473,12 +469,24 @@
 				this.swiperCurrent2 = index;
 			},
 			navTo(url){
+				if(!this.hasLogin){
+					uni.navigateTo({
+						url:'/pages/public/login'
+					})
+					return
+				}
 				uni.navigateTo({
 					url:url
 				})
 			},
 			//详情页
 			navToDetailPage(item) {
+				if(!this.hasLogin){
+					uni.navigateTo({
+						url:'/pages/public/login'
+					})
+					return
+				}
 				//测试数据没有写id，用title代替
 				let id = item.title;
 				uni.navigateTo({
@@ -487,6 +495,12 @@
 				})
 			},
 			navToProductDetailPage(item){
+				if(!this.hasLogin){
+					uni.navigateTo({
+						url:'/pages/public/login'
+					})
+					return
+				}
 				let id = item.id;
 				uni.navigateTo({
 					url: `/pages/product/product?id=${id}`

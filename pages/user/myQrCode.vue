@@ -37,8 +37,8 @@
 		data(){
 			return {
 				type:1,
-				qrCodeImage1: '/static/or6mJ5SdnzMS6O6v3P8fouvhBiT4.jpg',
-				qrCodeImage2: '/static/or6mJ5SdnzMS6O6v3P8fouvhBiT4.jpg',
+				qrCodeImage1: '',
+				qrCodeImage2: '',
 				access_token:'',
 				expires_in:0,
 			}
@@ -79,13 +79,14 @@
 					url: url,
 					data: {
 						width: 600,
-						scene: 'pUserId='+that.userInfo.id+'&phoneNumber='+that.userInfo.phoneNumber,
+						scene: 'phoneNumber='+that.userInfo.phoneNumber,
 						page: "pages/public/regist"  //这里按照需求设置值和参数   
 					},
 					method: "POST",
 					responseType: 'arraybuffer',  //设置响应类型
 					success(res) {
 						console.log(res)
+						console.log(uni.arrayBufferToBase64(res.data))
 						that.qrCodeImage1 = 'data:image/png;base64,'+uni.arrayBufferToBase64(res.data);  //对数据进行转换操作
 					},
 					fail(e) {
@@ -102,7 +103,7 @@
 					url: url,
 					data: {
 						width: 600,
-						scene: 'pUserId='+that.userInfo.id+'&phoneNumber='+that.userInfo.phoneNumber+'&isB=2',
+						scene: 'phoneNumber='+that.userInfo.phoneNumber,
 						page: "pages/partner/partner"  //这里按照需求设置值和参数   
 					},
 					method: "POST",

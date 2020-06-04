@@ -199,7 +199,12 @@
 				})
 			},
 			clickTab(item){
-				console.log(item,8989);
+				if(!this.hasLogin){
+					uni.navigateTo({
+						url:'/pages/public/login'
+					})
+					return
+				}
 				uni.navigateTo({
 					url:item.pagePath
 				})

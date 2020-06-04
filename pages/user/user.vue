@@ -273,13 +273,6 @@
 			}
 		},
 		created() {
-			let userInfo = uni.getStorageSync('userInfo') || '';
-			if(!userInfo.id){
-				console.log("created首页跳转登录",userInfo.id)
-				uni.reLaunch({
-					url:'/pages/public/login?flag=1'
-				})
-			}
 		},
 		onLoad(){
 			this.initData()
@@ -431,11 +424,23 @@
 				return `${year}-${month}-${day}`;
 			},
 			toMyQrCode(){
+				if(!this.hasLogin){
+					uni.navigateTo({
+						url:'/pages/public/login'
+					})
+					return
+				}
 				uni.navigateTo({
 					url:'/pages/user/myQrCode'
 				}) 
 			},
 			clickTab(item){
+				if(!this.hasLogin){
+					uni.navigateTo({
+						url:'/pages/public/login'
+					})
+					return
+				}
 				uni.navigateTo({
 					url:item.pagePath
 				})

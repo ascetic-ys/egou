@@ -211,12 +211,12 @@
 			// scene 需要使用 decodeURIComponent 才能获取到生成二维码时传入的 scene
 			if(query.scene){//通过扫描进入页面
 				const scene = decodeURIComponent(query.scene)
-				console.log("scence:",scence)
-				this.form.referrerPhone = scence.phoneNumber
-				if(isMobile(scence.phoneNumber)){
+				console.log("scene:",scene)
+				this.form.referrerPhone = scene.phoneNumberB
+				if(isMobile(scene.phoneNumberB)){
 					this.phoneDisabled=true
 				}
-				this.form.isB = scence.isB
+				this.form.isB = 2
 			}else if(query.isB){
 				this.form.isB=query.isB
 			}
