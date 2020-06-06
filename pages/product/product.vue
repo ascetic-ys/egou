@@ -213,7 +213,11 @@
 				<text class="yticon icon-xiatubiao--copy"></text>
 				<text>首页</text>
 			</navigator>
-			<button class="p-b-btn btn-service" open-type="contact" @contact="getContact">
+			<!-- <button class="p-b-btn btn-service" open-type="contact" @click="navTo" @contact="getContact">
+				<text class="yticon icon-xiaoxi"></text>
+				<text class="btn-name">客服</text>
+			</button> -->
+			<button class="p-b-btn btn-service" open-type="contact" @click="navTo2">
 				<text class="yticon icon-xiaoxi"></text>
 				<text class="btn-name">客服</text>
 			</button>
@@ -297,6 +301,8 @@
 	import jyfParser from '@/components/jyf-parser/jyf-parser'; // HBuilderX 2.5.5 及以上可以不需要
 	import {mapState} from 'vuex';
 	import share from '@/components/share';
+	
+	
 	export default{
 		components: {
 			share,
@@ -391,6 +397,28 @@
 					url
 				})  
 			},
+			navTo2(){
+				// 定义插件变量 引入方法
+				let chatPlugin = requirePlugin("ykfchat");
+				chatPlugin.callback.on("get_pic_templates", this.get_graphic, this); // 事件名称， 事件函数，this作用域
+				uni.navigateTo({
+					url: 'plugin://ykfchat/chat-page?wechatapp_id=186830&channel_id=9156&scene=p3012d9bnpl',
+				})  
+			},
+			get_graphic(callback) {
+			    
+				let id=this.product.id
+			    let productData = {
+			     _id: 87,
+			     title: this.product.product,
+			     description: this.product.productName,
+			     thumb: this.product.imgPath,
+			     value: this.product.price,
+			     url: `/pages/product/product?id=${id}`
+			    }
+			    console.log(productData);
+			    callback(productData)
+			  },
 			videoErrorCallback: function(e) {
 				uni.showModal({
 					content: e.target.errMsg,

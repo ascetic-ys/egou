@@ -60,11 +60,15 @@
         "usingComponents" : true,
         "plugins" : {
             "ocr-plugin" : {
-                "version" : "3.0.2",
+                "version" : "3.0.3",
                 "provider" : "wx4418e3e031e551be"
+            },
+            "ykfchat" : {
+                "version" : "2.0.11",
+                "provider" : "wx1fdc8c9f3a3a05e4"
             }
         },
-        "appid" : "wx2b13999266897202",
+        "appid" : "wx6e3ee0ef919002ff",
         "setting" : {
             "urlCheck" : false,
             "postcss" : false
