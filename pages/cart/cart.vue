@@ -25,13 +25,6 @@
 			return {}
 		},
 		created() {
-			let userInfo = uni.getStorageSync('userInfo') || '';
-			if(!userInfo.id){
-				console.log("created首页跳转登录",userInfo.id)
-				uni.reLaunch({
-					url:'/pages/public/login?flag=1'
-				})
-			}
 		},
 		onLoad(){
 			this.initPageTitle()

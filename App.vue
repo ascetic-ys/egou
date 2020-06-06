@@ -33,10 +33,6 @@
 					  selectedIconPath: "static/tab-achieve-current.png",
 					})
 				}
-			}else{
-				uni.reLaunch({
-					url:'/pages/public/login?flag=1'
-				})
 			}
 			if(weChat.language){
 				//更新微信授权状态
@@ -48,35 +44,10 @@
 				});
 			}
 			
-			// uni.getSystemInfo({
-			// 	success:function(e){
-			// 		Vue.prototype.statusBar = e.statusBarHeight
-			// 		// #ifndef MP
-			// 		if(e.platform == 'android') {Vue.prototype.customBar = e.statusBarHeight + 50
-			// 		}else {Vue.prototype.customBar = e.statusBarHeight + 45
-			// 		}
-			// 		// #endif
-			// 		// #ifdef MP-WEIXIN
-			// 		let custom = wx.getMenuButtonBoundingClientRect()
-			// 		Vue.prototype.customBar = custom.bottom + custom.top - e.statusBarHeight
-			// 		// #endif
-			// 		// #ifdef MP-ALIPAY
-			// 		Vue.prototype.customBar = e.statusBarHeight + e.titleBarHeight
-			// 		// #endif
-			// 	}
-			// })
-			
 		},
 		onShow: function() {
 			console.log('App Show')
 			this.checkUpdate()
-			// let userInfo = uni.getStorageSync('userInfo') || '';
-			// if(!userInfo.id){
-			// 	console.log("app-onShow首页跳转登录",this.hasLogin)
-			// 	uni.reLaunch({
-			// 		url:'/pages/public/login?flag=1'
-			// 	})
-			// }
 		},
 		onHide: function() {
 			console.log('App Hide')

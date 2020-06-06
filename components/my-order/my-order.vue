@@ -176,6 +176,12 @@
 			},
 			// 跳转详情
 			goOrderXQ(id){
+				if(!this.hasLogin){
+					uni.navigateTo({
+						url:'/pages/public/login'
+					})
+					return
+				}
 				uni.navigateTo({
 					url:`/pages/order/orderXQ?id=${id}`
 				})
@@ -203,6 +209,12 @@
 			},
 			// 物流
 			gotowl(id){
+				if(!this.hasLogin){
+					uni.reLaunch({
+						url:'/pages/public/login'
+					})
+					return
+				}
 				uni.navigateTo({
 					url:'/pages/customer/goodsliu?orderId=${id}'
 				})

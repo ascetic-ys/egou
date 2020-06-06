@@ -1,7 +1,7 @@
 <template>
 	<view class="content">
 		<scroll-view scroll-y class="left-aside">
-			<view v-for="item in cateLit" :key="item.id" class="f-item b-b" :class="{active: item.id === currentId}" @click="tabtap(item)">
+			<view v-for="(item,index) in cateLit" :key="item.id" class="f-item b-b" :class="{active: item.id === currentId}" @click="tabtap(item,index)">
 				{{item.largeCategory}}
 			</view>
 		</scroll-view>
@@ -9,7 +9,7 @@
 			<view v-for="item in cateLit" :key="item.id" class="s-list" :id="'main-'+item.id">
 				<text class="s-item">{{item.largeCategory}}</text>
 				<view class="t-list">
-					<view @click="navToList(titem,item)" class="t-item" v-for="titem in item.littleCategorylist" :key="titem.id">
+					<view class="t-item" v-for="titem in item.littleCategorylist" :key="titem.id" @tap.stop="navToList(titem,item)" >
 						<image :src="titem.filePath||`/static/temp/Cate4.jpg`"></image>
 						<text>{{titem.littleCategory}}</text>
 					</view>
@@ -22,6 +22,7 @@
 </template>
 
 <script>
+	import {mapState} from 'vuex';
 	
 	export default {
 		data() {
@@ -34,19 +35,22 @@
 		},
 		created() {
 			this.loadData();
-			let userInfo = uni.getStorageSync('userInfo') || '';
-			if(!userInfo.id){
-				console.log("created首页跳转登录",userInfo.id)
-				uni.reLaunch({
-					url:'/pages/public/login?flag=1'
-				})
-			}
+		},
+		computed: {
+			...mapState(['hasLogin','userInfo','weChat'])
 		},
 		methods: {
 			clickTab(item){
-				uni.navigateTo({
-					url:item.pagePath
-				})
+				if(!this.hasLogin){
+					uni.navigateTo({
+						url:'/pages/public/login'
+					})
+					return
+				}else{
+					uni.navigateTo({
+						url:item.pagePath
+					})
+				}
 			},
 			async loadData(){
 				this.$api.loading('加载中...')
@@ -63,12 +67,12 @@
 				})
 			},
 			//一级分类点击
-			tabtap(item){
+			tabtap(item,index){
 				if(!this.sizeCalcState){
 					this.calcSize();
 				}
 				this.currentId = item.id;
-				let index = this.cateLit.findIndex(sitem=>sitem.id === item.id);
+				// let index = this.cateLit.findIndex(sitem=>sitem.id === item.id);
 				this.tabScrollTop = this.cateLit[index].top;
 			},
 			//右侧栏滚动
@@ -77,7 +81,8 @@
 					this.calcSize();
 				}
 				let scrollTop = e.detail.scrollTop;
-				let tabs = this.cateLit.filter(item=>item.top <= scrollTop).reverse();
+				console.log('scrollTop:',scrollTop,e)
+				let tabs = this.cateLit.filter(item=>(item.top-20) <= scrollTop).reverse();
 				if(tabs.length > 0){
 					this.currentId = tabs[0].id;
 				}
@@ -92,18 +97,25 @@
 						size: true,
 						scrollOffset: true
 					}, data => {
-						console.log('data:',data)
 						item.top = h;
 						h += data.height;
 						item.bottom = h;
+						console.log('data:',item)
 					}).exec();
 				})
 				this.sizeCalcState = true;
 			},
 			navToList(item,pitem){
-				uni.navigateTo({
-					url: `/pages/product/list?largeCategory=${pitem.largeCategory}&littleCategory=${item.littleCategory}`
-				})
+				if(!this.hasLogin){
+					uni.navigateTo({
+						url:'/pages/public/login'
+					})
+				}else{
+					uni.navigateTo({
+						url: `/pages/product/list?largeCategory=${pitem.largeCategory}&littleCategory=${item.littleCategory}`
+					})
+				}
+				
 			}
 		}
 	}
