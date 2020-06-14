@@ -178,12 +178,12 @@
 			goOrderXQ(id){
 				if(!this.hasLogin){
 					uni.navigateTo({
-						url:'/pages/public/login'
+						url:'/pagesUser/public/loginogin'
 					})
 					return
 				}
 				uni.navigateTo({
-					url:`/pages/order/orderXQ?id=${id}`
+					url:`/pagesProduct/order/orderXQ?id=${id}`
 				})
 			},
 			//订单状态文字和颜色

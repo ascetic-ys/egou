@@ -1,30 +1,26 @@
 <template>
 	<view class="content">
-		<view class="navbar">
-			<view 
-				v-for="(item, index) in navList" :key="index" 
-				class="nav-item" 
-				:class="{current: tabCurrentIndex === index}"
-				@click="tabClick(index)"
-			>
-				{{item.text}}
+		<view class="navbar-date">
+			<view class="search-date">
+				<picker mode="date" :value="date1" :start="startDate" :end="endDate" @change="bindDateChange1">
+						<view class="uni-input">起始：{{date1}}</view>
+				</picker>
+				<text style="line-height: 70upx;">--</text>
+				<picker mode="date" :value="date2" :start="startDate" :end="endDate" @change="bindDateChange2">
+						<view class="uni-input">结束：{{date2}}</view>
+				</picker>
 			</view>
 		</view>
 		
 		<view>
 			<!-- 空白页 -->
-			<empty v-if="list.length === 0"></empty>
+			<!-- <empty v-if="list.length === 0"></empty> -->
 			<mescroll-body :bottom='bottom' :up='upOption' @down="downCallback" @up="upCallback" @init="mescrollInit">
 				<!-- 订单列表 -->
-				<view v-for="(item,index) in list" :key="index" class="order-item" @tap="goOrderXQ(item.id)">
+				<view v-for="(item,index) in list" :key="index" class="order-item" @tap="goRefundXQ(item.id)">
 					<view class="i-top b-b">
-						<text class="time">{{item.orderDate||''}}</text>
-						<text class="state" :style="{color: item.stateTipColor}">{{item.stateTip}}</text>
-						<!-- <text 
-							v-if="item.payState===9" 
-							class="del-btn yticon icon-iconfontshanchu1"
-							@click="deleteOrder(index)"
-						></text> -->
+						<text class="time">申请时间：{{item.applicationDate||''}}</text>
+						<text class="state" :style="{color: item.stateTipColor}" v-if="item.refundConclusion">{{item.refundConclusion}}</text>
 					</view>
 					
 					<scroll-view v-if="item.orderChildInfoList.length > 1" class="goods-box" scroll-x>
@@ -47,19 +43,24 @@
 							<text class="price">{{goodsItem.totalPrice}}</text>
 						</view>
 					</view>
-					
+					<view class="desc-box">
+						退款理由：
+						<text class="desc-text">{{item.refundReason}}</text>
+					</view>
+					<view class="desc-box" v-if="item.auditorOpinion">
+						审核意见：
+						<text class="desc-text">{{item.auditorOpinion}}</text>
+					</view>
 					<view class="price-box">
 						共
-						<text class="num">{{item.productNum||0}}</text>
+						<text class="num">{{item.productNum}}</text>
 						件商品 实付款
-						<text class="price">{{item.orderPrice||0}}</text>
-					</view>
-					<view class="action-box b-t" v-if="[3,4].indexOf(item.orderState)>-1">
-						<button class="action-btn" v-if="[3,4].indexOf(item.orderState)>-1" @tap.stop="gotowl(item.id)">查看物流</button>
+						<text class="price">{{item.orderPrice}}</text>
 					</view>
 				</view>
 			</mescroll-body>
 		</view>
+		
 	</view>
 </template> 
 
@@ -80,33 +81,35 @@
 				upOption:{
 					auto:false,
 				},
-				tabCurrentIndex: 0,
 				list: [],
-				navList: [
-					{state: 0,text: '全部'},
-					{state: 1,text: '待付款'},
-					{state: 2,text: '待发货'},
-					{state: 3,text: '待收货'},
-					{state: 4,text: '已完成'}
-				],
-				params:{}
+				params:{},
+				date1: 0,
+				date2: 0,
 			};
 		},
 		
 		async onLoad(options){
-			this.tabCurrentIndex = +options.state||0;
 			this.initParams()
-			this.tabClick(this.tabCurrentIndex);
-			// this.loadData()
+			this.loadData()
 		},
 		computed: {
+			startDate() {
+				return this.getDate('start');
+			},
+			endDate() {
+				return this.getDate('end');
+			},
 			...mapState(['hasLogin','userInfo','weChat'])
 		},
 		methods: {
 			initParams(){
+				this.date1 = this.getDate('lastmouth')
+				this.date2 = this.getDate()
 				this.params={
+					queryType:'orderRefundInfo',
 					orderByColumn:"",
 					isAsc:"",
+					userId:this.userInfo.id
 				}
 			},
 			/*下拉刷新的回调 */
@@ -147,10 +150,13 @@
 			//加载商品 ，带下拉刷新和上滑加载
 			async loadData(data={}) {
 				const {pageNum=1,pageSize=10}=data
+				this.params.userId=this.userInfo.id
 				if(!this.params.orderByColumn){
 					delete this.params.orderByColumn
 					delete this.params.isAsc
 				}
+				this.params.applicationDateStart=this.date1
+				this.params.applicationDateEnd=this.date2
 				return this.$api.httpPost('orderMainInfo/api/list',{
 					pageNum,
 					pageSize,
@@ -175,49 +181,41 @@
 				})
 			},
 			// 跳转详情
-			goOrderXQ(id){
-				if(!this.hasLogin){
-					uni.navigateTo({
-						url:'/pagesUser/public/loginogin'
-					})
-					return
-				}
+			goRefundXQ(id){
+				console.log("id:",id)
 				uni.navigateTo({
-					url:`/pagesProduct/order/orderXQ?id=${id}`
+					url:`/pagesProduct/order/orderRefundDetail?id=${id}`
 				})
 			},
 			//顶部tab点击
 			tabClick(index){
-				this.tabCurrentIndex = index;
 				this.list=[]
-				this.setParams(index)
 				this.loadData()
 			},
-			setParams(index){
-				//1：待付款、2待发货、3：待收货、4：已完成
-				if(index==0){
-					this.params.orderState=''
-				}else if(index==1){
-					this.params.orderState=1
-				}else if(index==2){
-					this.params.orderState=2
-				}else if(index==3){
-					this.params.orderState=3
-				}else if(index==4){
-					this.params.orderState=4
-				}
+			bindDateChange1(e) {
+				this.date1 = e.target.value
+				this.loadData()
 			},
-			// 物流
-			gotowl(id){
-				if(!this.hasLogin){
-					uni.reLaunch({
-						url:'/pagesUser/public/loginogin'
-					})
-					return
+			bindDateChange2(e) {
+				this.date2 = e.target.value
+				this.loadData()
+			},
+			getDate(type) {
+				const date = new Date();
+				let year = date.getFullYear();
+				let month = date.getMonth() + 1;
+				let day = date.getDate();
+		
+				if (type === 'start') {
+						year = year - 60;
+				} else if (type === 'end') {
+						year = year + 2;
+				}else if (type === 'lastmouth') {
+						month = month - 1;
 				}
-				uni.navigateTo({
-					url:'/pagesInfo/customer/goodsliu?orderId=${id}'
-				})
+				month = month > 9 ? month : '0' + month;;
+				day = day > 9 ? day : '0' + day;
+				return `${year}-${month}-${day}`;
 			},
 			//订单状态文字和颜色
 			orderExp(item){
@@ -258,6 +256,37 @@
 		background: $page-color-base;
 		height: 100%;
 	}
+	
+	.navbar-date{
+		display: flex;
+		padding: 0 5px;
+		background: #fff;
+		box-shadow: 0 1px 5px rgba(0,0,0,.06);
+		position: relative;
+		z-index: 10;
+		.search-date {
+			width: 100%;
+			background-color: #fffefc;
+			font-size: $font-base;
+			display: flex;
+			justify-content: space-between;
+			padding: 20upx 30upx;
+			.uni-input{
+				background-color: #d6dfdf;
+				padding:20upx;
+				border-radius: 10upx;
+			}
+			.num{
+				font-size: $font-lg;
+				color:$font-color-red ;
+			}
+			.money{
+				font-size: $font-lg;
+				color:$font-color-red ;
+			}
+		}
+	}
+	
 	
 	.swiper-box{
 		height: calc(100% - 40px);
@@ -390,6 +419,20 @@
 						margin: 0 2upx 0 8upx;
 					}
 				}
+			}
+		}
+		
+		.desc-box{
+			display: flex;
+			justify-content: flex-start;
+			align-items: baseline;
+			padding: 20upx 30upx;
+			font-size: $font-sm + 2upx;
+			color: $font-color-light;
+			.desc-text{
+				margin: 0 8upx;
+				font-size: $font-lg;
+				color: $font-color-dark;
 			}
 		}
 		

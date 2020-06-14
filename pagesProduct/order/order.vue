@@ -13,7 +13,7 @@
 		
 		<view>
 			<!-- 空白页 -->
-			<empty v-if="list.length === 0"></empty>
+			<!-- <empty v-if="list.length === 0"></empty> -->
 			<mescroll-body :bottom='bottom' :up='upOption' @down="downCallback" @up="upCallback" @init="mescrollInit">
 				<!-- 订单列表 -->
 				<view v-for="(item,index) in list" :key="index" class="order-item" @tap="goOrderXQ(item.id)">
@@ -26,36 +26,88 @@
 							@click="deleteOrder(index)"
 						></text> -->
 					</view>
-					
-					<scroll-view v-if="item.orderChildInfoList.length > 1" class="goods-box" scroll-x>
-						<view
-							v-for="(goodsItem, goodsIndex) in item.orderChildInfoList" :key="goodsIndex"
-							class="goods-item"
-						>
-							<image class="goods-img" :src="goodsItem.productInfo.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
-						</view>
-					</scroll-view>
-					<view
-						v-if="item.orderChildInfoList.length === 1" 
-						class="goods-box-single"
-						v-for="(goodsItem, goodsIndex) in item.orderChildInfoList" :key="goodsIndex"
+					<!-- 按厂家分组 -->
+					<!-- <view
+						class="goods-box-factory"
+						v-for="(group, groupIndex) in item.groupList" :key="groupIndex"
 					>
-						<image class="goods-img" :src="goodsItem.productInfo.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
-						<view class="right">
-							<text class="title clamp">{{goodsItem.productName}}</text>
-							<text class="attr-box">{{goodsItem.productInfo.color}}  x {{goodsItem.productNum}}</text>
-							<text class="price">{{goodsItem.totalPrice}}</text>
+						<view class="b-b"></view>
+						<view class="g-header" v-if="group.factoryShortName">
+							<text class="name">{{group.factoryShortName}}</text>
+						</view>
+						<scroll-view v-if="group.orderChildInfoList.length > 1" class="goods-box" scroll-x>
+							<view
+								v-for="(goodsItem, goodsIndex) in group.orderChildInfoList" :key="goodsIndex"
+								class="goods-item"
+							>
+								<image class="goods-img" :src="goodsItem.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
+							</view>
+						</scroll-view>
+						<view
+							v-if="group.orderChildInfoList.length === 1" 
+							class="goods-box-single"
+							v-for="(goodsItem, goodsIndex) in group.orderChildInfoList" :key="goodsIndex"
+						>
+							<image class="goods-img" :src="goodsItem.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
+							<view class="right">
+								<text class="title clamp">{{goodsItem.productName}}</text>
+								<text class="attr-box">{{goodsItem.color}}  x {{goodsItem.productNum}}</text>
+								<text class="price">{{goodsItem.totalPrice}}</text>
+							</view>
+						</view>
+						<view class="wuliu-box b-t" v-if="[3,4].indexOf(item.orderState)>-1" @tap.stop="gotowl(item.id,group.factoryNo)">
+							<view class="left-box">
+								<text class="left">配送</text>
+							</view>
+							<view class="middle-box">
+								<text class="top middle" >快递运输</text>
+								<text class="bottom middle" >工作日、双休日与节假日均可送货</text>
+							</view>
+							<view class="right-box">
+								<text class="yticon icon-you" ></text>
+							</view>
+						</view>
+					</view> -->
+					
+					<!-- 不按厂家分组 -->
+					<view
+						class="goods-box-factory"
+					>
+						<scroll-view v-if="item.orderChildInfoList.length > 1" class="goods-box" scroll-x>
+							<view
+								v-for="(goodsItem, goodsIndex) in item.orderChildInfoList" :key="goodsIndex"
+								class="goods-item"
+							>
+								<image class="goods-img" :src="goodsItem.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
+							</view>
+						</scroll-view>
+						<view
+							v-if="item.orderChildInfoList.length === 1" 
+							class="goods-box-single"
+							v-for="(goodsItem, goodsIndex) in item.orderChildInfoList" :key="goodsIndex"
+						>
+							<image class="goods-img" :src="goodsItem.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
+							<view class="right">
+								<text class="title clamp">{{goodsItem.productName}}</text>
+								<text class="attr-box">{{goodsItem.color}}  x {{goodsItem.productNum}}</text>
+								<text class="price">{{goodsItem.totalPrice}}</text>
+							</view>
 						</view>
 					</view>
 					
 					<view class="price-box">
 						共
-						<text class="num">{{item.productNum||0}}</text>
+						<text class="num">{{item.productNum}}</text>
 						件商品 实付款
-						<text class="price">{{item.orderPrice||0}}</text>
+						<text class="price">{{item.orderPrice}}</text>
 					</view>
-					<view class="action-box b-t" v-if="[3,4].indexOf(item.orderState)>-1">
+					<view class="action-box b-t" v-if="item.orderState != 0">
+						<button class="action-btn" v-if="[2,5].indexOf(item.orderState)>-1" :disabled="item.submitDisabled" @tap.stop="gotoRefund(item.id)">申请退款</button>
 						<button class="action-btn" v-if="[3,4].indexOf(item.orderState)>-1" @tap.stop="gotowl(item.id)">查看物流</button>
+						<button class="action-btn" v-if="item.orderState==1" :disabled="item.submitDisabled" @tap.stop="cancelOrder(item)">取消订单</button>
+						<button class="action-btn" v-if="item.orderState==3" :disabled="item.submitDisabled" @tap.stop="confirmReceipt(item)">确认收货</button>
+						<button class="action-btn" v-if="item.orderState==4" :disabled="item.submitDisabled" @tap.stop="feedback(item)">售后反馈</button>
+						<button class="action-btn recom" v-if="item.orderState==1" @tap.stop="toPay(item)">立即支付</button>
 					</view>
 				</view>
 			</mescroll-body>
@@ -85,9 +137,10 @@
 				navList: [
 					{state: 0,text: '全部'},
 					{state: 1,text: '待付款'},
-					{state: 2,text: '待发货'},
-					{state: 3,text: '待收货'},
-					{state: 4,text: '已完成'}
+					{state: 2,text: '待确认'},
+					{state: 3,text: '待发货'},
+					{state: 4,text: '待收货'},
+					{state: 5,text: '已完成'}
 				],
 				params:{}
 			};
@@ -97,7 +150,7 @@
 			this.tabCurrentIndex = +options.state||0;
 			this.initParams()
 			this.tabClick(this.tabCurrentIndex);
-			// this.loadData()
+			this.loadData()
 		},
 		computed: {
 			...mapState(['hasLogin','userInfo','weChat'])
@@ -107,6 +160,7 @@
 				this.params={
 					orderByColumn:"",
 					isAsc:"",
+					userId:this.userInfo.id
 				}
 			},
 			/*下拉刷新的回调 */
@@ -147,6 +201,7 @@
 			//加载商品 ，带下拉刷新和上滑加载
 			async loadData(data={}) {
 				const {pageNum=1,pageSize=10}=data
+				this.params.userId=this.userInfo.id
 				if(!this.params.orderByColumn){
 					delete this.params.orderByColumn
 					delete this.params.isAsc
@@ -159,8 +214,17 @@
 					console.log("请求结果：",r)
 					let orderList = r.rows
 					orderList.forEach(item=>{
+						console.log("item：",item)
 						//添加不同状态下订单的表现形式
 						item = Object.assign(item, this.orderExp(item));
+						let orderChildInfoList = []
+						item.groupList.forEach(e=>{
+							console.log("e：",e)
+							e.orderChildInfoList.forEach(x=>{
+								orderChildInfoList.push(x)
+							})
+						})
+						item.orderChildInfoList=orderChildInfoList
 					})
 					console.log('orderList',orderList)
 					if(pageNum===1){
@@ -176,12 +240,6 @@
 			},
 			// 跳转详情
 			goOrderXQ(id){
-				if(!this.hasLogin){
-					uni.navigateTo({
-						url:'/pagesUser/public/loginogin'
-					})
-					return
-				}
 				uni.navigateTo({
 					url:`/pagesProduct/order/orderXQ?id=${id}`
 				})
@@ -194,31 +252,119 @@
 				this.loadData()
 			},
 			setParams(index){
-				//1：待付款、2待发货、3：待收货、4：已完成
+				//1待付款、2待发货、5待确认、3待收货、4已完成
 				if(index==0){
 					this.params.orderState=''
 				}else if(index==1){
 					this.params.orderState=1
 				}else if(index==2){
-					this.params.orderState=2
+					this.params.orderState=5
 				}else if(index==3){
-					this.params.orderState=3
+					this.params.orderState=2
 				}else if(index==4){
+					this.params.orderState=3
+				}else if(index==5){
 					this.params.orderState=4
 				}
 			},
-			// 物流
-			gotowl(id){
-				if(!this.hasLogin){
-					uni.reLaunch({
-						url:'/pagesUser/public/loginogin'
-					})
-					return
-				}
+			// 退款
+			gotoRefund(id){
 				uni.navigateTo({
-					url:'/pagesInfo/customer/goodsliu?orderId=${id}'
+					url:`/pagesProduct/order/orderRefund?id=${id}`
 				})
 			},
+			// 物流
+			gotowl(id){
+				uni.navigateTo({
+					url:`/pagesInfo/customer/goodsliu?orderId=${id}`
+				})
+			},
+			//确认收货
+			confirmReceipt(item){
+				let _this = this
+				uni.showModal({
+					title:'温馨提示',
+					content:'您是否收到该订单商品？',
+					cancelText:'未收货',
+					confirmText:'已收货',
+					success: function (res) {
+						if (res.confirm) {
+							console.log('用户点击确定');
+							item.submitDisabled=true
+							_this.$api.loading('请求中...')
+							_this.$api.httpPost('orderMainInfo/api/update',{
+								id:item.id
+							}).then(r=>{
+								console.log('请求结果：',r)
+								if(r.code==0){
+									_this.$api.msg(r.msg||'操作成功')
+									_this.loadData()
+								}else{
+									item.submitDisabled=false
+									_this.$api.msg(r.msg||'网络错误请重试')
+								}
+								uni.hideLoading()
+							}).catch(e=>{
+								item.submitDisabled=false
+								console.log('请求错误：',e)
+								item.$api.msg(e.msg||'网络错误请重试')
+								uni.hideLoading()
+							})
+						} else if (res.cancel) {
+							console.log('用户点击取消');
+						}
+					}
+				})
+			},
+			//取消订单
+			cancelOrder(item){
+				let _this = this
+				uni.showModal({
+					title:'温馨提示',
+					content:'您确定要取消订单吗？',
+					success: function (res) {
+						if (res.confirm) {
+							console.log('用户点击确定');
+							item.submitDisabled=true
+							_this.$api.loading('请求中...')
+							_this.$api.httpPost('orderMainInfo/api/delete',{
+								id:item.id
+							}).then(r=>{
+								console.log('请求结果：',r)
+								if(r.code==0){
+									_this.$api.msg(r.msg||'取消成功')
+									_this.loadData()
+								}else{
+									item.submitDisabled=false
+									_this.$api.msg(r.msg||'网络错误请重试')
+								}
+								uni.hideLoading()
+							}).catch(e=>{
+								item.submitDisabled=false
+								console.log('请求错误：',e)
+								item.$api.msg(e.msg||'网络错误请重试')
+								uni.hideLoading()
+							})
+						} else if (res.cancel) {
+							console.log('用户点击取消');
+						}
+					}
+				})
+				
+			},
+			//售后反馈
+			feedback(item){
+				uni.navigateTo({
+					url: `/pagesProduct/order/orderService?orderId=${item.id}&orderNo=${item.orderNo}`
+				})
+			},
+			//去支付页面
+			toPay(item){
+				uni.navigateTo({
+					url: `/pagesProduct/money/pay?id=${item.id}`
+				})
+			},
+
 			//订单状态文字和颜色
 			orderExp(item){
 				let stateTip = '',
@@ -336,6 +482,42 @@
 					left: 20upx;
 					top: 50%;
 					transform: translateY(-50%);
+				}
+			}
+		}
+		.goods-box-factory{
+			display:flex;
+			position:relative;
+			flex-direction: column;
+			.g-header {
+				display: flex;
+				align-items: center;
+				height: 84upx;
+				padding: 30rpx 20rpx;
+				position: relative;
+				background: #FFFFFF;
+			}
+			.wuliu-box{
+				display:flex;
+				justify-content: space-between;
+				padding: 20rpx 20rpx 20rpx 0;
+				color: #505256;
+				font-size: 28rpx;
+				.left-box{
+					display:flex;
+					justify-content: space-between;
+				}
+				.middle-box{
+					display:flex;
+					flex-direction: column;
+					text-align: right;
+					flex: 1;
+				}
+				.right-box{
+					text-align: right;
+					line-height: 40rpx;
+					padding-top: 14rpx;
+					padding-left: 10rpx;
 				}
 			}
 		}

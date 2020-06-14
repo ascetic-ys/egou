@@ -43,7 +43,7 @@
 			clickTab(item){
 				if(!this.hasLogin){
 					uni.navigateTo({
-						url:'/pages/public/login'
+						url:'/pagesUser/public/loginogin'
 					})
 					return
 				}else{
@@ -108,11 +108,11 @@
 			navToList(item,pitem){
 				if(!this.hasLogin){
 					uni.navigateTo({
-						url:'/pages/public/login'
+						url:'/pagesUser/public/loginogin'
 					})
 				}else{
 					uni.navigateTo({
-						url: `/pages/product/list?largeCategory=${pitem.largeCategory}&littleCategory=${item.littleCategory}`
+						url: `/pagesProduct/product/list?largeCategory=${pitem.largeCategory}&littleCategory=${item.littleCategory}`
 					})
 				}
 				

@@ -201,7 +201,7 @@
 			clickTab(item){
 				if(!this.hasLogin){
 					uni.navigateTo({
-						url:'/pages/public/login'
+						url:'/pagesUser/public/loginogin'
 					})
 					return
 				}
@@ -211,7 +211,7 @@
 			},
 			navToLogin(){
 				uni.navigateTo({
-					url: '/pages/public/login'
+					url: '/pagesUser/public/loginogin'
 				})
 			},
 			 //选中状态处理
@@ -383,7 +383,7 @@
 				}
 
 				uni.navigateTo({
-					url: `/pages/order/createOrder?data=${JSON.stringify({
+					url: `/pagesProduct/order/createOrder?data=${JSON.stringify({
 						goodsList: goodsList,
 						totalMoney: this.total
 					})}`

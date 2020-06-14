@@ -3,7 +3,7 @@
 		
 		<view class="user-section">
 			<image class="bg" src="/static/user-bg.jpg"></image>
-			<view class="user-info-box" @click="navTo('/pages/person/person')">
+			<view class="user-info-box" @click="navTo('/pagesUser/person/person')">
 				<view class="portrait-box">
 					<image class="portrait" :src="userInfo.id?weChat.avatarUrl : '/static/missing-face.png'"></image>
 				</view>
@@ -29,11 +29,11 @@
 			</view> -->
 			
 			<view class="like-list" v-if='[1,4].indexOf(userInfo.tag)>-1'>
-				<view class="like-box" @click="navTo('/pages/order/favoriteList')">
+				<view class="like-box" @click="navTo('/pagesProduct/order/favoriteList')">
 					<text class="num">{{favoriteNum}}</text>
 					<text class="item yticon icon-shoucang">收藏夹</text>
 				</view>
-				<view class="like-box" @click="navTo('/pages/order/historyList')">
+				<view class="like-box" @click="navTo('/pagesProduct/order/historyList')">
 					<text class="num">{{historyNum}}</text>
 					<text class="item yticon icon-lishijilu">浏览足迹</text>
 				</view>
@@ -76,25 +76,25 @@
 			<view class="order-section" v-if='[1,4].indexOf(userInfo.tag)>-1'>
 				<view class="info-box">
 					<text class="info-title">我的订单</text>
-					<view class="info-more" @click="navTo('/pages/order/order?state=0')">
+					<view class="info-more" @click="navTo('/pagesProduct/order/order?state=0')">
 						<text>查看更多</text>
 						<text class="yticon icon-you"></text>
 					</view>
 				</view>
 				<view class="btn-box">
-					<view class="order-item" @click="navTo('/pages/order/order?state=1')" hover-class="common-hover"  :hover-stay-time="50">
+					<view class="order-item" @click="navTo('/pagesProduct/order/order?state=1')" hover-class="common-hover"  :hover-stay-time="50">
 						<text class="yticon icon-daifukuan"></text>
 						<text>待付款</text>
 					</view>
-					<view class="order-item" @click="navTo('/pages/order/order?state=2')"  hover-class="common-hover" :hover-stay-time="50">
+					<view class="order-item" @click="navTo('/pagesProduct/order/order?state=2')"  hover-class="common-hover" :hover-stay-time="50">
 						<text class="yticon icon-shouye"></text>
 						<text>待确认</text>
 					</view>
-					<view class="order-item" @click="navTo('/pages/order/order?state=4')" hover-class="common-hover"  :hover-stay-time="50">
+					<view class="order-item" @click="navTo('/pagesProduct/order/order?state=4')" hover-class="common-hover"  :hover-stay-time="50">
 						<text class="yticon icon-yishouhuo"></text>
 						<text>待收货</text>
 					</view>
-					<view class="order-item" @click="navTo('/pages/order/refundList')" hover-class="common-hover"  :hover-stay-time="50">
+					<view class="order-item" @click="navTo('/pagesProduct/order/refundList')" hover-class="common-hover"  :hover-stay-time="50">
 						<text class="yticon icon-shouhoutuikuan"></text>
 						<text>退款申请</text>
 					</view>
@@ -138,28 +138,28 @@
 				</view>
 			</view>
 			<view class="mybtn-section ">
-				<button-cell v-if='!userInfo.id || [1,4].indexOf(userInfo.tag)>-1' icon="icon-icon--" iconColor="#e07472" title="城市合伙人注册" border="" @eventClick="navTo('/pages/partner/partner?isB=1',true)"></button-cell>
-				<button-cell v-if='!userInfo.id || [1,4].indexOf(userInfo.tag)>-1' icon="icon-fenlei" iconColor="#e07472" title="B端用户注册" border="" @eventClick="navTo('/pages/partner/partner?isB=2',true)"></button-cell>
-				<button-cell v-if='[0].indexOf(userInfo.tag)>-1' icon="icon-icon--" iconColor="#e07472" title="城市合伙人信息" tips="查看已注册的合伙人" border="" @eventClick="navTo('/pages/partner/partnerList')"></button-cell>
-				<button-cell v-if='[1].indexOf(userInfo.tag)>-1' icon="icon-shoucang" iconColor="#e07472" title="会员中心" tips="访问会员中心" border="" @eventClick="navTo('/pages/user/membershipCenter')"></button-cell>
-				<button-cell v-if='[3].indexOf(userInfo.tag)>-1' icon="icon-saomiao" iconColor="#e07472" title="我的二维码" tips="查看我的二维码" border="" @eventClick="navTo('/pages/user/myQrCode')"></button-cell>
-				<!-- <button-cell v-if='hasLogin' icon="icon-lishijilu" iconColor="#e07472" title="浏览足迹" border="" tips="查看我最近浏览过的商品" @eventClick="navTo('/pages/order/historyList')"></button-cell> -->
-				<!-- <button-cell v-if='hasLogin' icon="icon-shoucang_xuanzhongzhuangtai" iconColor="#e07472" title="收藏夹" border="" tips="查看我收藏的商品列表" @eventClick="navTo('/pages/order/favoriteList')"></button-cell> -->
-				<button-cell v-if='hasLogin' icon="icon-dianhua-copy" iconColor="#e07472" title="意见反馈" border="" tips="查看我反馈的意见" @eventClick="navTo('/pages/order/opinionList')"></button-cell>
-				<button-cell v-if='[1,4].indexOf(userInfo.tag)>-1' icon="icon-dizhi" iconColor="#e07472" title="地址管理" border="" tips="查看我录入的地址信息" @eventClick="navTo('/pages/address/address')"></button-cell>
-				<!-- <button-cell v-if='[1,4].indexOf(userInfo.tag)>-1' icon="icon-shouye" iconColor="#e07472" title="发票管理" border="" tips="查看我记录的发票信息" @eventClick="navTo('/pages/invoice/invoice')"></button-cell> -->
-				<button-cell v-if='[1,4].indexOf(userInfo.tag)>-1' icon="icon-pingjia" iconColor="#e07472" title="售后反馈" border="" tips="查看我的售后反馈申请" @eventClick="navTo('/pages/order/serviceList')"></button-cell>
-				<button-cell v-if='userInfo.tag==2' icon="icon-shouye" iconColor="#e07472" title="我的订单" border="" tips="查看我提交的订单" @eventClick="navTo('/pages/myOrder/myOrder')"></button-cell>
-				<button-cell v-if='userInfo.tag==0' icon="icon-share" iconColor="#e07472" title="订单统计" border="" tips="查看最近订单图表信息" @eventClick="navTo('/pages/orderTj/orderTj?state=0')"></button-cell>
-				<!-- <button-cell v-if='userInfo.tag==0' icon="icon-pinglun-copy" iconColor="#e07472" title="待办事项" tips="有新的消息" @eventClick="navTo('/pages/notice/notice')"></button-cell> -->
-				<button-cell icon="icon-pinglun-copy" iconColor="#e07472" title="通知消息" tips="我的消息" border="" @eventClick="navTo('/pages/notice/message')"></button-cell>
-				<button-cell v-if='userInfo.tag==3 && userInfo.isB==1' icon="icon-fenlei" iconColor="#e07472" title="B端用户" border="" tips="查看我的B端用户信息" @eventClick="navTo('/pages/myUser/myBUser?state=0')"></button-cell>
-				<button-cell v-if='userInfo.tag==3' icon="icon-tuandui" iconColor="#e07472" title="我的客户" border="" tips="查看我的客户信息" @eventClick="navTo('/pages/myUser/myUser?state=0')"></button-cell>
-				<button-cell v-if='userInfo.tag==3' icon="icon-bianji" iconColor="#e07472" title="合伙人协议" border="" tips="查看曾签订的协议" @eventClick="navTo('/pages/partner/partnerProtocol')"></button-cell>
-				<button-cell v-if='userInfo.tag==3' icon="icon-iconfontweixin" iconColor="#e07472" title="会员费用支付" tips="查看会员续费记录" border="" @eventClick="navTo('/pages/partner/partnerVipPay')"></button-cell>
-				<button-cell icon="icon-shezhi1" iconColor="#e07472" title="设置" border="" @eventClick="navTo('/pages/set/set')"></button-cell>
-				<button-cell icon="icon-iLinkapp-" iconColor="#e07472" title="服务须知" border="" @eventClick="navTo('/pages/set/service')"></button-cell>
-				<button-cell icon="icon-tuijian" iconColor="#e07472" title="关于我们" border="" @eventClick="navTo('/pages/set/aboutUs')"></button-cell>
+				<button-cell v-if='!userInfo.id || [1,4].indexOf(userInfo.tag)>-1' icon="icon-icon--" iconColor="#e07472" title="城市合伙人注册" border="" @eventClick="navTo('/pagesUser/partner/partner?isB=1',true)"></button-cell>
+				<button-cell v-if='!userInfo.id || [1,4].indexOf(userInfo.tag)>-1' icon="icon-fenlei" iconColor="#e07472" title="B端用户注册" border="" @eventClick="navTo('/pagesUser/partner/partner?isB=2',true)"></button-cell>
+				<button-cell v-if='[0].indexOf(userInfo.tag)>-1' icon="icon-icon--" iconColor="#e07472" title="城市合伙人信息" tips="查看已注册的合伙人" border="" @eventClick="navTo('/pagesUser/partner/partnerList')"></button-cell>
+				<button-cell v-if='[1].indexOf(userInfo.tag)>-1' icon="icon-shoucang" iconColor="#e07472" title="会员中心" tips="访问会员中心" border="" @eventClick="navTo('/pagesUser/user/membershipCenter')"></button-cell>
+				<button-cell v-if='[3].indexOf(userInfo.tag)>-1' icon="icon-saomiao" iconColor="#e07472" title="我的二维码" tips="查看我的二维码" border="" @eventClick="navTo('/pagesUser/user/myQrCode')"></button-cell>
+				<!-- <button-cell v-if='hasLogin' icon="icon-lishijilu" iconColor="#e07472" title="浏览足迹" border="" tips="查看我最近浏览过的商品" @eventClick="navTo('/pagesProduct/order/historyList')"></button-cell> -->
+				<!-- <button-cell v-if='hasLogin' icon="icon-shoucang_xuanzhongzhuangtai" iconColor="#e07472" title="收藏夹" border="" tips="查看我收藏的商品列表" @eventClick="navTo('/pagesProduct/order/favoriteList')"></button-cell> -->
+				<button-cell v-if='hasLogin' icon="icon-dianhua-copy" iconColor="#e07472" title="意见反馈" border="" tips="查看我反馈的意见" @eventClick="navTo('/pagesProduct/order/opinionList')"></button-cell>
+				<button-cell v-if='[1,4].indexOf(userInfo.tag)>-1' icon="icon-dizhi" iconColor="#e07472" title="地址管理" border="" tips="查看我录入的地址信息" @eventClick="navTo('/pagesInfo/address/address')"></button-cell>
+				<!-- <button-cell v-if='[1,4].indexOf(userInfo.tag)>-1' icon="icon-shouye" iconColor="#e07472" title="发票管理" border="" tips="查看我记录的发票信息" @eventClick="navTo('/pagesInfo/invoice/invoice')"></button-cell> -->
+				<button-cell v-if='[1,4].indexOf(userInfo.tag)>-1' icon="icon-pingjia" iconColor="#e07472" title="售后反馈" border="" tips="查看我的售后反馈申请" @eventClick="navTo('/pagesProduct/order/serviceList')"></button-cell>
+				<button-cell v-if='userInfo.tag==2' icon="icon-shouye" iconColor="#e07472" title="我的订单" border="" tips="查看我提交的订单" @eventClick="navTo('/pagesInfo/myOrder/myOrder')"></button-cell>
+				<button-cell v-if='userInfo.tag==0' icon="icon-share" iconColor="#e07472" title="订单统计" border="" tips="查看最近订单图表信息" @eventClick="navTo('/pagesProduct/orderTj/orderTj?state=0')"></button-cell>
+				<!-- <button-cell v-if='userInfo.tag==0' icon="icon-pinglun-copy" iconColor="#e07472" title="待办事项" tips="有新的消息" @eventClick="navTo('/pagesInfo/notice/notice')"></button-cell> -->
+				<button-cell icon="icon-pinglun-copy" iconColor="#e07472" title="通知消息" tips="我的消息" border="" @eventClick="navTo('/pagesInfo/notice/message')"></button-cell>
+				<button-cell v-if='userInfo.tag==3 && userInfo.isB==1' icon="icon-fenlei" iconColor="#e07472" title="B端用户" border="" tips="查看我的B端用户信息" @eventClick="navTo('/pagesInfo/myUser/myBUser?state=0')"></button-cell>
+				<button-cell v-if='userInfo.tag==3' icon="icon-tuandui" iconColor="#e07472" title="我的客户" border="" tips="查看我的客户信息" @eventClick="navTo('/pagesInfo/myUser/myUser?state=0')"></button-cell>
+				<button-cell v-if='userInfo.tag==3' icon="icon-bianji" iconColor="#e07472" title="合伙人协议" border="" tips="查看曾签订的协议" @eventClick="navTo('/pagesUser/partner/partnerProtocol')"></button-cell>
+				<button-cell v-if='userInfo.tag==3' icon="icon-iconfontweixin" iconColor="#e07472" title="会员费用支付" tips="查看会员续费记录" border="" @eventClick="navTo('/pagesUser/partner/partnerVipPay')"></button-cell>
+				<button-cell icon="icon-shezhi1" iconColor="#e07472" title="设置" border="" @eventClick="navTo('/pagesUser/set/set')"></button-cell>
+				<button-cell icon="icon-iLinkapp-" iconColor="#e07472" title="服务须知" border="" @eventClick="navTo('/pagesUser/set/service')"></button-cell>
+				<button-cell icon="icon-tuijian" iconColor="#e07472" title="关于我们" border="" @eventClick="navTo('/pagesUser/set/aboutUs')"></button-cell>
 				<button-cell icon="icon-weixin" iconColor="#e07472" title="客服聊天" border="" :service="true"></button-cell>
 			</view>
 		</view>
@@ -284,7 +284,7 @@
 		onNavigationBarButtonTap(e) {
 			const index = e.index;
 			if (index === 0) {
-				this.navTo('/pages/set/set');
+				this.navTo('/pagesUser/set/set');
 			}else if(index === 1){
 				// #ifdef APP-PLUS
 				const pages = getCurrentPages();
@@ -295,7 +295,7 @@
 				});
 				// #endif
 				uni.navigateTo({
-					url: '/pages/notice/notice'
+					url: '/pagesInfo/notice/notice'
 				})
 			}
 		},
@@ -426,18 +426,18 @@
 			toMyQrCode(){
 				if(!this.hasLogin){
 					uni.navigateTo({
-						url:'/pages/public/login'
+						url:'/pagesUser/public/loginogin'
 					})
 					return
 				}
 				uni.navigateTo({
-					url:'/pages/user/myQrCode'
+					url:'/pagesUser/user/myQrCode'
 				}) 
 			},
 			clickTab(item){
 				if(!this.hasLogin){
 					uni.navigateTo({
-						url:'/pages/public/login'
+						url:'/pagesUser/public/loginogin'
 					})
 					return
 				}
@@ -468,7 +468,7 @@
 			 */
 			navTo(url,flag){
 				if(!flag && !this.hasLogin){
-					url = '/pages/public/login';
+					url = '/pagesUser/public/loginogin';
 				}
 				uni.navigateTo({  
 					url

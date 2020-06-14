@@ -14,7 +14,7 @@
 					<input type="text" v-model="productName" placeholder="请输入商品名称" confirm-type="search" @confirm="searchProduct"/>
 					<image class="input-icon" src="/static/indexImage/search.png" mode="aspectFit"/>
 				</view>
-				<view class="right-tip" @click="navTo('/pages/notice/message')">
+				<view class="right-tip" @click="navTo('/pagesInfo/notice/message')">
 					<image class="search-icon" src="/static/indexImage/message.png" mode="aspectFit"/>
 				</view>
 			</view>
@@ -74,7 +74,7 @@
 			
 			
 			<!-- 推荐商品 -->
-			<view class="f-header m-t" @tap="navTo('/pages/product/list')" id="main-0">
+			<view class="f-header m-t" @tap="navTo('/pagesProduct/product/list')" id="main-0">
 				<image src="/static/indexImage/hot.png"></image>
 				<view class="tit-box">
 					<text class="tit">热门推荐</text>
@@ -112,7 +112,7 @@
 
 
 			<!-- 推荐商品 -->
-			<view class="f-header m-t" @tap="navTo('/pages/product/list?category=品牌产品')" id="main-1">
+			<view class="f-header m-t" @tap="navTo('/pagesProduct/product/list?category=品牌产品')" id="main-1">
 				<image src="/static/indexImage/brund.png"></image>
 				<view class="tit-box">
 					<text class="tit">品牌区</text>
@@ -150,7 +150,7 @@
 
 
 			<!-- 推荐商品 -->
-			<view class="f-header m-t" @tap="navTo('/pages/product/list?category=自营产品')" id="main-2">
+			<view class="f-header m-t" @tap="navTo('/pagesProduct/product/list?category=自营产品')" id="main-2">
 				<image src="/static/indexImage/self.png"></image>
 				<view class="tit-box">
 					<text class="tit">商城自运营区</text>
@@ -231,12 +231,12 @@
 			toProductList(item){
 				if(!this.hasLogin){
 					uni.navigateTo({
-						url:'/pages/public/login'
+						url:'/pagesUser/public/loginogin'
 					})
 					return
 				}
 				uni.navigateTo({
-					url: `/pages/product/list?largeCategory=${item.largeCategory}&littleCategory=${item.littleCategory}`
+					url: `/pagesProduct/product/list?largeCategory=${item.largeCategory}&littleCategory=${item.littleCategory}`
 				})
 			},
 			//顶部tab点击
@@ -247,7 +247,7 @@
 			navTo(url){
 				if(!this.hasLogin){
 					uni.navigateTo({
-						url:'/pages/public/login'
+						url:'/pagesUser/public/loginogin'
 					})
 					return
 				}
@@ -258,12 +258,12 @@
 			searchProduct(){
 				if(!this.hasLogin){
 					uni.navigateTo({
-						url:'/pages/public/login'
+						url:'/pagesUser/public/loginogin'
 					})
 					return
 				}
 				uni.navigateTo({
-					url:`/pages/product/list?productName=${this.productName}`
+					url:`/pagesProduct/product/list?productName=${this.productName}`
 				})
 			},
 			navToCategory(){
@@ -426,27 +426,27 @@
 			navToDetailPage(item) {
 				if(!this.hasLogin){
 					uni.navigateTo({
-						url:'/pages/public/login'
+						url:'/pagesUser/public/loginogin'
 					})
 					return
 				}
 				//测试数据没有写id，用title代替
 				let id = item.title;
 				uni.navigateTo({
-					// url: `/pages/product/product?id=${id}`
-					url: `/pages/product/factoryPage?id=${id}`
+					// url: `/pagesProduct/product/product?id=${id}`
+					url: `/pagesProduct/product/factoryPage?id=${id}`
 				})
 			},
 			navToProductDetailPage(item){
 				if(!this.hasLogin){
 					uni.navigateTo({
-						url:'/pages/public/login'
+						url:'/pagesUser/public/loginogin'
 					})
 					return
 				}
 				let id = item.id;
 				uni.navigateTo({
-					url: `/pages/product/product?id=${id}`
+					url: `/pagesProduct/product/product?id=${id}`
 				})
 			}
 		},
@@ -470,7 +470,7 @@
 				});
 				// #endif
 				uni.navigateTo({
-					url: '/pages/notice/notice'
+					url: '/pagesInfo/notice/notice'
 				})
 			}
 		}
@@ -577,6 +577,7 @@
 				position: relative;
 				&.current{
 					font-weight: 800;
+					text-shadow: 4rpx 4rpx 4rpx rgba(70, 70, 70, 0.7);
 					&:after{
 						content: '';
 						position: absolute;

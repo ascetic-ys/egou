@@ -1,64 +1,24 @@
 <template>
 	<view class="content">
-		<view class="navbar">
-			<view 
-				v-for="(item, index) in navList" :key="index" 
-				class="nav-item" 
-				:class="{current: tabCurrentIndex === index}"
-				@click="tabClick(index)"
-			>
-				{{item.text}}
-			</view>
-		</view>
-		
-		<view>
+		<view >
 			<!-- 空白页 -->
-			<empty v-if="list.length === 0"></empty>
+			<!-- <empty v-if="list.length === 0"></empty> -->
 			<mescroll-body :bottom='bottom' :up='upOption' @down="downCallback" @up="upCallback" @init="mescrollInit">
 				<!-- 订单列表 -->
-				<view v-for="(item,index) in list" :key="index" class="order-item" @tap="goOrderXQ(item.id)">
+				<view v-for="(item,index) in list" :key="index" class="order-item" @tap='toProtocolDetail(item)'>
 					<view class="i-top b-b">
-						<text class="time">{{item.orderDate||''}}</text>
-						<text class="state" :style="{color: item.stateTipColor}">{{item.stateTip}}</text>
-						<!-- <text 
-							v-if="item.payState===9" 
-							class="del-btn yticon icon-iconfontshanchu1"
-							@click="deleteOrder(index)"
-						></text> -->
-					</view>
-					
-					<scroll-view v-if="item.orderChildInfoList.length > 1" class="goods-box" scroll-x>
-						<view
-							v-for="(goodsItem, goodsIndex) in item.orderChildInfoList" :key="goodsIndex"
-							class="goods-item"
-						>
-							<image class="goods-img" :src="goodsItem.productInfo.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
-						</view>
-					</scroll-view>
-					<view
-						v-if="item.orderChildInfoList.length === 1" 
-						class="goods-box-single"
-						v-for="(goodsItem, goodsIndex) in item.orderChildInfoList" :key="goodsIndex"
-					>
-						<image class="goods-img" :src="goodsItem.productInfo.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
-						<view class="right">
-							<text class="title clamp">{{goodsItem.productName}}</text>
-							<text class="attr-box">{{goodsItem.productInfo.color}}  x {{goodsItem.productNum}}</text>
-							<text class="price">{{goodsItem.totalPrice}}</text>
-						</view>
-					</view>
-					
-					<view class="price-box">
-						共
-						<text class="num">{{item.productNum||0}}</text>
-						件商品 实付款
-						<text class="price">{{item.orderPrice||0}}</text>
-					</view>
-					<view class="action-box b-t" v-if="[3,4].indexOf(item.orderState)>-1">
-						<button class="action-btn" v-if="[3,4].indexOf(item.orderState)>-1" @tap.stop="gotowl(item.id)">查看物流</button>
+						<text class="time">协议签署日期：{{item.signDate||''}}</text>
+						<text class="yticon icon-you"></text>
 					</view>
 				</view>
 			</mescroll-body>
+			<!-- <view class="action-box b-t" v-if="list.length>0">
+				<button class="action-btn recom" @tap.stop="continueProtocol()">协议续签</button>
+			</view> -->
+			<!-- 底部 -->
+			<view class="footer" v-if="list.length>0">
+				<button class="confirm-btn" @tap="continueProtocol">协议续签</button>
+			</view>
 		</view>
 	</view>
 </template> 
@@ -66,7 +26,6 @@
 <script>
 	import MescrollMixin from "@/components/mescroll-uni/mescroll-mixins.js";
 	import {mapState} from 'vuex';
-	import {RESOURCE } from '@/api/resource.js'
 	import empty from "@/components/empty";
 	
 	export default {
@@ -80,35 +39,17 @@
 				upOption:{
 					auto:false,
 				},
-				tabCurrentIndex: 0,
 				list: [],
-				navList: [
-					{state: 0,text: '全部'},
-					{state: 1,text: '待付款'},
-					{state: 2,text: '待发货'},
-					{state: 3,text: '待收货'},
-					{state: 4,text: '已完成'}
-				],
-				params:{}
+				params:{},
 			};
 		},
-		
 		async onLoad(options){
-			this.tabCurrentIndex = +options.state||0;
-			this.initParams()
-			this.tabClick(this.tabCurrentIndex);
-			// this.loadData()
+			this.loadData()
 		},
 		computed: {
 			...mapState(['hasLogin','userInfo','weChat'])
 		},
 		methods: {
-			initParams(){
-				this.params={
-					orderByColumn:"",
-					isAsc:"",
-				}
-			},
 			/*下拉刷新的回调 */
 			downCallback() {
 				//联网加载数据
@@ -147,108 +88,38 @@
 			//加载商品 ，带下拉刷新和上滑加载
 			async loadData(data={}) {
 				const {pageNum=1,pageSize=10}=data
-				if(!this.params.orderByColumn){
-					delete this.params.orderByColumn
-					delete this.params.isAsc
-				}
-				return this.$api.httpPost('orderMainInfo/api/list',{
+				this.params.parentId=this.userInfo.id
+				return this.$api.httpPost('protocolRecord/api/list',{
 					pageNum,
 					pageSize,
 					...this.params
 				}).then(r=>{
 					console.log("请求结果：",r)
-					let orderList = r.rows
-					orderList.forEach(item=>{
-						//添加不同状态下订单的表现形式
-						item = Object.assign(item, this.orderExp(item));
-					})
-					console.log('orderList',orderList)
 					if(pageNum===1){
-						this.list=orderList
+						this.list=r.data
 					}else{
-						this.list=this.list.concat(orderList)
+						this.list=this.list.concat(r.data)
 					}
 					return r
 				}).catch(e=>{
 					console.log("请求错误：",e)
 					this.$api.msg(e.msg||'网络异常请重试')
 				})
+				
+			},
+			//协议续签
+			continueProtocol(){
+				uni.navigateTo({
+					url:`/pagesUser/partner/partnerProtocolAgree?parentId=${this.userInfo.id}&isB=${this.userInfo.isB}`
+				})
 			},
 			// 跳转详情
-			goOrderXQ(id){
-				if(!this.hasLogin){
-					uni.navigateTo({
-						url:'/pagesUser/public/loginogin'
-					})
-					return
-				}
+			toProtocolDetail(item){
+				console.log(item)
 				uni.navigateTo({
-					url:`/pagesProduct/order/orderXQ?id=${id}`
+					url: `/pagesUser/partner/partnerProtocolDetail?id=${item.id}&isB=${this.userInfo.isB}`
 				})
 			},
-			//顶部tab点击
-			tabClick(index){
-				this.tabCurrentIndex = index;
-				this.list=[]
-				this.setParams(index)
-				this.loadData()
-			},
-			setParams(index){
-				//1：待付款、2待发货、3：待收货、4：已完成
-				if(index==0){
-					this.params.orderState=''
-				}else if(index==1){
-					this.params.orderState=1
-				}else if(index==2){
-					this.params.orderState=2
-				}else if(index==3){
-					this.params.orderState=3
-				}else if(index==4){
-					this.params.orderState=4
-				}
-			},
-			// 物流
-			gotowl(id){
-				if(!this.hasLogin){
-					uni.reLaunch({
-						url:'/pagesUser/public/loginogin'
-					})
-					return
-				}
-				uni.navigateTo({
-					url:'/pagesInfo/customer/goodsliu?orderId=${id}'
-				})
-			},
-			//订单状态文字和颜色
-			orderExp(item){
-				let stateTip = '',
-					stateTipColor = '#fa436a';
-				switch(+item.orderState){
-					case 0:
-						stateTip = '已取消'; 
-						stateTipColor = '#909399';
-						break;
-					case 1:
-						stateTip = '待付款'; break;
-					case 2:
-						stateTip = '待发货'; break;
-					case 3:
-						stateTip = '待收货'; break;
-					case 4:
-						stateTip = '已完成'; break;
-					case 5:
-						stateTip = '待确认'; break;
-					case 9:
-						stateTip = '订单已关闭'; 
-						stateTipColor = '#909399';
-						break;
-					default:
-						stateTip = '待付款';
-					//更多自定义
-				}
-				let submitDisabled=false
-				return {stateTip, stateTipColor,submitDisabled};
-			}
 		},
 	}
 </script>
@@ -258,6 +129,37 @@
 		background: $page-color-base;
 		height: 100%;
 	}
+	
+	.navbar-date{
+		display: flex;
+		padding: 0 5px;
+		background: #fff;
+		box-shadow: 0 1px 5px rgba(0,0,0,.06);
+		position: relative;
+		z-index: 10;
+		.search-date {
+			width: 100%;
+			background-color: #fffefc;
+			font-size: $font-base;
+			display: flex;
+			justify-content: space-between;
+			padding: 20upx 30upx;
+			.uni-input{
+				background-color: #d6dfdf;
+				padding:20upx;
+				border-radius: 10upx;
+			}
+			.num{
+				font-size: $font-lg;
+				color:$font-color-red ;
+			}
+			.money{
+				font-size: $font-lg;
+				color:$font-color-red ;
+			}
+		}
+	}
+	
 	
 	.swiper-box{
 		height: calc(100% - 40px);
@@ -393,25 +295,30 @@
 			}
 		}
 		
-		.price-box{
+		.desc-box{
 			display: flex;
-			justify-content: flex-end;
+			justify-content: flex-start;
 			align-items: baseline;
 			padding: 20upx 30upx;
 			font-size: $font-sm + 2upx;
 			color: $font-color-light;
-			.num{
+			.desc-text{
 				margin: 0 8upx;
-				color: $font-color-dark;
-			}
-			.price{
 				font-size: $font-lg;
 				color: $font-color-dark;
-				&:before{
-					content: '￥';
-					font-size: $font-sm;
-					margin: 0 2upx 0 8upx;
-				}
+			}
+		}
+		.explain-box{
+			display: flex;
+			justify-content: flex-start;
+			align-items: baseline;
+			padding: 20upx 30upx;
+			font-size: $font-sm + 2upx;
+			color: $font-color-light;
+			.explain-text{
+				margin: 0 8upx;
+				font-size: $font-lg;
+				color: $font-color-dark;
 			}
 		}
 		.action-box{
@@ -577,6 +484,54 @@
 	
 		100% {
 			opacity: .2
+		}
+	}
+	.feedback-add{
+		position: fixed;
+		bottom: 50rpx;
+		left: 50rpx;
+		width: 100rpx;
+		height: 100rpx;
+		button{
+			width: 100%;
+			height: 100%;
+			background: #fa436a;
+			border-radius: 50%;
+			padding: 0;
+			text{
+				color: #FFFFFF;
+				font-size: 60rpx;
+				height: 100rpx;
+				line-height: 100rpx;
+			}
+		}
+	}
+	.footer{
+		position: fixed;
+		left: 0;
+		bottom: 0;
+		z-index: 995;
+		display: flex;
+		align-items: center;
+		width: 100%;
+		height: 90upx;
+		justify-content: space-between;
+		font-size: 30upx;
+		background-color: #fff;
+		z-index: 998;
+		color: $font-color-base;
+		box-shadow: 0 -1px 5px rgba(0,0,0,.1);
+		.confirm-btn{
+			width: 50%;
+			height: 76upx;
+			line-height: 76upx;
+			border-radius: 50px;
+			background: $uni-color-primary;
+			color: #fff;
+			font-size: $font-lg;
+			&:after{
+				border-radius: 100px;
+			}
 		}
 	}
 </style>
