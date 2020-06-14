@@ -121,7 +121,7 @@
 						this.$api.msg('登录成功')
 						this.changeTabBar(r.data.tag)
 						uni.switchTab({
-							url:'/pagesUser/user/user'
+							url:'/pages/user/user'
 						})
 					}else{
 						this.$api.msg(r.msg||'网络异常请重试')
