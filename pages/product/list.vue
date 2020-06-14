@@ -130,6 +130,12 @@
 			// #endif
 			this.params.largeCategory=options.largeCategory
 			this.params.littleCategory=options.littleCategory
+			if(options.productName){
+				this.params.productName=options.productName
+			}
+			if(options.category){
+				this.params.category=options.category
+			}
 			if(options.ifVip){
 				this.ifVip=options.ifVip
 			}
@@ -158,7 +164,9 @@
 					color:'',
 					ifVip:this.ifVip,
 					lowPrice:'',
-					highPrice:''
+					highPrice:'',
+					productName:'',
+					category:''
 				}
 			},
 			/*下拉刷新的回调 */
