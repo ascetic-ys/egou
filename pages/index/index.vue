@@ -58,16 +58,16 @@
 			</view>
 			
 			<view class="ad-1">
-				<swiper class="serviceImg" circular autoplay @change="swiperChange2">
-					<swiper-item v-for="(item, index) in serviceImgList" :key="index" class="serviceImg-item" @click="navToDetailPage({title: '轮播服务'})">
+				<swiper class="serviceImg" circular autoplay @change="swiperChange1">
+					<swiper-item v-for="(item, index) in serviceImgList1" :key="index" class="serviceImg-item" @click="navToDetailPage({title: '轮播服务'})">
 						<image :src="item.filePath" mode="scaleToFill"/>
 					</swiper-item>
 				</swiper>
 				<!-- 自定义swiper指示器 -->
 				<view class="swiper-dots">
-					<text class="num">{{swiperCurrent2+1}}</text>
+					<text class="num">{{swiperCurrent1+1}}</text>
 					<text class="sign">/</text>
-					<text class="num">{{swiperLength2}}</text>
+					<text class="num">{{swiperLength1}}</text>
 				</view>
 			</view>
 			
@@ -122,7 +122,7 @@
 			
 			<view class="guess-section">
 				<view 
-					v-for="(item, index) in brundGoodsList" :key="index"
+					v-for="(item, index) in goodsList2" :key="index"
 					class="guess-item"
 					@click="navToProductDetailPage(item)"
 				>
@@ -135,16 +135,16 @@
 			</view>		
 
 			<view class="ad-1">
-				<swiper class="serviceImg" circular autoplay @change="swiperChange2">
+				<swiper class="serviceImg" circular autoplay @change="swiperChange3">
 					<swiper-item v-for="(item, index) in serviceImgList3" :key="index" class="serviceImg-item" @click="navToDetailPage({title: '轮播服务'})">
 						<image :src="item.filePath" mode="scaleToFill"/>
 					</swiper-item>
 				</swiper>
 				<!-- 自定义swiper指示器 -->
 				<view class="swiper-dots">
-					<text class="num">{{swiperCurrent2+1}}</text>
+					<text class="num">{{swiperCurrent3+1}}</text>
 					<text class="sign">/</text>
-					<text class="num">{{swiperLength2}}</text>
+					<text class="num">{{swiperLength3}}</text>
 				</view>
 			</view>
 
@@ -160,7 +160,7 @@
 			
 			<view class="guess-section">
 				<view 
-					v-for="(item, index) in selfGoodsList" :key="index"
+					v-for="(item, index) in goodsList3" :key="index"
 					class="guess-item"
 					@click="navToProductDetailPage(item)"
 				>
@@ -171,6 +171,46 @@
 					<text class="price" v-if="hasLogin">￥{{item.price||'暂无'}}</text>
 				</view>
 			</view>	
+			
+			
+			<view class="ad-1">
+				<swiper class="serviceImg" circular autoplay @change="swiperChange4">
+					<swiper-item v-for="(item, index) in serviceImgList4" :key="index" class="serviceImg-item" @click="navToDetailPage({title: '轮播服务'})">
+						<image :src="item.filePath" mode="scaleToFill"/>
+					</swiper-item>
+				</swiper>
+				<!-- 自定义swiper指示器 -->
+				<view class="swiper-dots">
+					<text class="num">{{swiperCurrent4+1}}</text>
+					<text class="sign">/</text>
+					<text class="num">{{swiperLength4}}</text>
+				</view>
+			</view>
+			
+			
+			<!-- 推荐商品 -->
+			<view class="f-header m-t" @tap="navTo('/pagesProduct/product/list?category=定制产品')" id="main-3">
+				<image src="/static/indexImage/custom.png"></image>
+				<view class="tit-box">
+					<text class="tit">定制区</text>
+				</view>
+				<text class="yticon icon-you"></text>
+			</view>
+			
+			<view class="guess-section">
+				<view 
+					v-for="(item, index) in goodsList4" :key="index"
+					class="guess-item"
+					@click="navToProductDetailPage(item)"
+				>
+					<view class="image-wrapper">
+						<image :src="item.imgPath" mode="aspectFill"></image>
+					</view>
+					<text class="title clamp">{{item.productName}}</text>
+					<text class="price" v-if="hasLogin">￥{{item.price||'暂无'}}</text>
+				</view>
+			</view>	
+				
 				
 		</scroll-view>
 	</view>
@@ -188,6 +228,8 @@
 				productName:'',
 				swiperCurrent: 0,
 				swiperLength: 0,
+				swiperCurrent1: 0,
+				swiperLength1: 0,
 				swiperCurrent2: 0,
 				swiperLength2: 0,
 				swiperCurrent3: 0,
@@ -195,16 +237,19 @@
 				swiperCurrent4: 0,
 				swiperLength4: 0,
 				carouselList: [],
-				serviceImgList: [],
+				serviceImgList1: [],
 				serviceImgList2: [],
 				serviceImgList3: [],
+				serviceImgList4: [],
 				goodsList: [],
-				brundGoodsList: [],
-				selfGoodsList: [],
+				goodsList2: [],
+				goodsList3: [],
+				goodsList4: [],
 				navList:[
 					{state: 0,text: '精选'},
 					{state: 1,text: '品牌区'},
-					{state: 2,text: '商城自运营区'}
+					{state: 2,text: '商城自营区'},
+					{state: 3,text: '定制区'}
 				],
 				scrollntoView:'',
 				tabCurrentIndex:0,
@@ -277,13 +322,15 @@
 			 */
 			async loadData() {
 				this.initCarouseList()
-				this.initServiceImgList()
+				this.initServiceImgList1()
 				this.initServiceImgList2()
 				this.initServiceImgList3()
+				this.initServiceImgList4()
 				this.initCateList()
 				this.initRecommendGoodsList()
-				this.initBrundGoodsList()
-				this.initSelfGoodsList()
+				this.initGoodsList2()
+				this.initGoodsList3()
+				this.initGoodsList4()
 			},
 			initCarouseList(){
 				this.$api.httpPost('homePage/api/query',{
@@ -298,13 +345,13 @@
 					this.$api.msg(e.msg||'网络异常请重试')
 				})
 			},
-			initServiceImgList(){
+			initServiceImgList1(){
 				this.$api.httpPost('homePage/api/query',{
-					titleType:4
+					titleType:3
 				}).then(r=>{
 					// console.log("服务图片请求结果：",r)
-					this.serviceImgList=r.data.orderFilePathList
-					this.swiperLength2 = this.serviceImgList.length;
+					this.serviceImgList1=r.data.orderFilePathList
+					this.swiperLength1 = this.serviceImgList1.length;
 				}).catch(e=>{
 					// console.log("请求错误：",e)
 					this.$api.msg(e.msg||'网络异常请重试')
@@ -312,11 +359,11 @@
 			},
 			initServiceImgList2(){
 				this.$api.httpPost('homePage/api/query',{
-					titleType:5
+					titleType:4
 				}).then(r=>{
 					// console.log("服务图片请求结果：",r)
 					this.serviceImgList2=r.data.orderFilePathList
-					this.swiperLength3 = this.serviceImgList2.length;
+					this.swiperLength2 = this.serviceImgList2.length;
 				}).catch(e=>{
 					// console.log("请求错误：",e)
 					this.$api.msg(e.msg||'网络异常请重试')
@@ -324,11 +371,23 @@
 			},
 			initServiceImgList3(){
 				this.$api.httpPost('homePage/api/query',{
-					titleType:6
+					titleType:5
 				}).then(r=>{
 					// console.log("服务图片请求结果：",r)
 					this.serviceImgList3=r.data.orderFilePathList
-					this.swiperLength4 = this.serviceImgList3.length;
+					this.swiperLength3 = this.serviceImgList3.length;
+				}).catch(e=>{
+					// console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+				})
+			},
+			initServiceImgList4(){
+				this.$api.httpPost('homePage/api/query',{
+					titleType:6
+				}).then(r=>{
+					// console.log("服务图片请求结果：",r)
+					this.serviceImgList4=r.data.orderFilePathList
+					this.swiperLength4 = this.serviceImgList4.length;
 				}).catch(e=>{
 					// console.log("请求错误：",e)
 					this.$api.msg(e.msg||'网络异常请重试')
@@ -371,7 +430,7 @@
 					this.$api.msg(e.msg||'网络异常请重试')
 				})
 			},
-			initBrundGoodsList(){
+			initGoodsList2(){
 				this.$api.httpPost('productInfo/api/list',{
 					pageNum:1,
 					pageSize:4,
@@ -380,14 +439,14 @@
 				}).then(r=>{
 					// console.log("品牌产品请求结果：",r)
 					if(r.code==0){
-						this.brundGoodsList = r.rows
+						this.goodsList2 = r.rows
 					}
 				}).catch(e=>{
 					// console.log("请求错误：",e)
 					this.$api.msg(e.msg||'网络异常请重试')
 				})
 			},
-			initSelfGoodsList(){
+			initGoodsList3(){
 				this.$api.httpPost('productInfo/api/list',{
 					pageNum:1,
 					pageSize:4,
@@ -396,7 +455,23 @@
 				}).then(r=>{
 					// console.log("自营产品请求结果：",r)
 					if(r.code==0){
-						this.selfGoodsList = r.rows
+						this.goodsList3 = r.rows
+					}
+				}).catch(e=>{
+					// console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+				})
+			},
+			initGoodsList4(){
+				this.$api.httpPost('productInfo/api/list',{
+					pageNum:1,
+					pageSize:4,
+					ifHomePage:1,
+					category:'定制产品'
+				}).then(r=>{
+					// console.log("自营产品请求结果：",r)
+					if(r.code==0){
+						this.goodsList4 = r.rows
 					}
 				}).catch(e=>{
 					// console.log("请求错误：",e)
