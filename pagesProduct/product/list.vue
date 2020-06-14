@@ -137,9 +137,8 @@
 				this.params.category=options.category
 			}
 			if(options.ifVip){
-				this.ifVip=options.ifVip
+				this.params.ifVip=options.ifVip
 			}
-			this.params.ifVip=this.ifVip
 			this.sizeList = await this.$api.json('sizeList')
 			this.colorList = await this.$api.json('colorList')
 			this.loadCateList()
@@ -162,7 +161,7 @@
 					orderByColumn:'',
 					isAsc:'',
 					color:'',
-					ifVip:this.ifVip,
+					ifVip:'',
 					lowPrice:'',
 					highPrice:'',
 					productName:'',

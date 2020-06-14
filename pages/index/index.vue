@@ -251,7 +251,6 @@
 					{state: 2,text: '商城自营区'},
 					{state: 3,text: '定制区'}
 				],
-				ifVip:1,//是否会员商品（1：否、2：是）
 				scrollntoView:'',
 				tabCurrentIndex:0,
 				sHeight:980,
@@ -436,7 +435,6 @@
 					pageNum:1,
 					pageSize:4,
 					ifHomePage:1,
-					ifVip:this.ifVip,
 					category:'品牌产品'
 				}).then(r=>{
 					console.log("品牌产品请求结果：",r)
@@ -453,7 +451,6 @@
 					pageNum:1,
 					pageSize:4,
 					ifHomePage:1,
-					ifVip:this.ifVip,
 					category:'自营产品'
 				}).then(r=>{
 					console.log("自营产品请求结果：",r)
@@ -470,7 +467,6 @@
 					pageNum:1,
 					pageSize:4,
 					ifHomePage:1,
-					ifVip:this.ifVip,
 					category:'定制产品'
 				}).then(r=>{
 					console.log("定制产品请求结果：",r)
