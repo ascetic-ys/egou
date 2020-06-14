@@ -164,7 +164,7 @@
 			</view>
 		</view>
 		
-		<view v-show="true">
+		<view v-show="false">
 			<list-cell icon="icon-yiguoqi1" title="icon-yiguoqi1"></list-cell>
 			<list-cell icon="icon-iconfontshanchu1" title="icon-iconfontshanchu1"></list-cell>
 			<list-cell icon="icon-iconfontweixin" title="icon-iconfontweixin"></list-cell>
@@ -426,7 +426,7 @@
 			toMyQrCode(){
 				if(!this.hasLogin){
 					uni.navigateTo({
-						url:'/pagesUser/public/loginogin'
+						url:'/pagesUser/public/login'
 					})
 					return
 				}
@@ -437,7 +437,7 @@
 			clickTab(item){
 				if(!this.hasLogin){
 					uni.navigateTo({
-						url:'/pagesUser/public/loginogin'
+						url:'/pagesUser/public/login'
 					})
 					return
 				}
@@ -468,7 +468,7 @@
 			 */
 			navTo(url,flag){
 				if(!flag && !this.hasLogin){
-					url = '/pagesUser/public/loginogin';
+					url = '/pagesUser/public/login';
 				}
 				uni.navigateTo({  
 					url

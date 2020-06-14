@@ -178,7 +178,7 @@
 			goOrderXQ(id){
 				if(!this.hasLogin){
 					uni.navigateTo({
-						url:'/pagesUser/public/loginogin'
+						url:'/pagesUser/public/login'
 					})
 					return
 				}

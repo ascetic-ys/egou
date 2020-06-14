@@ -276,7 +276,7 @@
 			toProductList(item){
 				if(!this.hasLogin){
 					uni.navigateTo({
-						url:'/pagesUser/public/loginogin'
+						url:'/pagesUser/public/login'
 					})
 					return
 				}
@@ -292,7 +292,7 @@
 			navTo(url){
 				if(!this.hasLogin){
 					uni.navigateTo({
-						url:'/pagesUser/public/loginogin'
+						url:'/pagesUser/public/login'
 					})
 					return
 				}
@@ -303,7 +303,7 @@
 			searchProduct(){
 				if(!this.hasLogin){
 					uni.navigateTo({
-						url:'/pagesUser/public/loginogin'
+						url:'/pagesUser/public/login'
 					})
 					return
 				}
@@ -501,7 +501,7 @@
 			navToDetailPage(item) {
 				if(!this.hasLogin){
 					uni.navigateTo({
-						url:'/pagesUser/public/loginogin'
+						url:'/pagesUser/public/login'
 					})
 					return
 				}
@@ -515,7 +515,7 @@
 			navToProductDetailPage(item){
 				if(!this.hasLogin){
 					uni.navigateTo({
-						url:'/pagesUser/public/loginogin'
+						url:'/pagesUser/public/login'
 					})
 					return
 				}

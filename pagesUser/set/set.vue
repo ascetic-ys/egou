@@ -71,7 +71,7 @@
 				    		this.logout();
 				    		setTimeout(()=>{
 				    			uni.navigateTo({
-				    				url:'/pagesUser/public/loginogin?flag=1'
+				    				url:'/pagesUser/public/login?flag=1'
 				    			})
 				    		}, 200)
 				    	}

@@ -557,7 +557,7 @@
 			},
 			agreeNo(){
 				uni.navigateTo({
-					url:'/pagesUser/public/loginogin'
+					url:'/pagesUser/public/login'
 				})
 			},
 			agreeYes(){
@@ -686,7 +686,7 @@
 							// this.login(r.data)
 							this.$api.msg(r.msg||'注册成功')
 							uni.navigateTo({
-								url:'/pagesUser/public/loginogin'
+								url:'/pagesUser/public/login'
 							})
 						}else{
 							this.$api.msg(r.msg||'网络异常请重试')

@@ -93,7 +93,7 @@
 							this.$api.msg(r.msg||'修改成功')
 							this.logout()
 							uni.navigateTo({
-								url:'/pagesUser/public/loginogin'
+								url:'/pagesUser/public/login'
 							})
 						}else{
 							this.$api.msg(r.msg||'网络异常请重试')

@@ -201,7 +201,7 @@
 			clickTab(item){
 				if(!this.hasLogin){
 					uni.navigateTo({
-						url:'/pagesUser/public/loginogin'
+						url:'/pagesUser/public/login'
 					})
 					return
 				}
@@ -211,7 +211,7 @@
 			},
 			navToLogin(){
 				uni.navigateTo({
-					url: '/pagesUser/public/loginogin'
+					url: '/pagesUser/public/login'
 				})
 			},
 			 //选中状态处理

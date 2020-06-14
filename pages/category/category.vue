@@ -43,7 +43,7 @@
 			clickTab(item){
 				if(!this.hasLogin){
 					uni.navigateTo({
-						url:'/pagesUser/public/loginogin'
+						url:'/pagesUser/public/login'
 					})
 					return
 				}else{
@@ -108,7 +108,7 @@
 			navToList(item,pitem){
 				if(!this.hasLogin){
 					uni.navigateTo({
-						url:'/pagesUser/public/loginogin'
+						url:'/pagesUser/public/login'
 					})
 				}else{
 					uni.navigateTo({
