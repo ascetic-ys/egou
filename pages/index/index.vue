@@ -1,326 +1,178 @@
 <template>
 	<view class="content">
-		<!-- 头部轮播 -->
-		<view class="carousel-section">
-			<!-- 标题栏和状态栏占位符 -->
-			<view class="titleNview-placing"></view>
-			<!-- 背景色区域 -->
-			<view class="titleNview-background" :style="{backgroundColor:titleNViewBackground}"></view>
-			<swiper class="carousel" circular autoplay @change="swiperChange">
-				<swiper-item v-for="(item, index) in carouselList" :key="index" class="carousel-item" @click="navToDetailPage({title: '轮播广告'})">
-					<image :src="item.filePath" />
-				</swiper-item>
-			</swiper>
-			<!-- 自定义swiper指示器 -->
-			<view class="swiper-dots">
-				<text class="num">{{swiperCurrent+1}}</text>
-				<text class="sign">/</text>
-				<text class="num">{{swiperLength}}</text>
-			</view>
-		</view>
-		<!-- 分类 -->
-		<!-- <view class="cate-section" @tap="gotoCate">
-			<view class="cate-item">
-				<image src="/static/temp/Cate1.jpg"></image>
-				<text>地面材料</text>
-			</view>
-			<view class="cate-item">
-				<image src="/static/temp/Cate2.jpg"></image>
-				<text>灯饰照明</text>
-			</view>
-			<view class="cate-item">
-				<image src="/static/temp/Cate3.jpg"></image>
-				<text>厨房卫浴</text>
-			</view>
-			<view class="cate-item">
-				<image src="/static/temp/Cate4.jpg"></image>
-				<text>卧室家具</text>
-			</view>
-			<view class="cate-item">
-				<image src="/static/temp/Cate5.jpg"></image>
-				<text>办公家具</text>
-			</view>
-		</view> -->
-		<view class="cate-section" >
-			<view class="cate-item" v-for="(item,i) in naviCateList" :key='i' @tap="toProductList(item)">
-				<image :src="item.filePath||`/static/temp/Cate1.jpg`"></image>
-				<text>{{item.littleCategory}}</text>
-			</view>
-		</view>
 		
-		<view class="ad-1">
-			<swiper class="serviceImg" circular autoplay @change="swiperChange2">
-				<swiper-item v-for="(item, index) in serviceImgList" :key="index" class="serviceImg-item" @click="navToDetailPage({title: '轮播服务'})">
-					<image :src="item.filePath" mode="scaleToFill"/>
-				</swiper-item>
-			</swiper>
-			<!-- 自定义swiper指示器 -->
-			<view class="swiper-dots">
-				<text class="num">{{swiperCurrent2+1}}</text>
-				<text class="sign">/</text>
-				<text class="num">{{swiperLength2}}</text>
+		<view class="search-header">
+			<view class="top-img">
+				<image class="bg-img logo-img" src="/static/indexImage/LOGO-car.png" mode="aspectFit"/>
+				<image class="bg-img logo-text" src="/static/indexImage/LOGO-text.png" mode="aspectFit"/>
+			</view>
+			<view class="search-box">
+				<view class="left-tip" @click="navToCategory()">
+					<image class="search-icon" src="/static/indexImage/search-category.png" mode="aspectFit"/>
+				</view>
+				<view class="search-input">
+					<input type="text" v-model="productName" placeholder="请输入商品名称" confirm-type="search" @confirm="searchProduct"/>
+					<image class="input-icon" src="/static/indexImage/search.png" mode="aspectFit"/>
+				</view>
+				<view class="right-tip" @click="navTo('/pages/notice/message')">
+					<image class="search-icon" src="/static/indexImage/message.png" mode="aspectFit"/>
+				</view>
+			</view>
+			<view class="navbar">
+				<view 
+					v-for="(item, index) in navList" :key="index" 
+					class="nav-item" 
+					:class="{current: tabCurrentIndex === index}"
+					@click="tabClick(index)"
+				>
+					{{item.text}}
+				</view>
 			</view>
 		</view>
+		<view class="space-header"></view>
 		
-		<!-- 秒杀楼层 -->
-		<!-- <view class="seckill-section m-t">
-			<view class="s-header">
-				<image class="s-img" src="/static/temp/secskill-img.jpg" mode="widthFix"></image>
-				<text class="tip">8点场</text>
-				<text class="hour timer">07</text>
-				<text class="minute timer">13</text>
-				<text class="second timer">55</text>
+		<scroll-view scroll-with-animation scroll-y class="right-aside"  :scroll-into-view='scrollntoView' :style="{'height':sHeight+'rpx'}">
+			<!-- 头部轮播 -->
+			<view class="carousel-section">
+				<!-- 标题栏和状态栏占位符 -->
+				<view class="titleNview-placing"></view>
+				<!-- 背景色区域 -->
+				<view class="titleNview-background" :style="{backgroundColor:titleNViewBackground}"></view>
+				<swiper class="carousel" circular autoplay @change="swiperChange">
+					<swiper-item v-for="(item, index) in carouselList" :key="index" class="carousel-item" @click="navToDetailPage({title: '轮播广告'})">
+						<image :src="item.filePath" />
+					</swiper-item>
+				</swiper>
+				<!-- 自定义swiper指示器 -->
+				<view class="swiper-dots">
+					<text class="num">{{swiperCurrent+1}}</text>
+					<text class="sign">/</text>
+					<text class="num">{{swiperLength}}</text>
+				</view>
+			</view>
+			<view class="cate-section" >
+				<view class="cate-item" v-for="(item,i) in naviCateList" :key='i' @tap="toProductList(item)">
+					<image :src="item.filePath||`/static/temp/Cate1.jpg`"></image>
+					<text class="cate-text">{{item.littleCategory}}</text>
+				</view>
+			</view>
+			
+			<view class="ad-1">
+				<swiper class="serviceImg" circular autoplay @change="swiperChange2">
+					<swiper-item v-for="(item, index) in serviceImgList" :key="index" class="serviceImg-item" @click="navToDetailPage({title: '轮播服务'})">
+						<image :src="item.filePath" mode="scaleToFill"/>
+					</swiper-item>
+				</swiper>
+				<!-- 自定义swiper指示器 -->
+				<view class="swiper-dots">
+					<text class="num">{{swiperCurrent2+1}}</text>
+					<text class="sign">/</text>
+					<text class="num">{{swiperLength2}}</text>
+				</view>
+			</view>
+			
+			
+			
+			<!-- 推荐商品 -->
+			<view class="f-header m-t" @tap="navTo('/pages/product/list')" id="main-0">
+				<image src="/static/indexImage/hot.png"></image>
+				<view class="tit-box">
+					<text class="tit">热门推荐</text>
+				</view>
 				<text class="yticon icon-you"></text>
 			</view>
-			<scroll-view class="floor-list" scroll-x>
-				<view class="scoll-wrapper">
-					<view 
-						v-for="(item, index) in goodsList" :key="index"
-						class="floor-item"
-						@click="navToDetailPage(item)"
-					>
-						<image :src="item.image" mode="aspectFill"></image>
-						<text class="title clamp">{{item.title}}</text>
-						<text class="price">￥{{item.price}}</text>
-					</view>
-				</view>
-			</scroll-view>
-		</view> -->
-		
-		<!-- 厂家简介 -->
-		<view class="f-header m-t" v-if="false">
-			<image src="/static/temp/h1.png"></image>
-			<view class="tit-box">
-				<text class="tit">厂家简介</text>
-				<text class="tit2">Factory Profile</text>
-			</view>
-			<text class="yticon icon-you"></text>
-		</view>
-		<view class="group-section" v-if="false">
-			<swiper class="g-swiper" :duration="500">
-				<swiper-item
-					class="g-swiper-item"
+			
+			<view class="guess-section">
+				<view 
 					v-for="(item, index) in goodsList" :key="index"
-					v-if="index%2 === 0"
-					@click="navToDetailPage(item)"
+					class="guess-item"
+					@click="navToProductDetailPage(item)"
 				>
-					<view class="g-item left">
-						<image :src="item.image" mode="aspectFill"></image>
-						<view class="t-box">
-							<text class="title clamp">{{item.title}}</text>
-							<view class="price-box">
-								<!-- <text class="price">￥{{item.price}}</text> 
-								<text class="m-price">￥188</text> -->
-								<text class="jj">新时代建材领军企业</text>
-							</view>
-							<!-- <view class="pro-box">
-							  	<view class="progress-box">
-							  		<progress percent="72" activeColor="#fa436a" active stroke-width="6" />
-							  	</view>
-								<text>6人成团</text>
-							</view> -->
-						</view>
-						            
+					<view class="image-wrapper">
+						<image :src="item.imgPath" mode="aspectFill"></image>
 					</view>
-					<view class="g-item right">
-						<view class="text-box">
-							<p>成立时间：</p>
-							<text class="nr">2020.01.01</text>
-						</view>
-						<view class="text-box">
-							<p>法人代表：</p>
-							<text class="nr">张三</text>
-						</view>
-						<view class="text-box">
-							<p>注册资金：</p>
-							<text class="nr">500万</text>
-						</view>
-						<view class="text-box">
-							<p>厂家地址：</p>
-							<text class="nr">湖北省武汉市</text>
-						</view>
-						<view class="text-box">
-							<p>联系电话：</p>
-							<text class="nr">0719-5858558</text>
-						</view>
-					</view>
-				</swiper-item>
+					<text class="title clamp">{{item.productName}}</text>
+					<text class="price" v-if="hasLogin">￥{{item.price||'暂无'}}</text>
+				</view>
+			</view>
+			
+			<view class="ad-1">
+				<swiper class="serviceImg" circular autoplay @change="swiperChange2">
+					<swiper-item v-for="(item, index) in serviceImgList2" :key="index" class="serviceImg-item" @click="navToDetailPage({title: '轮播服务'})">
+						<image :src="item.filePath" mode="scaleToFill"/>
+					</swiper-item>
+				</swiper>
+				<!-- 自定义swiper指示器 -->
+				<view class="swiper-dots">
+					<text class="num">{{swiperCurrent2+1}}</text>
+					<text class="sign">/</text>
+					<text class="num">{{swiperLength2}}</text>
+				</view>
+			</view>
 
-			</swiper>
-		</view>
-		<!-- 品牌简介 -->
-		<view class="f-header m-t" v-if="false">
-			<image src="/static/temp/h1.png"></image>
-			<view class="tit-box">
-				<text class="tit">品牌简介</text>
-				<text class="tit2">Brand Profile</text>
+
+			<!-- 推荐商品 -->
+			<view class="f-header m-t" @tap="navTo('/pages/product/list?category=品牌产品')" id="main-1">
+				<image src="/static/indexImage/brund.png"></image>
+				<view class="tit-box">
+					<text class="tit">品牌区</text>
+				</view>
+				<text class="yticon icon-you"></text>
 			</view>
-			<text class="yticon icon-you"></text>
-		</view>
-		<view class="group-section" v-if="false">
-			<swiper class="g-swiper" :duration="500">
-				<swiper-item
-					class="g-swiper-item"
-					v-for="(item, index) in goodsList" :key="index"
-					v-if="index%2 === 0"
-					@click="navToDetailPage(item)"
+			
+			<view class="guess-section">
+				<view 
+					v-for="(item, index) in brundGoodsList" :key="index"
+					class="guess-item"
+					@click="navToProductDetailPage(item)"
 				>
-					<view class="g-item left">
-						<image :src="item.image" mode="aspectFill"></image>
-						<view class="t-box">
-							<text class="title clamp">贝尔（BBL） 地板 </text>
-							<view class="price-box">
-								<!-- <text class="price">￥{{item.price}}</text> 
-								<text class="m-price">￥188</text> -->
-								<text class="jj">纯实木地板 18mm 厂家直销 家用环保 时尚花色 木地板 红枫古道 深灰色</text>
-							</view>
-						</view>
-						            
+					<view class="image-wrapper">
+						<image :src="item.imgPath" mode="aspectFill"></image>
 					</view>
-					<view class="g-item right">
-						<view class="text-box">
-							<p>创立时间：</p>
-							<text class="nr">2000.01.01</text>
-						</view>
-						<view class="text-box">
-							<p>品牌名称：</p>
-							<text class="nr">贝尔</text>
-						</view>
-						<view class="text-box">
-							<p>品牌内涵：</p>
-							<text class="nr">便宜实惠</text>
-						</view>
-						<view class="text-box">
-							<p>厂家地址：</p>
-							<text class="nr">北京市</text>
-						</view>
-						<view class="text-box">
-							<p>联系电话：</p>
-							<text class="nr">0000-5858558</text>
-						</view>
-					</view>
-				</swiper-item>
-		
-			</swiper>
-		</view>
-		<view class="f-header m-t" v-if="false">
-			<image src="/static/temp/cate6.jpg"></image>
-			<view class="tit-box">
-				<text class="tit">售后服务</text>
-				<text class="tit2">After Service</text>
-			</view>
-			<text class="yticon icon-you"></text>		
-		</view>
-		<view class="group-section" v-if="false">
-			<view class="shdoc">
-				所有产品均由厂家直接发货、提供发票，去掉其他中间环节确保产品价格与质量，并由本平台提供相应的售后服务，请您放心购买！
-				本平台售后服务电话：400-800-666，优质服务，售后无忧！
-			</view>
-		
-		</view>
-		
-		
-		
-		<!-- 分类推荐楼层 -->
-		<!-- <view class="f-header m-t">
-			<image src="/static/temp/h1.png"></image>
-			<view class="tit-box">
-				<text class="tit">分类精选</text>
-				<text class="tit2">Competitive Products For You</text>
-			</view>
-			<text class="yticon icon-you"></text>
-		</view>
-		<view class="hot-floor">
-			<view class="floor-img-box">
-				<image class="floor-img" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1553409398864&di=4a12763adccf229133fb85193b7cc08f&imgtype=0&src=http%3A%2F%2Fb-ssl.duitang.com%2Fuploads%2Fitem%2F201703%2F19%2F20170319150032_MNwmn.jpeg" mode="scaleToFill"></image>
-			</view>
-			<scroll-view class="floor-list" scroll-x>
-				<view class="scoll-wrapper">
-					<view 
-						v-for="(item, index) in goodsList" :key="index"
-						class="floor-item"
-						@click="navToDetailPage(item)"
-					>
-						<image :src="item.image" mode="aspectFill"></image>
-						<text class="title clamp">{{item.title}}</text>
-						<text class="price">￥{{item.price}}</text>
-					</view>
-					<view class="more">
-						<text>查看全部</text>
-						<text>More+</text>
-					</view>
+					<text class="title clamp">{{item.productName}}</text>
+					<text class="price" v-if="hasLogin">￥{{item.price||'暂无'}}</text>
 				</view>
-			</scroll-view>
-		</view>
-		<view class="hot-floor">
-			<view class="floor-img-box">
-				<image class="floor-img" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1553409984228&di=dee176242038c2d545b7690b303d65ea&imgtype=0&src=http%3A%2F%2Fhbimg.b0.upaiyun.com%2F5ef4da9f17faaf4612f0d5046f4161e556e9bbcfdb5b-rHjf00_fw658" mode="scaleToFill"></image>
-			</view>
-			<scroll-view class="floor-list" scroll-x>
-				<view class="scoll-wrapper">
-					<view 
-						v-for="(item, index) in goodsList" :key="index"
-						class="floor-item"
-						@click="navToDetailPage(item)"
-					>
-						<image :src="item.image3" mode="aspectFill"></image>
-						<text class="title clamp">{{item.title}}</text>
-						<text class="price">￥{{item.price}}</text>
-					</view>
-					<view class="more">
-						<text>查看全部</text>
-						<text>More+</text>
-					</view>
+			</view>		
+
+			<view class="ad-1">
+				<swiper class="serviceImg" circular autoplay @change="swiperChange2">
+					<swiper-item v-for="(item, index) in serviceImgList3" :key="index" class="serviceImg-item" @click="navToDetailPage({title: '轮播服务'})">
+						<image :src="item.filePath" mode="scaleToFill"/>
+					</swiper-item>
+				</swiper>
+				<!-- 自定义swiper指示器 -->
+				<view class="swiper-dots">
+					<text class="num">{{swiperCurrent2+1}}</text>
+					<text class="sign">/</text>
+					<text class="num">{{swiperLength2}}</text>
 				</view>
-			</scroll-view>
-		</view>
-		<view class="hot-floor">
-			<view class="floor-img-box">
-				<image class="floor-img" src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1553409794730&di=12b840ec4f5748ef06880b85ff63e34e&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F01dc03589ed568a8012060c82ac03c.jpg%40900w_1l_2o_100sh.jpg" mode="scaleToFill"></image>
 			</view>
-			<scroll-view class="floor-list" scroll-x>
-				<view class="scoll-wrapper">
-					<view 
-						v-for="(item, index) in goodsList" :key="index"
-						class="floor-item"
-						@click="navToDetailPage(item)"
-					>
-						<image :src="item.image2" mode="aspectFill"></image>
-						<text class="title clamp">{{item.title}}</text>
-						<text class="price">￥{{item.price}}</text>
-					</view>
-					<view class="more">
-						<text>查看全部</text>
-						<text>More+</text>
-					</view>
+
+
+			<!-- 推荐商品 -->
+			<view class="f-header m-t" @tap="navTo('/pages/product/list?category=自营产品')" id="main-2">
+				<image src="/static/indexImage/self.png"></image>
+				<view class="tit-box">
+					<text class="tit">商城自运营区</text>
 				</view>
-			</scroll-view>
-		</view> -->
-		<!-- 推荐商品 -->
-		<view class="f-header m-t" @tap="navTo('/pages/product/list')">
-			<image src="/static/temp/h1.png"></image>
-			<view class="tit-box">
-				<text class="tit">商品推荐</text>
-				<text class="tit2">Guess You Like It</text>
+				<text class="yticon icon-you"></text>
 			</view>
-			<text class="yticon icon-you"></text>
-		</view>
-		
-		<view class="guess-section">
-			<view 
-				v-for="(item, index) in goodsList" :key="index"
-				class="guess-item"
-				@click="navToProductDetailPage(item)"
-			>
-				<view class="image-wrapper">
-					<image :src="item.image" mode="aspectFill"></image>
+			
+			<view class="guess-section">
+				<view 
+					v-for="(item, index) in selfGoodsList" :key="index"
+					class="guess-item"
+					@click="navToProductDetailPage(item)"
+				>
+					<view class="image-wrapper">
+						<image :src="item.imgPath" mode="aspectFill"></image>
+					</view>
+					<text class="title clamp">{{item.productName}}</text>
+					<text class="price" v-if="hasLogin">￥{{item.price||'暂无'}}</text>
 				</view>
-				<text class="title clamp">{{item.productName}}</text>
-				<text class="price" v-if="hasLogin">￥{{item.price}}</text>
-			</view>
-		</view>
-		<!-- 底部自定义tabbar -->
-		<!-- <tab-bar :current="0" @clickTab="clickTab"></tab-bar> -->
+			</view>	
+				
+		</scroll-view>
 	</view>
 </template>
 
@@ -333,13 +185,30 @@
 		data() {
 			return {
 				titleNViewBackground: '',
+				productName:'',
 				swiperCurrent: 0,
 				swiperLength: 0,
 				swiperCurrent2: 0,
 				swiperLength2: 0,
+				swiperCurrent3: 0,
+				swiperLength3: 0,
+				swiperCurrent4: 0,
+				swiperLength4: 0,
 				carouselList: [],
 				serviceImgList: [],
+				serviceImgList2: [],
+				serviceImgList3: [],
 				goodsList: [],
+				brundGoodsList: [],
+				selfGoodsList: [],
+				navList:[
+					{state: 0,text: '精选'},
+					{state: 1,text: '品牌区'},
+					{state: 2,text: '商城自运营区'}
+				],
+				scrollntoView:'',
+				tabCurrentIndex:0,
+				sHeight:980,
 				cateList:[],//分类
 				naviCateList:[]//导航分类
 			};
@@ -350,13 +219,13 @@
 		},
 		created() {
 			this.loadData();
-			// let userInfo = uni.getStorageSync('userInfo') || '';
-			// if(!userInfo.id){
-			// 	console.log("created首页跳转登录",userInfo.id)
-			// 	uni.reLaunch({
-			// 		url:'/pages/public/login?flag=1'
-			// 	})
-			// }
+			let _this = this
+			uni.getSystemInfo({
+			    success: function (res) {
+			        console.log(res.windowHeight);
+					_this.sHeight=res.windowHeight*2-260
+			    }
+			});
 		},
 		methods: {
 			toProductList(item){
@@ -370,7 +239,12 @@
 					url: `/pages/product/list?largeCategory=${item.largeCategory}&littleCategory=${item.littleCategory}`
 				})
 			},
-			clickTab(item){
+			//顶部tab点击
+			tabClick(index){
+				this.tabCurrentIndex = index
+				this.scrollntoView='main-'+index
+			},
+			navTo(url){
 				if(!this.hasLogin){
 					uni.navigateTo({
 						url:'/pages/public/login'
@@ -378,7 +252,23 @@
 					return
 				}
 				uni.navigateTo({
-					url:item.pagePath
+					url:url
+				})
+			},
+			searchProduct(){
+				if(!this.hasLogin){
+					uni.navigateTo({
+						url:'/pages/public/login'
+					})
+					return
+				}
+				uni.navigateTo({
+					url:`/pages/product/list?productName=${this.productName}`
+				})
+			},
+			navToCategory(){
+				uni.switchTab({
+					url:'/pages/category/category'
 				})
 			},
 			/**
@@ -386,46 +276,73 @@
 			 * 分次请求未作整合
 			 */
 			async loadData() {
-				// let carouselList = await this.$api.json('carouselList');
 				this.initCarouseList()
 				this.initServiceImgList()
+				this.initServiceImgList2()
+				this.initServiceImgList3()
 				this.initCateList()
 				this.initRecommendGoodsList()
+				this.initBrundGoodsList()
+				this.initSelfGoodsList()
 			},
 			initCarouseList(){
 				this.$api.httpPost('homePage/api/query',{
 					titleType:1
 				}).then(r=>{
-					console.log("轮播图片请求结果：",r)
+					// console.log("轮播图片请求结果：",r)
 					this.carouselList=r.data.orderFilePathList
 					this.titleNViewBackground = "none";
 					this.swiperLength = this.carouselList.length;
 				}).catch(e=>{
-					console.log("请求错误：",e)
+					// console.log("请求错误：",e)
 					this.$api.msg(e.msg||'网络异常请重试')
 				})
 			},
 			initServiceImgList(){
 				this.$api.httpPost('homePage/api/query',{
-					titleType:2
+					titleType:4
 				}).then(r=>{
-					console.log("服务图片请求结果：",r)
+					// console.log("服务图片请求结果：",r)
 					this.serviceImgList=r.data.orderFilePathList
 					this.swiperLength2 = this.serviceImgList.length;
 				}).catch(e=>{
-					console.log("请求错误：",e)
+					// console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+				})
+			},
+			initServiceImgList2(){
+				this.$api.httpPost('homePage/api/query',{
+					titleType:5
+				}).then(r=>{
+					// console.log("服务图片请求结果：",r)
+					this.serviceImgList2=r.data.orderFilePathList
+					this.swiperLength3 = this.serviceImgList2.length;
+				}).catch(e=>{
+					// console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+				})
+			},
+			initServiceImgList3(){
+				this.$api.httpPost('homePage/api/query',{
+					titleType:6
+				}).then(r=>{
+					// console.log("服务图片请求结果：",r)
+					this.serviceImgList3=r.data.orderFilePathList
+					this.swiperLength4 = this.serviceImgList3.length;
+				}).catch(e=>{
+					// console.log("请求错误：",e)
 					this.$api.msg(e.msg||'网络异常请重试')
 				})
 			},
 			initCateList(){
 				this.$api.httpGet('largeCategory/api/listAll').then(r=>{
-					console.log("请求结果：",r)
+					// console.log("请求结果：",r)
 					if(r.code==0){
 						this.cateList = r.data
 						this.naviCateList=[]
 						this.cateList.forEach(e=>{
 							e.littleCategorylist.forEach(en=>{
-								if(this.naviCateList.length<5){
+								if(this.naviCateList.length<10){
 									let item = {
 										"id": en.id,
 										"littleCategory": en.littleCategory,
@@ -439,21 +356,50 @@
 						})
 					}
 				}).catch(e=>{
-					console.log("请求错误：",e)
+					// console.log("请求错误：",e)
 					this.$api.msg(e.msg||'网络异常请重试')
 				})
 			},
 			initRecommendGoodsList(){
 				this.$api.httpGet('productInfo/api/recommend').then(r=>{
-					console.log("请求结果：",r)
+					// console.log("请求结果：",r)
 					if(r.code==0){
 						this.goodsList = r.data
-						this.goodsList.forEach(e=>{
-							e.image=e.imgPath?e.imgPath:''
-						})
 					}
 				}).catch(e=>{
-					console.log("请求错误：",e)
+					// console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+				})
+			},
+			initBrundGoodsList(){
+				this.$api.httpPost('productInfo/api/list',{
+					pageNum:1,
+					pageSize:4,
+					ifHomePage:1,
+					category:'品牌产品'
+				}).then(r=>{
+					// console.log("品牌产品请求结果：",r)
+					if(r.code==0){
+						this.brundGoodsList = r.rows
+					}
+				}).catch(e=>{
+					// console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+				})
+			},
+			initSelfGoodsList(){
+				this.$api.httpPost('productInfo/api/list',{
+					pageNum:1,
+					pageSize:4,
+					ifHomePage:1,
+					category:'自营产品'
+				}).then(r=>{
+					// console.log("自营产品请求结果：",r)
+					if(r.code==0){
+						this.selfGoodsList = r.rows
+					}
+				}).catch(e=>{
+					// console.log("请求错误：",e)
 					this.$api.msg(e.msg||'网络异常请重试')
 				})
 			},
@@ -468,16 +414,13 @@
 				const index = e.detail.current;
 				this.swiperCurrent2 = index;
 			},
-			navTo(url){
-				if(!this.hasLogin){
-					uni.navigateTo({
-						url:'/pages/public/login'
-					})
-					return
-				}
-				uni.navigateTo({
-					url:url
-				})
+			swiperChange3(e) {
+				const index = e.detail.current;
+				this.swiperCurrent3 = index;
+			},
+			swiperChange4(e) {
+				const index = e.detail.current;
+				this.swiperCurrent4 = index;
 			},
 			//详情页
 			navToDetailPage(item) {
@@ -546,6 +489,108 @@
 		font-size: $font-sm;
 		 text-indent:2em
 	}
+	.right-aside{
+		flex: 1;
+		overflow: hidden;
+	}
+	.space-header{
+		height: 260rpx;
+	}
+	.search-header{
+		width: 100%;
+		height: 260rpx;
+		background-color: #E92620;
+		display: flex;
+		flex-direction: column;
+		position: fixed;
+		z-index: 9;
+		.top-img{
+			padding-top: 58rpx;
+			.bg-img{
+				height: 60rpx;
+			}
+			.logo-img{
+				width: 156rpx;
+			}
+			.logo-text{
+				width: 270rpx;
+			}
+
+		}
+		.search-box{
+			// position: absolute;
+			// bottom: 0rpx;
+			width: 100%;
+			height: 70rpx;
+			display: flex;
+			padding: 0 20rpx;
+
+			.search-icon{
+				width: 32rpx;
+				height: 70rpx;
+			}
+			.left-tip{
+				
+			}
+			.right-tip{
+				
+			}
+			.search-input{
+				background-color: #FFFFFF;
+				line-height: 50rpx;
+				height: 60rpx;
+				width: 85%;
+				border-radius: 50rpx;
+				margin: 5rpx 20rpx;
+				padding: 5rpx 20rpx;
+				position: relative;
+				.input-icon{
+					position: absolute;
+					left: 20rpx;
+					width: 36rpx;
+					height: 40rpx;
+					top: 10rpx;
+
+				}
+				input{
+					margin-left: 50rpx;
+				}
+			}
+		}
+		.navbar{
+			display: flex;
+			justify-content: flex-start;
+			height: 40px;
+			padding: 0 5px;
+			box-shadow: 0 1px 5px rgba(0,0,0,.06);
+			position: relative;
+			z-index: 10;
+			.nav-item{
+				flex: 1;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 100%;
+				font-size: 15px;
+				font-weight: 400;
+				color: #FFF;
+				position: relative;
+				&.current{
+					font-weight: 800;
+					&:after{
+						content: '';
+						position: absolute;
+						left: 50%;
+						bottom: 0;
+						transform: translateX(-50%);
+						width: 44px;
+						height: 0;
+						border-bottom: 2px solid $base-color;
+					}
+				}
+			}
+		}
+	}
 	/* #ifdef MP */
 	.mp-search-box{
 		position:absolute;
@@ -569,8 +614,8 @@
 		.cate-section{
 			position:relative;
 			z-index:5;
-			border-radius:16upx 16upx 0 0;
-			margin-top:-20upx;
+			border-radius:16rpx;
+			margin: 12rpx;
 		}
 		.carousel-section{
 			padding: 0;
@@ -593,7 +638,7 @@
 	
 	
 	page {
-		background: #f5f5f5;
+		background: #E6E6E6;
 	}
 	.m-t{
 		margin-top: 16upx;
@@ -679,25 +724,35 @@
 			align-items: center;
 			font-size: $font-sm + 2upx;
 			color: $font-color-dark;
+			margin-bottom: 20rpx;
+			.cate-text{
+				width: 120rpx;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				font-size: 20rpx;
+				line-height: 40rpx;
+				text-align: center;
+			}
 		}
 		/* 原图标颜色太深,不想改图了,所以加了透明度 */
 		image {
-			width: 120upx;
-			height: 120upx;
-			margin-bottom: 14upx;
-			// border-radius: 50%;
-			// opacity: .7;
-			box-shadow: 4upx 4upx 20upx rgba(250, 67, 106, 0.3);
+			width: 110rpx;
+			height: 110rpx;
+			margin-bottom: 14rpx;
+			box-shadow: 4rpx 4rpx 4rpx rgba(70,70,70, 0.7);
+			border-radius: 50%;
+			margin: 5px;
 		}
 	}
 	.ad-1{
-		width: 100%;
-		height: 200upx;
+		width: 750rpx;
+		height: 280rpx;
 		background: #fff;
 		position: relative;
 		.serviceImg {
 			width: 100%;
-			height: 200upx;
+			height: 100%;
 			.serviceImg-item {
 				width: 100%;
 				height: 100%;
@@ -773,13 +828,13 @@
 	.f-header{
 		display:flex;
 		align-items:center;
-		height: 140upx;
+		height: 100upx;
 		padding: 6upx 30upx 8upx;
 		background: #fff;
 		image{
 			flex-shrink: 0;
-			width: 80upx;
-			height: 80upx;
+			width: 60upx;
+			height: 60upx;
 			margin-right: 20upx;
 		}
 		.tit-box{

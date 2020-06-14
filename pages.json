@@ -3,42 +3,8 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				// #ifdef MP
 				"navigationBarTitleText": "柏福车饰",
-				//"navigationStyle": "custom",
-				// #endif 
-				"app-plus": {
-					"titleNView": {
-						"type": "transparent",
-						"searchInput": {
-							"backgroundColor": "rgba(231, 231, 231,.7)",
-							"borderRadius": "16px",
-							"placeholder": "请输入商品 如：木地板",
-							"disabled": true,
-							"placeholderColor": "#606266"
-						},
-						"buttons": [{
-								"fontSrc": "/static/yticon.ttf",
-								"text": "\ue60d",
-								"fontSize": "26",
-								"color": "#303133",
-								"float": "left",
-								"background": "rgba(0,0,0,0)"
-							},
-							{
-								"fontSrc": "/static/yticon.ttf",
-								"text": "\ue744",
-								"fontSize": "27",
-								"color": "#303133",
-								"background": "rgba(0,0,0,0)",
-								"redDot": true
-							}
-						],
-						"backButton": { //自定义 backButton
-						   "display": "none"
-						 }
-					}
-				}
+				"navigationStyle": "custom"
 			}
 		},
 		{
@@ -473,7 +439,7 @@
 	"globalStyle": {
 		"navigationBarTextStyle": "white",
 		"navigationBarTitleText": "uni-app",
-		"navigationBarBackgroundColor": "#4F4F4F",
+		"navigationBarBackgroundColor": "#E92620",
 		"backgroundColor": "#f8f8f8",
 		"usingComponents": {
 		    "ocr-navigator": "plugin://ocr-plugin/ocr-navigator"
