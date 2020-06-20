@@ -485,6 +485,10 @@
 				// this.titleNViewBackground = this.carouselList[index].background;
 			},
 			//轮播图切换修改背景色
+			swiperChange1(e) {
+				const index = e.detail.current;
+				this.swiperCurrent1 = index;
+			},
 			swiperChange2(e) {
 				const index = e.detail.current;
 				this.swiperCurrent2 = index;
