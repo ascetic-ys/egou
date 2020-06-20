@@ -77,15 +77,15 @@
 						</view>
 					</view>
 					<view class="attr-list" v-for="item in cateList" :key="item.id">
-						<text>{{item.largeCategory}}</text>
+						<text>{{item.orderProductCategory}}</text>
 						<view class="item-list">
 							<text 
-								v-for="(lt, index) in item.littleCategorylist" 
-								:key="lt.littleCategory" class="tit"
-								:class="{selected: lt.littleCategory===params.littleCategory}"
+								v-for="(lt, index) in item.categoryList" 
+								:key="lt.orderProductCategory" class="tit"
+								:class="{selected: lt.orderProductCategory===params.littleCategory}"
 								@click="changeCate(lt,item)"
 							>
-								{{lt.littleCategory}}
+								{{lt.orderProductCategory}}
 							</text>
 						</view>
 					</view>
@@ -129,7 +129,10 @@
 			this.headerTop = document.getElementsByTagName('uni-page-head')[0].offsetHeight+'px';
 			// #endif
 			this.params.largeCategory=options.largeCategory
-			this.params.littleCategory=options.littleCategory
+			if(options.littleCategory){
+				this.params.littleCategory=options.littleCategory
+			}
+			
 			if(options.productName){
 				this.params.productName=options.productName
 			}
@@ -233,7 +236,7 @@
 			},
 			//加载分类
 			async loadCateList(){
-				this.$api.httpGet('largeCategory/api/listAll').then(r=>{
+				this.$api.httpGet('productCategory/api/listAll').then(r=>{
 					console.log("请求结果：",r)
 					if(r.code==0){
 						this.cateList = r.data
@@ -264,8 +267,8 @@
 			},
 			//分类点击
 			changeCate(litem,item){
-				this.params.largeCategory=item.largeCategory
-				this.params.littleCategory=litem.littleCategory
+				this.params.largeCategory=item.orderProductCategory
+				this.params.littleCategory=litem.orderProductCategory
 				// this.toggleCateMask();
 				// this.loadData();
 			},

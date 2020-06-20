@@ -2,16 +2,16 @@
 	<view class="content">
 		<scroll-view scroll-y class="left-aside">
 			<view v-for="(item,index) in cateLit" :key="item.id" class="f-item b-b" :class="{active: item.id === currentId}" @click="tabtap(item,index)">
-				{{item.largeCategory}}
+				{{item.orderProductCategory}}
 			</view>
 		</scroll-view>
 		<scroll-view scroll-with-animation scroll-y class="right-aside" @scroll="asideScroll" :scroll-top="tabScrollTop">
 			<view v-for="item in cateLit" :key="item.id" class="s-list" :id="'main-'+item.id">
-				<text class="s-item">{{item.largeCategory}}</text>
+				<text class="s-item">{{item.orderProductCategory}}</text>
 				<view class="t-list">
-					<view class="t-item" v-for="titem in item.littleCategorylist" :key="titem.id" @tap.stop="navToList(titem,item)" >
-						<image :src="titem.filePath||`/static/temp/Cate4.jpg`"></image>
-						<text>{{titem.littleCategory}}</text>
+					<view class="t-item" v-for="titem in item.categoryList" :key="titem.id" @tap.stop="navToList(titem,item)" >
+						<image :src="titem.imgPath||`/static/temp/Cate4.jpg`"></image>
+						<text>{{titem.orderProductCategory}}</text>
 					</view>
 				</view>
 			</view>
@@ -54,7 +54,7 @@
 			},
 			async loadData(){
 				this.$api.loading('加载中...')
-				this.$api.httpGet('largeCategory/api/listAll').then(r=>{
+				this.$api.httpGet('productCategory/api/listAll').then(r=>{
 					console.log("请求结果：",r)
 					if(r.code==0){
 						this.cateLit = r.data

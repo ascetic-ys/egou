@@ -3,8 +3,8 @@ let URL_SHOW='https://zhonghekeep.com/'
 let COMPANY_NAME='柏福车饰'
 
 if(process.env.NODE_ENV === 'development'){
-	/* URL_API = 'http://192.168.1.104:8080/'
-	URL_SHOW='http://192.168.1.104:8080/' */
+	/* URL_API = 'http://localhost:8080/'
+	URL_SHOW='http://localhost:8080/' */
 }
 
 export const RESOURCE = {
