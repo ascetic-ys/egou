@@ -447,6 +447,8 @@
 				this.$api.httpPost('productInfo/api/list',{
 					pageNum:1,
 					pageSize:4,
+					orderByColumn:'orderNum',
+					isAsc:'asc',
 					ifHomePage:1,
 					category:'品牌产品'
 				}).then(r=>{
@@ -463,6 +465,8 @@
 				this.$api.httpPost('productInfo/api/list',{
 					pageNum:1,
 					pageSize:4,
+					orderByColumn:'orderNum',
+					isAsc:'asc',
 					ifHomePage:1,
 					category:'自营产品'
 				}).then(r=>{
@@ -479,6 +483,8 @@
 				this.$api.httpPost('productInfo/api/list',{
 					pageNum:1,
 					pageSize:4,
+					orderByColumn:'orderNum',
+					isAsc:'asc',
 					ifHomePage:1,
 					category:'定制产品'
 				}).then(r=>{

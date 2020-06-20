@@ -112,7 +112,7 @@
 					})
 				}else{
 					uni.navigateTo({
-						url: `/pagesProduct/product/list?largeCategory=${pitem.largeCategory}&littleCategory=${item.littleCategory}`
+						url: `/pagesProduct/product/list?largeCategory=${pitem.orderProductCategory}&littleCategory=${item.orderProductCategory}`
 					})
 				}
 				

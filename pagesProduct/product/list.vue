@@ -210,9 +210,12 @@
 			loadData(data={}) {
 				const {pageNum=1,pageSize=10}=data
 				if(!this.params.orderByColumn){
-					delete this.params.orderByColumn
-					delete this.params.isAsc
+					/* delete this.params.orderByColumn
+					delete this.params.isAsc */
+					this.params.orderByColumn='orderNum'
+					this.params.isAsc='asc'
 				}
+				
 				delete this.params.size
 				this.$api.loading('加载中...')
 				return this.$api.httpPost('productInfo/api/list',{
