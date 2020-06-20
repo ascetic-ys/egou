@@ -216,7 +216,7 @@
 			},
 			 //选中状态处理
 			check(type, index,mm){
-				console.log("type:",type,index,mm)
+				// console.log("type:",type,index,mm)
 				if(type === 'item'){
 					const checked = !this.cartList[index].checked
 					const list = this.cartList[index].productInfoList
@@ -237,7 +237,7 @@
 					let itemFlagTrue = false//至少有一个商品选中为true
 					let itemFlagFalse = false//至少有一个商品未选中为true
 					this.cartList[index].productInfoList.forEach((item,mn)=>{
-						console.log("item",item)
+						// console.log("item",item)
 						if(item.checked){
 							itemFlagTrue=true
 						}
@@ -252,7 +252,7 @@
 						//至少有一个商品选中
 						this.cartList[index].checked = true
 					}
-					console.log("itemFlagFalse",itemFlagFalse)
+					// console.log("itemFlagFalse",itemFlagFalse)
 					if(itemFlagFalse){
 						//至少有一个未选中
 						this.allChecked = false;
@@ -275,13 +275,15 @@
 			},
 			//数量
 			numberChange(data){
+				// console.log("data：",data)
+				// console.log("this.cartList：",this.cartList)
 				this.cartList[data.index].productInfoList[data.mindex].productNum = data.number;
 				// this.$api.loading('请求中...')
 				this.$api.httpPost('shoppingCart/api/update',{
 					id:this.cartList[data.index].productInfoList[data.mindex].shoppingCartId,
 					productNum:this.cartList[data.index].productInfoList[data.mindex].productNum
 				}).then(r=>{
-					console.log('请求结果：',r)
+					// console.log('请求结果：',r)
 					if(r.code==0){
 						// this.$api.msg(r.msg||'修改成功')
 						this.calcTotal();

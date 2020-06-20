@@ -246,7 +246,7 @@
 			<view class="mask"></view>
 			<view class="layer attr-content" @click.stop="stopPrevent">
 				<view class="a-t" v-if="product.orderProductColorList.length>0">
-					<image :src="specSelected.imgPath||product.orderProductColorList[0].imgPath" mode="aspectFit"></image>
+					<image :src="specSelected.imgPath||product.orderProductColorList[0].imgPath" mode="aspectFill"></image>
 					<view class="right">
 						<text class="price">¥{{specSelected.price}}</text>
 						<!-- <text class="stock">库存：188件</text> -->
@@ -1113,11 +1113,14 @@
 			color: $font-color-base;
 			padding-top: 30upx;
 			padding-left: 10upx;
+			max-height: 600rpx;
 		}
 		.item-list{
 			padding: 20upx 0 0;
 			display: flex;
 			flex-wrap: wrap;
+			height: 100%;
+			overflow-y: scroll;
 			.select-box{
 				display: flex;
 				align-items: center;
