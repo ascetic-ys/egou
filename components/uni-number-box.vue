@@ -37,6 +37,10 @@
 				type: Number,
 				default: 0
 			},
+			mindex: {
+				type: Number,
+				default: 0
+			},
 			value: {
 				type: Number,
 				default: 0
@@ -76,7 +80,8 @@
 			inputValue(number) {
 				const data = {
 					number: number,
-					index: this.index
+					index: this.index,
+					mindex: this.mindex
 				}
 				this.$emit('eventChange', data);
 			}
