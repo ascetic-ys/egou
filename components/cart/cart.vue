@@ -503,6 +503,10 @@
 					color: $font-color-light;
 					height: 50upx;
 					line-height: 50upx;
+					display:block; /*这里设置inline-block或者block；根据使用情况来定（行内元素需要加这个，块级元素和行内块级可以不用）*/
+					white-space:nowrap;
+					overflow:hidden;
+					text-overflow:ellipsis;
 				}
 				.price{
 					height: 50upx;

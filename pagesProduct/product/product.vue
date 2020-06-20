@@ -271,7 +271,7 @@
 						</text>
 					</view>
 				</view> -->
-				<view class="attr-list" v-if="product.orderProductColorList.length>0">
+				<scroll-view class="attr-list" v-if="product.orderProductColorList.length>0" scroll-y>
 					<text>颜色</text>
 					<view class="item-list">
 						<view 
@@ -284,7 +284,7 @@
 							<text class="tit">{{item.color}}</text>
 						</view>
 					</view>
-				</view>
+				</scroll-view>
 				<button class="btn" @click="toggleSpec">完成</button>
 			</view>
 		</view>
@@ -1114,13 +1114,16 @@
 			padding-top: 30upx;
 			padding-left: 10upx;
 			max-height: 600rpx;
+			overflow-y: scroll;
 		}
 		.item-list{
 			padding: 20upx 0 0;
 			display: flex;
+			align-items: center;
+			justify-content: left;
 			flex-wrap: wrap;
-			height: 100%;
-			overflow-y: scroll;
+			height: 550rpx;
+			
 			.select-box{
 				display: flex;
 				align-items: center;
