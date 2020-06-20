@@ -15,7 +15,7 @@
 					<image class="input-icon" src="/static/indexImage/search.png" mode="aspectFit"/>
 				</view>
 				<view class="right-tip" @click="navTo('/pagesInfo/notice/message')">
-					<image class="search-icon" src="/static/indexImage/message.png" mode="aspectFit"/>
+					<image class="search-icon2" src="/static/indexImage/message.png" mode="aspectFit"/>
 				</view>
 			</view>
 			<view class="navbar">
@@ -52,8 +52,8 @@
 			</view>
 			<view class="cate-section" >
 				<view class="cate-item" v-for="(item,i) in naviCateList" :key='i' @tap="toProductList(item)">
-					<image :src="item.filePath||`/static/temp/Cate1.jpg`"></image>
-					<text class="cate-text">{{item.littleCategory}}</text>
+					<image :src="item.imgPath||`/static/temp/Cate1.jpg`"></image>
+					<text class="cate-text">{{item.orderProductCategory}}</text>
 				</view>
 			</view>
 			
@@ -189,10 +189,10 @@
 			
 			
 			<!-- 推荐商品 -->
-			<view class="f-header m-t" @tap="navTo('/pagesProduct/product/list?category=定制产品')" id="main-3">
-				<image src="/static/indexImage/custom.png"></image>
+			<view class="f-header m-t" @tap="navTo('/pagesProduct/product/list?ifVip=2')" id="main-3">
+				<image src="/static/indexImage/logo.png" class="vipImg"></image>
 				<view class="tit-box">
-					<text class="tit">定制区</text>
+					<text class="tit">VIP区</text>
 				</view>
 				<text class="yticon icon-you"></text>
 			</view>
@@ -249,7 +249,7 @@
 					{state: 0,text: '精选'},
 					{state: 1,text: '品牌区'},
 					{state: 2,text: '商城自营区'},
-					{state: 3,text: '定制区'}
+					{state: 3,text: 'VIP区'}
 				],
 				scrollntoView:'',
 				tabCurrentIndex:0,
@@ -281,7 +281,9 @@
 					return
 				}
 				uni.navigateTo({
-					url: `/pagesProduct/product/list?largeCategory=${item.largeCategory}&littleCategory=${item.littleCategory}`
+					/* url: `/pagesProduct/product/list?largeCategory=${item.largeCategory}&littleCategory=${item.littleCategory}` */
+					//修改为大类
+					url: `/pagesProduct/product/list?largeCategory=${item.orderProductCategory}`
 				})
 			},
 			//顶部tab点击
@@ -347,7 +349,7 @@
 			},
 			initServiceImgList1(){
 				this.$api.httpPost('homePage/api/query',{
-					titleType:3
+					titleType:4//精选区海报
 				}).then(r=>{
 					// console.log("服务图片请求结果：",r)
 					this.serviceImgList1=r.data.orderFilePathList
@@ -359,7 +361,7 @@
 			},
 			initServiceImgList2(){
 				this.$api.httpPost('homePage/api/query',{
-					titleType:4
+					titleType:5//品牌区海报
 				}).then(r=>{
 					// console.log("服务图片请求结果：",r)
 					this.serviceImgList2=r.data.orderFilePathList
@@ -371,7 +373,7 @@
 			},
 			initServiceImgList3(){
 				this.$api.httpPost('homePage/api/query',{
-					titleType:5
+					titleType:6//自营区海报
 				}).then(r=>{
 					// console.log("服务图片请求结果：",r)
 					this.serviceImgList3=r.data.orderFilePathList
@@ -383,7 +385,7 @@
 			},
 			initServiceImgList4(){
 				this.$api.httpPost('homePage/api/query',{
-					titleType:6
+					titleType:2//vip区海报
 				}).then(r=>{
 					// console.log("服务图片请求结果：",r)
 					this.serviceImgList4=r.data.orderFilePathList
@@ -394,13 +396,13 @@
 				})
 			},
 			initCateList(){
-				this.$api.httpGet('largeCategory/api/listAll').then(r=>{
+				this.$api.httpGet('productCategory/api/listAll').then(r=>{
 					// console.log("请求结果：",r)
 					if(r.code==0){
 						this.cateList = r.data
 						this.naviCateList=[]
 						this.cateList.forEach(e=>{
-							e.littleCategorylist.forEach(en=>{
+							/* e.littleCategorylist.forEach(en=>{
 								if(this.naviCateList.length<10){
 									let item = {
 										"id": en.id,
@@ -408,10 +410,21 @@
 										"parentId": en.parentId,
 										"filePath": en.filePath,
 										"largeCategory": e.largeCategory,
+										"imgPath": e.imgPath,
 									}
 									this.naviCateList.push(item)
 								}
-							})
+								
+							}) */
+							//修改为显示大类
+							if(this.naviCateList.length<10){
+								let item = {
+									"id": e.id,
+									"orderProductCategory": e.orderProductCategory,
+									"imgPath": e.imgPath,
+								}
+								this.naviCateList.push(item)
+							}
 						})
 					}
 				}).catch(e=>{
@@ -582,7 +595,7 @@
 		.top-img{
 			padding-top: 58rpx;
 			.bg-img{
-				height: 60rpx;
+				height: 50rpx;
 			}
 			.logo-img{
 				width: 156rpx;
@@ -604,26 +617,31 @@
 				width: 32rpx;
 				height: 70rpx;
 			}
+			.search-icon2{
+				width: 38rpx;
+				height: 70rpx;
+			}
 			.left-tip{
-				
+				margin-left: 28rpx;
 			}
 			.right-tip{
 				
 			}
 			.search-input{
 				background-color: #FFFFFF;
-				line-height: 50rpx;
-				height: 60rpx;
-				width: 85%;
+				line-height: 45rpx;
+				height: 45rpx;
+				width: 77%;
 				border-radius: 50rpx;
-				margin: 5rpx 20rpx;
-				padding: 5rpx 20rpx;
+				margin: 14rpx 20rpx;
+				padding: 5rpx 10rpx;
 				position: relative;
+				font-size: 21rpx;
 				.input-icon{
 					position: absolute;
 					left: 20rpx;
-					width: 36rpx;
-					height: 40rpx;
+					width: 30rpx;
+					height: 30rpx;
 					top: 10rpx;
 
 				}
@@ -816,9 +834,10 @@
 			width: 110rpx;
 			height: 110rpx;
 			margin-bottom: 14rpx;
-			box-shadow: 4rpx 4rpx 4rpx rgba(70,70,70, 0.7);
+			/* box-shadow: 4rpx 4rpx 4rpx rgba(70,70,70, 0.7); */
 			border-radius: 50%;
 			margin: 5px;
+			border:1px solid #D8DADA;
 		}
 	}
 	.ad-1{
@@ -909,9 +928,12 @@
 		background: #fff;
 		image{
 			flex-shrink: 0;
-			width: 60upx;
-			height: 60upx;
-			margin-right: 20upx;
+			width: 45upx;
+			height: 45upx;
+			margin-right: 10upx;
+		}
+		.vipImg{
+			
 		}
 		.tit-box{
 			flex: 1;
