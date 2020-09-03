@@ -1,24 +1,52 @@
 <template>
 	<view class="content b-t">
-		<mescroll-body :bottom='bottom' :up='upOption' @down="downCallback" @up="upCallback" @init="mescrollInit">
-			<view class="list b-b" v-for="(item, index) in invoiceList" :key="index" @click="checkInvoice(item)">
-				<view class="wrapper">
-					<view class="invoice-box">
-						<text v-if="item.isDefault==1" class="tag">默认</text>
-						<text class="invoice">{{item.companyName}}</text>
-					</view>
-					<view class="u-box">
-						<text class="name">{{item.duty}}</text>
-						<text class="mobile">{{item.phoneNumber}}</text>
-					</view>
-				</view>
-				<text class="yticon icon-bianji" @click.stop="addInvoice('edit', item)"></text>
+		<view class="navbar">
+			<view 
+				v-for="(item, index) in navList" :key="index" 
+				class="nav-item" 
+				:class="{current: tabCurrentIndex === index}"
+				@click="tabClick(index)"
+			>
+				{{item.text}}
 			</view>
-		</mescroll-body>
-		<text v-if="invoiceList.length==0" style="display:block;padding: 16upx 30upx 10upx;lihe-height: 1.6;color: #fa436a;font-size: 24upx;">
-			暂无发票信息
-		</text>
-		<button class="add-btn" @click="addInvoice('add')">新增发票信息</button>
+		</view>
+		<view>
+			<view class="row b-b" :class="{current: tabCurrentIndex ==0}">
+				<text class="tit">名称</text>
+				<input class="input" type="text" v-model="invoice.companyName" placeholder=" 名称" placeholder-class="placeholder" />
+				<image class="selectImg" src="../../static/tab-cate.png" @click="selectInvoice()"></image>
+			</view>
+			<view class="row b-b" :class="{current: tabCurrentIndex != 2}">
+				<text class="tit">税号</text>
+				<input class="input" type="text" v-model="invoice.duty" placeholder="税号" placeholder-class="placeholder" />
+			</view>
+			<view class="row b-b" :class="{current: tabCurrentIndex != 2}">
+				<text class="tit">电话</text>
+				<input class="input" type="number" v-model="invoice.phoneNumber" placeholder="电话" placeholder-class="placeholder" />
+			</view>
+			<!-- <view class="row ">
+				<text class="tit">省市区</text>
+				<view class="input">
+					{{form.addressName}} 
+					<pickerAddress @change="changeAddress">{{form.addressName}}</pickerAddress>
+				</view>
+				<text class="yticon icon-shouhuodizhi"></text>
+			</view>
+			<view class="row "> 
+				<text class="tit">具体位置</text>
+				<input class="input" type="text" v-model="form.area" placeholder="楼号、门牌" placeholder-class="placeholder" />
+			</view> -->
+			<view class="row b-b" :class="{current: tabCurrentIndex != 2}">
+				<text class="tit">开户行</text>
+				<input class="input" v-model="invoice.openingBank" placeholder="开户行" placeholder-class="placeholder" />
+			</view>
+			<view class="row b-b" :class="{current: tabCurrentIndex != 2}">
+				<text class="tit">账户</text>
+				<input class="input" type="number" v-model="invoice.account" placeholder="账户" placeholder-class="placeholder" />
+			</view>
+			
+			<button class="add-btn" @click="checkInvoice()">确定</button>
+		</view>
 		
 	</view>
 </template>
@@ -37,12 +65,31 @@
 				source: 0,
 				params:{},
 				invoiceList: [],
-				
+				invoice: {
+					companyName: '',
+					duty: '',
+					phoneNumber: '',
+					address:'',
+					openingBank:'',
+					account:'',
+					area: '',
+					addressName:'选择地址',
+					addressValue:'',
+					parentId:'',
+					isDefault: 0,
+				},
+				tabCurrentIndex: 0,
+				navList: [
+					{state: 0,text: '不开发票'},
+					{state: 1,text: '个人发票'},
+					{state: 2,text: '企业发票'}
+				],
 			}
 		},
 		onLoad(option){
 			console.log(option.source);
 			this.source = option.source;
+			this.tabClick(this.tabCurrentIndex);
 			this.initParams()
 			this.loadData()
 		},
@@ -96,6 +143,7 @@
 			async loadData(data={}) {
 				const {pageNum=1,pageSize=10}=data
 				this.params.parentId=this.userInfo.id
+				this.params.isDefault=1
 				if(!this.params.orderByColumn){
 					delete this.params.orderByColumn
 					delete this.params.isAsc
@@ -107,11 +155,12 @@
 					...this.params
 				}).then(r=>{
 					console.log("请求结果：",r)
-					if(pageNum===1){
+					this.invoice=r.rows[0]
+					/* if(pageNum===1){
 						this.invoiceList=r.rows
 					}else{
 						this.invoiceList=this.invoiceList.concat(r.rows)
-					}
+					} */
 					// uni.hideLoading();
 					return r
 				}).catch(e=>{
@@ -121,22 +170,33 @@
 				})
 			},
 			//选择地址
-			checkInvoice(item){
-				if(this.source == 1){
+			checkInvoice(){
+				if(this.tabCurrentIndex == 1){
 					//this.$api.prePage()获取上一页实例，在App.vue定义
-					this.$api.prePage().invoice = item;
-					uni.navigateBack()
+					this.$api.prePage().invoice = this.invoice;
+					
+				}else if(this.tabCurrentIndex == 2){
+					this.$api.prePage().invoice = {companyName:this.invoice.companyName};
+				}else{
+					this.$api.prePage().invoice = {}
 				}
+				uni.navigateBack()
 			},
-			addInvoice(type, item){
+			selectInvoice(){
 				uni.navigateTo({
-					url: `/pagesInfo/invoice/invoiceManage?type=${type}&data=${JSON.stringify(item)}`
+					url: `/pagesInfo/invoice/invoice?source=1`
 				})
 			},
 			//添加或修改成功之后回调
 			refreshList(){
 				//添加或修改后事件，这里直接在最前面添加了一条数据，实际应用中直接刷新地址列表即可
 				this.loadData()
+			},
+			//顶部tab点击
+			tabClick(index){
+				this.tabCurrentIndex = index;
+				this.list=[]
+				
 			}
 		}
 	}
@@ -245,6 +305,50 @@
 					border-bottom: 2px solid $base-color;
 				}
 			}
+		}
+	}
+	.row{
+		display: flex;
+		align-items: center;
+		position: relative;
+		padding:0 30upx;
+		height: 110upx;
+		background: #fff;
+		&.current{
+			display: none;
+			
+		}
+		.selectImg{
+			width: 50rpx;
+			height: 50rpx;
+		}
+		.tit{
+			flex-shrink: 0;
+			width: 160upx;
+			font-size: 30upx;
+			color: $font-color-dark;
+		}
+		.tit-l{
+			font-size: 22upx;
+			color: $font-color-base;
+		}
+		.input{
+			flex: 1;
+			font-size: 30upx;
+			color: $font-color-dark;
+		}
+		.icon-shouhuodizhi{
+			font-size: 36upx;
+			color: $font-color-light;
+		}
+	}
+	.default-row{
+		margin-top: 16upx;
+		.tit{
+			flex: 1;
+		}
+		switch{
+			transform: translateX(16upx) scale(.9);
 		}
 	}
 </style>

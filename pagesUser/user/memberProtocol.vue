@@ -68,7 +68,7 @@
 					bCard:'',//乙方身份证号
 					content:'',//协议内容
 					signDate:'',//签字日期（yyyy-mm-dd）
-					parentId:'',//合伙人ID（销售员）
+					parentId:'',//城市渠道商ID（销售员）
 				},
 				protocol:{},
 				partner:{}//注册成功后合作伙伴的信息
@@ -122,7 +122,7 @@
 					bCard:this.userInfo.cardNumber,//乙方身份证号
 					content:this.protocol.content,//协议内容
 					signDate:this.getDate(),//签字日期（yyyy-mm-dd）
-					parentId:this.userInfo.id,//合伙人ID（销售员）
+					parentId:this.userInfo.id,//城市渠道商ID（销售员）
 				}
 			},
 			agreeYes(){

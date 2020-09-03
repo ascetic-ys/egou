@@ -92,7 +92,7 @@
 						<image :src="item.imgPath" mode="aspectFill"></image>
 					</view>
 					<text class="title clamp">{{item.productName}}</text>
-					<text class="price" v-if="hasLogin">￥{{item.price||'暂无'}}</text>
+					<text class="price" v-if="hasLogin">￥{{item.factoryPrice||'暂无'}}</text>
 				</view>
 			</view>
 			
@@ -111,7 +111,7 @@
 			</view>
 
 
-			<!-- 推荐商品 -->
+			<!-- 品牌区 -->
 			<view class="f-header m-t" @tap="navTo('/pagesProduct/product/list?category=品牌产品')" id="main-1">
 				<image src="/static/indexImage/brund.png"></image>
 				<view class="tit-box">
@@ -130,27 +130,27 @@
 						<image :src="item.imgPath" mode="aspectFill"></image>
 					</view>
 					<text class="title clamp">{{item.productName}}</text>
-					<text class="price" v-if="hasLogin">￥{{item.price||'暂无'}}</text>
+					<text class="price" v-if="hasLogin">￥{{item.factoryPrice||'暂无'}}</text>
 				</view>
 			</view>		
 
-			<view class="ad-1">
+			<!-- <view class="ad-1">
 				<swiper class="serviceImg" circular autoplay @change="swiperChange3">
 					<swiper-item v-for="(item, index) in serviceImgList3" :key="index" class="serviceImg-item" @click="navToDetailPage({title: '轮播服务'})">
 						<image :src="item.filePath" mode="scaleToFill"/>
 					</swiper-item>
 				</swiper>
-				<!-- 自定义swiper指示器 -->
+				
 				<view class="swiper-dots">
 					<text class="num">{{swiperCurrent3+1}}</text>
 					<text class="sign">/</text>
 					<text class="num">{{swiperLength3}}</text>
 				</view>
-			</view>
+			</view> -->
 
 
 			<!-- 推荐商品 -->
-			<view class="f-header m-t" @tap="navTo('/pagesProduct/product/list?category=自营产品')" id="main-2">
+			<!-- <view class="f-header m-t" @tap="navTo('/pagesProduct/product/list?category=自营产品')" id="main-2">
 				<image src="/static/indexImage/self.png"></image>
 				<view class="tit-box">
 					<text class="tit">商城自运营区</text>
@@ -170,7 +170,7 @@
 					<text class="title clamp">{{item.productName}}</text>
 					<text class="price" v-if="hasLogin">￥{{item.price||'暂无'}}</text>
 				</view>
-			</view>	
+			</view> -->	
 			
 			
 			<view class="ad-1">
@@ -188,8 +188,8 @@
 			</view>
 			
 			
-			<!-- 推荐商品 -->
-			<view class="f-header m-t" @tap="navTo('/pagesProduct/product/list?ifVip=2')" id="main-3">
+			<!-- VIP区 -->
+			<view class="f-header m-t" @tap="navTo('/pagesProduct/product/list?ifVip=2')" id="main-2">
 				<image src="/static/indexImage/logo.png" class="vipImg"></image>
 				<view class="tit-box">
 					<text class="tit">VIP区</text>
@@ -207,7 +207,7 @@
 						<image :src="item.imgPath" mode="aspectFill"></image>
 					</view>
 					<text class="title clamp">{{item.productName}}</text>
-					<text class="price" v-if="hasLogin">￥{{item.price||'暂无'}}</text>
+					<text class="price" v-if="hasLogin">￥{{item.factoryPrice||'暂无'}}</text>
 				</view>
 			</view>	
 				
@@ -248,8 +248,8 @@
 				navList:[
 					{state: 0,text: '精选'},
 					{state: 1,text: '品牌区'},
-					{state: 2,text: '商城自营区'},
-					{state: 3,text: 'VIP区'}
+					/* {state: 2,text: '商城自营区'}, */
+					{state: 2,text: 'VIP区'}
 				],
 				scrollntoView:'',
 				tabCurrentIndex:0,
@@ -597,7 +597,8 @@
 	.search-header{
 		width: 100%;
 		height: 260rpx;
-		background-color: #E92620;
+		/* background-color: #E92620; */
+		background-color: #010101;
 		display: flex;
 		flex-direction: column;
 		position: fixed;

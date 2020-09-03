@@ -4,12 +4,16 @@
 		<view class="user-section">
 			<image class="bg" src="/static/user-bg.jpg"></image>
 			<view class="user-info-box" @click="navTo('/pagesUser/person/person')">
+				<view>
+					<image class="portraitBorder" :src="portraitBorderPath"></image>
+				</view>
 				<view class="portrait-box">
 					<image class="portrait" :src="userInfo.id?weChat.avatarUrl : '/static/missing-face.png'"></image>
 				</view>
 				<view class="info-box">
 					<text class="username">{{userInfo.userName || '游客'}}</text>
-					<text class="address">{{userInfo.province||''}}{{userInfo.city||''}}{{userInfo.district||''}}</text>
+					<!-- <text class="address">{{userInfo.province||''}}{{userInfo.city||''}}{{userInfo.district||''}}</text> -->
+					<text class="address">ID:{{bfid}}</text>
 				</view>
 				<view class="code-box" v-if="hasLogin && userInfo.tag==3" @tap.stop="toMyQrCode">
 					<image src="/static/images/qr-code.png"></image>
@@ -138,29 +142,30 @@
 				</view>
 			</view>
 			<view class="mybtn-section ">
-				<button-cell v-if='!userInfo.id || [1,4].indexOf(userInfo.tag)>-1' icon="icon-icon--" iconColor="#e07472" title="城市合伙人注册" border="" @eventClick="navTo('/pagesUser/partner/partner?isB=1',true)"></button-cell>
-				<button-cell v-if='!userInfo.id || [1,4].indexOf(userInfo.tag)>-1' icon="icon-fenlei" iconColor="#e07472" title="B端用户注册" border="" @eventClick="navTo('/pagesUser/partner/partner?isB=2',true)"></button-cell>
-				<button-cell v-if='[0].indexOf(userInfo.tag)>-1' icon="icon-icon--" iconColor="#e07472" title="城市合伙人信息" tips="查看已注册的合伙人" border="" @eventClick="navTo('/pagesUser/partner/partnerList')"></button-cell>
-				<button-cell v-if='[1].indexOf(userInfo.tag)>-1' icon="icon-shoucang" iconColor="#e07472" title="会员中心" tips="访问会员中心" border="" @eventClick="navTo('/pagesUser/user/membershipCenter')"></button-cell>
-				<button-cell v-if='[3].indexOf(userInfo.tag)>-1' icon="icon-saomiao" iconColor="#e07472" title="我的二维码" tips="查看我的二维码" border="" @eventClick="navTo('/pagesUser/user/myQrCode')"></button-cell>
-				<!-- <button-cell v-if='hasLogin' icon="icon-lishijilu" iconColor="#e07472" title="浏览足迹" border="" tips="查看我最近浏览过的商品" @eventClick="navTo('/pagesProduct/order/historyList')"></button-cell> -->
-				<!-- <button-cell v-if='hasLogin' icon="icon-shoucang_xuanzhongzhuangtai" iconColor="#e07472" title="收藏夹" border="" tips="查看我收藏的商品列表" @eventClick="navTo('/pagesProduct/order/favoriteList')"></button-cell> -->
-				<button-cell v-if='hasLogin' icon="icon-dianhua-copy" iconColor="#e07472" title="意见反馈" border="" tips="查看我反馈的意见" @eventClick="navTo('/pagesProduct/order/opinionList')"></button-cell>
-				<button-cell v-if='[1,4].indexOf(userInfo.tag)>-1' icon="icon-dizhi" iconColor="#e07472" title="地址管理" border="" tips="查看我录入的地址信息" @eventClick="navTo('/pagesInfo/address/address')"></button-cell>
-				<!-- <button-cell v-if='[1,4].indexOf(userInfo.tag)>-1' icon="icon-shouye" iconColor="#e07472" title="发票管理" border="" tips="查看我记录的发票信息" @eventClick="navTo('/pagesInfo/invoice/invoice')"></button-cell> -->
-				<button-cell v-if='[1,4].indexOf(userInfo.tag)>-1' icon="icon-pingjia" iconColor="#e07472" title="售后反馈" border="" tips="查看我的售后反馈申请" @eventClick="navTo('/pagesProduct/order/serviceList')"></button-cell>
-				<button-cell v-if='userInfo.tag==2' icon="icon-shouye" iconColor="#e07472" title="我的订单" border="" tips="查看我提交的订单" @eventClick="navTo('/pagesInfo/myOrder/myOrder')"></button-cell>
-				<button-cell v-if='userInfo.tag==0' icon="icon-share" iconColor="#e07472" title="订单统计" border="" tips="查看最近订单图表信息" @eventClick="navTo('/pagesProduct/orderTj/orderTj?state=0')"></button-cell>
-				<!-- <button-cell v-if='userInfo.tag==0' icon="icon-pinglun-copy" iconColor="#e07472" title="待办事项" tips="有新的消息" @eventClick="navTo('/pagesInfo/notice/notice')"></button-cell> -->
-				<button-cell icon="icon-pinglun-copy" iconColor="#e07472" title="通知消息" tips="我的消息" border="" @eventClick="navTo('/pagesInfo/notice/message')"></button-cell>
-				<button-cell v-if='userInfo.tag==3 && userInfo.isB==1' icon="icon-fenlei" iconColor="#e07472" title="B端用户" border="" tips="查看我的B端用户信息" @eventClick="navTo('/pagesInfo/myUser/myBUser?state=0')"></button-cell>
-				<button-cell v-if='userInfo.tag==3' icon="icon-tuandui" iconColor="#e07472" title="我的客户" border="" tips="查看我的客户信息" @eventClick="navTo('/pagesInfo/myUser/myUser?state=0')"></button-cell>
-				<button-cell v-if='userInfo.tag==3' icon="icon-bianji" iconColor="#e07472" title="合伙人协议" border="" tips="查看曾签订的协议" @eventClick="navTo('/pagesUser/partner/partnerProtocol')"></button-cell>
-				<button-cell v-if='userInfo.tag==3' icon="icon-iconfontweixin" iconColor="#e07472" title="会员费用支付" tips="查看会员续费记录" border="" @eventClick="navTo('/pagesUser/partner/partnerVipPay')"></button-cell>
-				<button-cell icon="icon-shezhi1" iconColor="#e07472" title="设置" border="" @eventClick="navTo('/pagesUser/set/set')"></button-cell>
-				<button-cell icon="icon-iLinkapp-" iconColor="#e07472" title="服务须知" border="" @eventClick="navTo('/pagesUser/set/service')"></button-cell>
-				<button-cell icon="icon-tuijian" iconColor="#e07472" title="关于我们" border="" @eventClick="navTo('/pagesUser/set/aboutUs')"></button-cell>
-				<button-cell icon="icon-weixin" iconColor="#e07472" title="客服聊天" border="" :service="true"></button-cell>
+				<button-cell v-if='!userInfo.id || [1,4].indexOf(userInfo.tag)>-1' icon="icon-icon--" iconColor="#6E7070" title="城市渠道商注册" border="" @eventClick="navTo('/pagesUser/partner/partner?isB=1',true)"></button-cell>
+				<button-cell v-if='!userInfo.id || [1,4].indexOf(userInfo.tag)>-1' icon="icon-fenlei" iconColor="#6E7070" title="渠道商B端注册" border="" @eventClick="navTo('/pagesUser/partner/partner?isB=2',true)"></button-cell>
+				<button-cell v-if='[0].indexOf(userInfo.tag)>-1' icon="icon-icon--" iconColor="#6E7070" title="城市渠道商信息" tips="查看已注册的城市渠道商" border="" @eventClick="navTo('/pagesUser/partner/partnerList')"></button-cell>
+				<button-cell v-if='[1].indexOf(userInfo.tag)>-1' icon="icon-shoucang" iconColor="#6E7070" title="会员中心" tips="访问会员中心" border="" @eventClick="navTo('/pagesUser/user/membershipCenter')"></button-cell>
+				<button-cell v-if='[3].indexOf(userInfo.tag)>-1' icon="icon-saomiao" iconColor="#6E7070" title="我的二维码" tips="查看我的二维码" border="" @eventClick="navTo('/pagesUser/user/myQrCode')"></button-cell>
+				<!-- <button-cell v-if='hasLogin' icon="icon-lishijilu" iconColor="#6E7070" title="浏览足迹" border="" tips="查看我最近浏览过的商品" @eventClick="navTo('/pagesProduct/order/historyList')"></button-cell> -->
+				<!-- <button-cell v-if='hasLogin' icon="icon-shoucang_xuanzhongzhuangtai" iconColor="#6E7070" title="收藏夹" border="" tips="查看我收藏的商品列表" @eventClick="navTo('/pagesProduct/order/favoriteList')"></button-cell> -->
+				<button-cell v-if='hasLogin' icon="icon-dianhua-copy" iconColor="#6E7070" title="意见反馈" border="" tips="查看我反馈的意见" @eventClick="navTo('/pagesProduct/order/opinionList')"></button-cell>
+				<button-cell v-if='[1,4].indexOf(userInfo.tag)>-1' icon="icon-dizhi" iconColor="#6E7070" title="地址管理" border="" tips="查看我录入的地址信息" @eventClick="navTo('/pagesInfo/address/address')"></button-cell>
+				<button-cell v-if='[1,4].indexOf(userInfo.tag)>-1' icon="icon-shouye" iconColor="#6E7070" title="发票管理" border="" tips="查看我记录的发票信息" @eventClick="navTo('/pagesInfo/invoice/invoice')"></button-cell>
+				<button-cell v-if='[1,4].indexOf(userInfo.tag)>-1' icon="icon-pingjia" iconColor="#6E7070" title="售后反馈" border="" tips="查看我的售后反馈申请" @eventClick="navTo('/pagesProduct/order/serviceList')"></button-cell>
+				<button-cell v-if='userInfo.tag==2' icon="icon-shouye" iconColor="#6E7070" title="我的订单" border="" tips="查看我提交的订单" @eventClick="navTo('/pagesInfo/myOrder/myOrder')"></button-cell>
+				<button-cell v-if='userInfo.tag==0' icon="icon-share" iconColor="#6E7070" title="订单统计" border="" tips="查看最近订单图表信息" @eventClick="navTo('/pagesProduct/orderTj/orderTj?state=0')"></button-cell>
+				<!-- <button-cell v-if='userInfo.tag==0' icon="icon-pinglun-copy" iconColor="#6E7070" title="待办事项" tips="有新的消息" @eventClick="navTo('/pagesInfo/notice/notice')"></button-cell> -->
+				<button-cell icon="icon-pinglun-copy" iconColor="#6E7070" title="通知消息" tips="我的消息" border="" @eventClick="navTo('/pagesInfo/notice/message')"></button-cell>
+				<button-cell v-if='userInfo.tag==3 && userInfo.isB==1' icon="icon-fenlei" iconColor="#6E7070" title="城市渠道商B端" border="" tips="查看我的城市渠道商B端信息" @eventClick="navTo('/pagesInfo/myUser/myBUser?state=0')"></button-cell>
+				<button-cell v-if='userInfo.tag==3' icon="icon-tuandui" iconColor="#6E7070" title="我的客户" border="" tips="查看我的客户信息" @eventClick="navTo('/pagesInfo/myUser/myUser?state=0')"></button-cell>
+				<button-cell v-if='userInfo.tag==3' icon="icon-bianji" iconColor="#6E7070" title="城市渠道商协议" border="" tips="查看曾签订的协议" @eventClick="navTo('/pagesUser/partner/partnerProtocol')"></button-cell>
+				<button-cell v-if='userInfo.tag==3' icon="icon-iconfontweixin" iconColor="#6E7070" title="会员费用支付" tips="查看会员续费记录" border="" @eventClick="navTo('/pagesUser/partner/partnerVipPay')"></button-cell>
+				<button-cell icon="icon-shezhi1" iconColor="#6E7070" title="设置" border="" @eventClick="navTo('/pagesUser/set/set')"></button-cell>
+				<button-cell icon="icon-iLinkapp-" iconColor="#6E7070" title="服务须知" border="" @eventClick="navTo('/pagesUser/set/service')"></button-cell>
+				<button-cell icon="icon-tuijian" iconColor="#6E7070" title="关于我们" border="" @eventClick="navTo('/pagesUser/set/aboutUs')"></button-cell>
+				<button-cell icon="icon-weixin" iconColor="#6E7070" title="平台客服(人工)" border="" :service="true"></button-cell>
+				<!-- #6E7070 -->
 			</view>
 		</view>
 		
@@ -270,6 +275,8 @@
 				yesterdayUser:0,//	昨日新增用户
 				favoriteNum:0,
 				historyNum:0,
+				portraitBorderPath:'',
+				bfid:'',
 			}
 		},
 		created() {
@@ -314,6 +321,40 @@
 				}
 				this.getFavoriteNum()
 				this.getHistoryNum()
+				this.portraitBorderLoad()
+				this.bfidLoad()
+				this.dateDiff()
+				
+			},
+			/*
+			 * 获取指定日期(字符串类型)到当前时间的天数
+			 */
+			 dateDiff(){
+				if(this.userInfo.ifVip==2&&this.userInfo.vipState==1){
+					let date2 = new Date();
+					let validDate=this.userInfo.validDate
+					var date1 = new Date(Date.parse(validDate.replace(/-/g,   "/")));
+					var iDays = parseInt(Math.abs(date2.getTime()- date1.getTime()) /1000/60/60/24); 
+					console.log(iDays)
+					if(iDays>=0&&iDays<=7){
+						this.$api.msg("您的会员即将到期，请尽快充值！")
+					}
+				}
+				
+			 },
+			bfidLoad(){
+				const id=this.userInfo.id.toString()
+				let bfid='BF'
+				for(let i=id.length;i<6;i++){
+					bfid+='0'
+				}
+				this.bfid=bfid+id
+			},
+			portraitBorderLoad(){
+				this.portraitBorderPath='/static/images/common-head-portrait.png'
+				if(this.userInfo.ifVip==2&&this.userInfo.vipState==1){
+					this.portraitBorderPath='/static/images/vipd-head-portrait.png'
+				}
 			},
 			getFavoriteNum(){
 				this.$api.httpPost('footmark/api/list',{
@@ -551,11 +592,26 @@
 		align-items:center;
 		position:relative;
 		z-index: 1;
+		.portrait-box{
+			
+		}
+		.portraitBorder{
+			width: 164upx;
+			height: 145upx;
+			border-radius: 50%;
+			position: absolute;
+			z-index: 1;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			right: 0;
+		}
 		.portrait{
 			width: 130upx;
-			height: 130upx;
-			border:5upx solid #fff;
+			height: 120upx;
+			/* border:5upx solid #fff; */
 			border-radius: 50%;
+			margin-left: 10px;
 		}
 		.info-box{
 			display: flex;

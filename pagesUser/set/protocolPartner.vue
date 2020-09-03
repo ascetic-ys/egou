@@ -33,7 +33,7 @@
 				this.$api.httpPost('protocol/api/list',{
 					protocolType:'1'
 				}).then(r=>{
-					console.log("合伙人协议请求结果：",r)
+					console.log("城市渠道商协议请求结果：",r)
 					this.$refs.article.setContent(r.data.content);
 				}).catch(e=>{
 					console.log("请求错误：",e)

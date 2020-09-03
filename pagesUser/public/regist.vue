@@ -17,6 +17,25 @@
 						<text class="cell-tit" :class="[tag==1?'':'typeDis']">企业用户</text>
 					</view>
 					<block v-if="tag==1">
+						<view class="input-item">
+							<text class="tit">用户类别</text>
+							
+							<!-- picker 内部需要文字撑开 不然点不到！！！！ -->
+							<!-- <view class="input">
+								<picker mode="selector" :value="userTypeIndex" :range="userTypeList" range-key="typeLabel" @change="userTypeSelect">
+									<view>{{form.userTypeLabel}}</view>
+								</picker>
+							</view> -->
+							<view class="input">
+								<checkbox-group @change="userTypeCheckChange">
+									<label v-for="item in userTypeList" :key="item.id" style="margin-right: 10px;">
+										<checkbox :value="item.id" style="transform:scale(0.7)"/> {{item.typeLabel}}
+									</label>
+									
+								</checkbox-group>
+							</view>
+							
+						</view>
 						<view class="input-item2">
 							<ocr-navigator @onSuccess="businessLicenseSuccess" certificateType="businessLicense" :opposite="false">
 							  <!-- <button class="ocr-wrapper">营业执照</button> -->
@@ -395,7 +414,8 @@
 					district:'',
 					salesPersonPhoneNumber:'',
 					smsCode:'',
-					duty:''
+					duty:'',
+					userInfoTypeList:[]
 				},
 				generalUser:{
 					userName:'',//	是	string	姓名
@@ -423,7 +443,9 @@
 				showImg4:'',
 				userPassword2: '',
 				userPassword3: '',
-				agreement:''
+				agreement:'',
+				userTypeList:[],
+				userTypeIndex:0
 			}
 		},
 		onLoad(query){
@@ -437,7 +459,7 @@
 			// this.form.userName = this.weChat.nickName
 			this.form.sex=this.weChat.gender==0?1:0
 			this.initArguement()
-			
+			this.initUserType()
 		},
 		computed: {
 			...mapState(['hasLogin','userInfo','weChat'])
@@ -455,6 +477,22 @@
 					console.log("请求错误：",e)
 					this.$api.msg(e.msg||'网络异常请重试')
 				})
+			},
+			initUserType(){
+				this.$api.httpGet('userType/api/list').then(r=>{
+					console.log("用户分类请求结构：",r)
+					this.userTypeList=r.data
+				})
+			},
+			userTypeCheckChange(e){
+				let values = e.target.value;
+			   this.form.userInfoTypeList=[]
+			    const userTypeList=this.userTypeList
+				for (let item of userTypeList) {
+					if(values.includes(item.id.toString())){
+						let obj={userTypeId:item.id,userTypeLabel:item.typeLabel}
+					}
+				} 
 			},
 			sendCode(){
 				let phone=""

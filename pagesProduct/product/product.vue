@@ -1,7 +1,7 @@
 <template>
 	<view class="container">
 		<view class="carousel">
-			<swiper indicator-dots circular=true duration="400" >
+			<swiper indicator-dots autoplay="true" interval="2000" circular=true duration="400" >
 				<swiper-item class="swiper-item" v-for="(item1,index1) in videoList" :key="index1">
 					<view class="video-wrapper">
 						<video id="myVideo" :src="item1" @error="videoErrorCallback" 
@@ -18,7 +18,7 @@
 						<image
 							:src="item" 
 							class="loaded" 
-							mode="aspectFit"
+							mode="scaleToFill"
 						></image>
 					</view>
 				</swiper-item>
@@ -47,7 +47,7 @@
 			<view class="price-content">
 				<view class="price-box">
 					<text class="price-tip">¥</text>
-					<text class="price">{{specSelected.price}}</text>
+					<text class="price">{{specSelected.price||product.factoryPrice}}</text>
 					<!-- <text class="m-price">¥488</text> -->
 					<!-- <text class="coupon-tip">7折</text> -->
 				</view>
@@ -80,7 +80,7 @@
 				<text class="tit">已选购</text>
 				<view class="con">
 					<view class="selected-box">
-						<image :src="specSelected.imgPath" mode="aspectFit"></image>
+						<image :src="specSelected.imgPath||'/static/errorImage.jpg'" mode="aspectFit"></image>
 						<text class="selected-text">{{specSelected.color}}</text>
 					</view>
 				</view>
@@ -162,6 +162,22 @@
 		<view class="detail-params" v-show="tabCurrentIndex==1">
 			<!-- 商品编号、风格、主要材质、工艺、功能、体积、面料、适用场景 -->
 			<view class="d-data">
+				<text class="title">产品规格</text>
+				<text class="info">{{product.productStandard||'-'}}</text>
+			</view>
+			<view class="d-data">
+				<text class="title">商品编码</text>
+				<text class="info">{{product.productCode||'-'}}</text>
+			</view>
+			<view class="d-data">
+				<text class="title">颜色</text>
+				<text class="info">{{product.color||'-'}}</text>
+			</view>
+			<view class="d-data">
+				<text class="title">库存数量</text>
+				<text class="info">{{product.stockNum||'-'}}</text>
+			</view>
+			<view class="d-data">
 				<text class="title">商品编号</text>
 				<text class="info">{{product.brand||'-'}}</text>
 			</view>
@@ -209,10 +225,14 @@
 		
 		<!-- 底部操作菜单 -->
 		<view class="page-bottom" v-if="[1,4].indexOf(userInfo.tag)>-1">
-			<navigator url="/pages/index/index" open-type="switchTab" class="p-b-btn">
+			<navigator :url="`/pagesProduct/product/factory?factoryNo=${product.factoryNo}`" open-type="navigate" class="p-b-btn">
+				<text class="yticon icon-xiatubiao--copy"></text>
+				<text>店铺</text>
+			</navigator>
+			<!-- <navigator url="/pages/index/index" open-type="switchTab" class="p-b-btn">
 				<text class="yticon icon-xiatubiao--copy"></text>
 				<text>首页</text>
-			</navigator>
+			</navigator> -->
 			<!-- <button class="p-b-btn btn-service" open-type="contact" @click="navTo" @contact="getContact">
 				<text class="yticon icon-xiaoxi"></text>
 				<text class="btn-name">客服</text>
@@ -246,7 +266,7 @@
 			<view class="mask"></view>
 			<view class="layer attr-content" @click.stop="stopPrevent">
 				<view class="a-t" v-if="product.orderProductColorList.length>0">
-					<image :src="specSelected.imgPath||product.orderProductColorList[0].imgPath" mode="aspectFill"></image>
+					<image :src="specSelected.imgPath||product.orderProductColorList[0].imgPath||'/static/errorImage.jpg'" mode="aspectFill"></image>
 					<view class="right">
 						<text class="price">¥{{specSelected.price}}</text>
 						<!-- <text class="stock">库存：188件</text> -->
@@ -280,7 +300,7 @@
 							:class="{selected: item.selected}"
 							@click="selectColor(item)"
 						>
-							<image :src="item.imgPath" mode="aspectFit"></image>
+							<image :src="item.imgPath||'/static/errorImage.jpg'" mode="aspectFit"></image>
 							<text class="tit">{{item.color}}</text>
 						</view>
 					</view>
@@ -632,6 +652,14 @@
 				})
 			},
 			buy(){
+				if(this.userInfo.ifVip!=2||this.userInfo.vipState!=1){
+					//不是vip用户
+					if(this.product.ifVip==2||(this.userInfo.tag==1&&!this.product.isBuy)){
+						this.$api.msg('你没有权限购买该物品，需成为VIP会员后才可购买。')
+						return
+					}
+				}
+				
 				let goodsList = [];
 				let goods = {
 					factoryShortName:this.product.factoryShortName,
@@ -658,6 +686,13 @@
 			},
 			//加入购物车
 			addCart(){
+				if(this.userInfo.ifVip!=2||this.userInfo.vipState!=1){
+					//不是vip用户
+					if(this.product.ifVip==2||(this.userInfo.tag==1&&!this.product.isBuy)){
+						this.$api.msg('你没有权限购买该物品，需成为VIP会员后才可购买。')
+						return
+					}
+				}
 				this.$api.loading('请求中...')
 				this.$api.httpPost('shoppingCart/api/add',{
 					userId:this.userInfo.id,
@@ -696,7 +731,7 @@
 		color: #888;
 	}
 	.carousel {
-		height: 432upx;
+		height: 600upx;
 /* 		height: 722upx; */
 		position:relative;
 		swiper{
@@ -871,7 +906,7 @@
 			color: $font-color-dark;
 			.selected-box{
 				display: flex;
-				align-items: center;
+				align-items: center; 
 				justify-content: flex-start;
 				/* background: #eee; */
 				margin-right: 20upx;
@@ -1119,7 +1154,7 @@
 		.item-list{
 			padding: 20upx 0 0;
 			display: flex;
-			align-items: center;
+			/* align-items: center; */
 			justify-content: left;
 			flex-wrap: wrap;
 			height: 550rpx;

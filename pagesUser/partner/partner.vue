@@ -8,7 +8,7 @@
 			<view class="wrapper" style="padding-top: 115px;">
 				<!-- <view class="left-top-sign">LOGIN</view> -->
 				<view class="welcome">
-					{{form.isB==1?"合伙人":"B端用户"}}注册，请填写资料！
+					{{form.isB==1?"城市渠道商":"城市渠道商B端"}}注册，请填写资料！
 				</view>
 				
 				<view class="input-content">
@@ -200,7 +200,7 @@
 					bCard:'',//乙方身份证号
 					content:'',//协议内容
 					signDate:'',//签字日期（yyyy-mm-dd）
-					parentId:'',//合伙人ID（销售员）
+					parentId:'',//城市渠道商ID（销售员）
 				},
 				phoneDisabled:false,
 				protocol:{},
@@ -222,7 +222,7 @@
 			}
 			if(this.form.isB==2){
 				uni.setNavigationBarTitle({
-				    title: "B端用户注册"
+				    title: "城市渠道商B端注册"
 				});
 			}
 			this.form.sex=this.weChat.gender==0?1:0
@@ -353,7 +353,7 @@
 									...this.form
 								})
 					}).then(r=>{
-						console.log('合伙人注册请求响应：',r)
+						console.log('城市渠道商注册请求响应：',r)
 						if(r.code==0){
 							this.partner=r.data
 							// this.$api.msg(r.msg||'注册成功')

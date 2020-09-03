@@ -7,11 +7,11 @@
 			<!-- <view class="nav-item" :class="{current: params.orderByColumn === 'sales'}" @click="tabClick('sales')">
 				销量优先
 			</view> -->
-			<view class="nav-item" :class="{current: params.orderByColumn === 'price'}" @click="tabClick('price')">
+			<view class="nav-item" :class="{current: params.orderByColumn === 'factoryPrice'}" @click="tabClick('factoryPrice')">
 				<text>价格</text>
 				<view class="p-box">
-					<text :class="{active: params.isAsc === 'asc' && params.orderByColumn === 'price'}" class="yticon icon-shang" @click="tabClick('price','asc')"></text>
-					<text :class="{active: params.isAsc === 'desc' && params.orderByColumn === 'price'}" class="yticon icon-shang xia" @click="tabClick('price','desc')"></text>
+					<text :class="{active: params.isAsc === 'asc' && params.orderByColumn === 'factoryPrice'}" class="yticon icon-shang" @click="tabClick('factoryPrice','asc')"></text>
+					<text :class="{active: params.isAsc === 'desc' && params.orderByColumn === 'factoryPrice'}" class="yticon icon-shang xia" @click="tabClick('factoryPrice','desc')"></text>
 				</view>
 			</view>
 			<text class="cate-item yticon icon-fenlei1" @click="toggleCateMask('show')"></text>
@@ -28,7 +28,7 @@
 					</view>
 					<text class="title clamp">{{item.productName}}</text>
 					<view class="price-box">
-						<text class="price">{{item.price}}</text>
+						<text class="price">{{item.factoryPrice}}</text>
 						<!-- <text>已售 {{item.sales||0}}</text> -->
 					</view>
 				</view>

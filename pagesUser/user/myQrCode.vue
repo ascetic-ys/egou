@@ -25,7 +25,7 @@
 		</view>
 		<view class="change-qrcode" v-if="userInfo.isB!=2">
 			<button class="code-img img-left" :class="[type==1?'show':'hide']" @click="changeType(1)">用户注册二维码</button>
-			<button class="code-img img-right" :class="[type==2?'show':'hide']" @click="changeType(2)">B端用户注册二维码</button>
+			<button class="code-img img-right" :class="[type==2?'show':'hide']" @click="changeType(2)">城市渠道商B端注册二维码</button>
 		</view>
 	</view>
 </template>
@@ -46,7 +46,7 @@
 		onLoad(){
 			// this.createQrCode()
 			if(this.userInfo.isB==2){
-				//是b端用户,只显示一个二维码
+				//是城市渠道商B端,只显示一个二维码
 				this.type=1
 			}
 			this.qrCodeImage1=this.userInfo.userQrCode

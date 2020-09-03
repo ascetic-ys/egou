@@ -61,6 +61,11 @@
 				"navigationBarTitleText": ""
 			}
 		}, {
+			"path": "invoice/invoiceOrder",
+			"style": {
+				"navigationBarTitleText": "发票信息"
+			}
+		}, {
             "path" : "myUser/myUser",
             "style" : {
 				"navigationBarTitleText": "我的客户"
@@ -68,7 +73,7 @@
         },{
             "path" : "myUser/myBUser",
             "style" : {
-        		"navigationBarTitleText": "我的B端用户"
+        		"navigationBarTitleText": "我的城市渠道商B端"
         	}
         },{
             "path" : "myAchievement/myAchievement",
@@ -150,6 +155,21 @@
 				"navigationBarTitleText": "申请退款"
 			}
 		},{
+			"path": "order/orderClaim",
+			"style": {
+				"navigationBarTitleText": "小额理赔"
+			}
+		},{
+			"path": "order/orderClaimList",
+			"style": {
+				"navigationBarTitleText": "小额理赔列表"
+			}
+		},{
+			"path": "order/orderClaimDetail",
+			"style": {
+				"navigationBarTitleText": "理赔详情"
+			}
+		},{
 			"path": "order/refundList",
 			"style": {
 				"navigationBarTitleText": "我的退款申请"
@@ -175,6 +195,11 @@
 				"navigationBarTitleText": "售后反馈详情"
 			}
 		},{
+			"path": "order/orderEvaluate",
+			"style": {
+				"navigationBarTitleText": "订单评价"
+			}
+		},{
 			"path": "product/product",
 			"style": {
 				"navigationBarTitleText": "详情展示"
@@ -182,6 +207,16 @@
 		}, 
 		{
 			"path": "product/factoryPage",
+			"style": {
+				"navigationBarTitleText": "厂家详情展示"
+			}
+		},{
+			"path": "product/factory",
+			"style": {
+				"navigationBarTitleText": "厂家详情展示"
+			}
+		},{
+			"path": "product/factoryDetail",
 			"style": {
 				"navigationBarTitleText": "厂家详情展示"
 			}
@@ -239,7 +274,7 @@
 		{
 			"path": "set/protocolPartner",
 			"style": {
-				"navigationBarTitleText": "合伙人协议"
+				"navigationBarTitleText": "城市渠道商协议"
 			}
 		},
 		{
@@ -331,17 +366,17 @@
         },{
             "path" : "partner/partnerPay",
             "style" : {
-            	"navigationBarTitleText": "合伙人会员费用支付"
+            	"navigationBarTitleText": "城市渠道商会员费用支付"
             }
         },{
             "path" : "partner/partnerPayEdit",
             "style" : {
-            	"navigationBarTitleText": "合伙人会员费用支付"
+            	"navigationBarTitleText": "城市渠道商会员费用支付"
             }
         },{
             "path" : "partner/partnerProtocol",
             "style" : {
-            	"navigationBarTitleText": "合伙人协议"
+            	"navigationBarTitleText": "城市渠道商协议"
             }
         },{
             "path" : "partner/partnerVipPay",
@@ -366,24 +401,24 @@
         },{
             "path" : "partner/partnerProtocolAgree",
             "style" : {
-            	"navigationBarTitleText": "城市合伙人协议"
+            	"navigationBarTitleText": "城市渠道商协议"
             }
         },{
             "path" : "partner/partnerList",
             "style" : {
-            	"navigationBarTitleText": "城市合伙人列表"
+            	"navigationBarTitleText": "城市渠道商列表"
             }
         },{
             "path" : "partner/partnerDetail",
             "style" : {
-            	"navigationBarTitleText": "城市合伙人详情"
+            	"navigationBarTitleText": "城市渠道商详情"
             }
         }]
 	}],
 	"globalStyle": {
 		"navigationBarTextStyle": "white",
 		"navigationBarTitleText": "uni-app",
-		"navigationBarBackgroundColor": "#E92620",
+		"navigationBarBackgroundColor": "#010101",
 		"backgroundColor": "#f8f8f8",
 		"usingComponents": {
 		    "ocr-navigator": "plugin://ocr-plugin/ocr-navigator"

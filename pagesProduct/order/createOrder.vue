@@ -23,7 +23,7 @@
 		</navigator>
 
 		<view class="goods-section">
-			
+
 			<!-- 商品列表 -->
 			<view class="g-header b-b">
 				<text class="name">柏福车饰</text>
@@ -46,27 +46,17 @@
 				</view>
 			</view>
 		</view>
+
 		
-		<!-- 发票 -->
-		<!-- <navigator url="/pagesInfo/invoice/invoice?source=1" class="invoice-section yt-list">
-			<view class="yt-list-cell b-b">
-				<text class="cell-tit clamp">发票</text>
-				<text class="cell-tip">{{invoice.companyName||'否'}}</text>
-				<text class="yticon icon-you"></text>
-			</view>
-		</navigator> -->
-		
+
 		<!-- 金额明细 -->
 		<view class="yt-list">
 			<view class="yt-list-cell b-b">
 				<text class="cell-tit clamp">订单金额</text>
 				<text class="cell-tip">￥{{totalMoney}}</text>
 			</view>
-			<!-- <view class="yt-list-cell b-b">
-				<text class="cell-tit clamp">优惠金额</text>
-				<text class="cell-tip red">-￥35</text>
-			</view>
-			<view class="yt-list-cell b-b">
+
+			<!--<view class="yt-list-cell b-b">
 				<text class="cell-tit clamp">运费</text>
 				<text class="cell-tip">免运费</text>
 			</view> -->
@@ -76,13 +66,22 @@
 			</view> -->
 		</view>
 		
+		<!-- 发票 -->
+		<navigator url="/pagesInfo/invoice/invoiceOrder?source=1" class="invoice-section yt-list">
+			<view class="yt-list-cell b-b">
+				<text class="cell-tit clamp">发票</text>
+				<text class="cell-tip">{{invoice.companyName||'不开发票'}}</text>
+				<text class="yticon icon-you"></text>
+			</view>
+		</navigator>
+
 		<view class="yt-list" v-if="isCustomizationFlag">
 			<view class="yt-list-cell b-b">
 				<text class="cell-tit clamp">品牌型号</text>
 				<text class="cell-tip">{{model}}</text>
 			</view>
 		</view>
-		
+
 		<!-- 行驶证 -->
 		<view class="yt-list-file" v-if="isCustomizationFlag">
 			<view class="input-item2">
@@ -91,7 +90,7 @@
 				  <button  class="ocr-wrapper">行驶证</button>
 				</ocr-navigator> -->
 				<ocr-navigator @onSuccess="driverSuccess" certificateType="drivingLicense" :opposite="false">
-				  <!-- <button class="ocr-wrapper">营业执照</button> -->
+					<!-- <button class="ocr-wrapper">营业执照</button> -->
 					<view class="upCarm">
 						<image src="../../static/carm.png" mode=""></image>
 						<text>行驶证</text>
@@ -99,6 +98,13 @@
 				</ocr-navigator>
 				<image :src="showImg" mode=""></image>
 			</view>
+		</view>
+		<view class="yt-list">
+
+			<view class="yt-list-cell b-b">
+				<textarea class="" placeholder="备注" maxlength="100" v-model="remarks" />
+				</view>
+			
 		</view>
 		
 		<!-- 底部 -->
@@ -134,7 +140,8 @@
 				submitDisabled:false,
 				model:'',//品牌型号
 				vin:'',//车辆识别码
-				vehicleType:''//车辆类型
+				vehicleType:'',//车辆类型,
+				remarks:''
 			}
 		},
 		onLoad(option){
@@ -256,6 +263,7 @@
 					return
 				}
 				this.submitDisabled=true
+				this.params.remarks=this.remarks
 				this.$api.loading('请求中...')
 				this.$api.httpPost('orderMainInfo/api/save',this.params
 				).then(r=>{

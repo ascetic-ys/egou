@@ -142,7 +142,7 @@
 					pageSize,
 					...this.params
 				}).then(r=>{
-					console.log("我的B端用户请求结果：",r)
+					console.log("我的城市渠道商B端请求结果：",r)
 					if(pageNum===1){
 						this.list=r.data.rows
 					}else{

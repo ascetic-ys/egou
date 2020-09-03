@@ -7,7 +7,7 @@
 				<view class="uni-banner">
 					<view class="agreement">
 						<view class="content-box">
-							<view class="title">{{isB==1?'城市合伙人':'B端用户'}}协议</view>
+							<view class="title">{{isB==1?'城市渠道商':'城市渠道商B端'}}协议</view>
 							
 							<scroll-view class="content">
 								<view class="user-info">

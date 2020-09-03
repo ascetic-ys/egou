@@ -102,11 +102,14 @@
 						<text class="price">{{item.orderPrice}}</text>
 					</view>
 					<view class="action-box b-t" v-if="item.orderState != 0">
+						<button class="action-btn"  :disabled="item.submitDisabled" @tap.stop="gotoClaim(item.id)">小额理赔</button>
+						<!-- <button class="action-btn"  :disabled="item.submitDisabled" @tap.stop="gotoClaimList(item.id)">理赔列表</button> -->
 						<button class="action-btn" v-if="[2,5].indexOf(item.orderState)>-1" :disabled="item.submitDisabled" @tap.stop="gotoRefund(item.id)">申请退款</button>
 						<button class="action-btn" v-if="[3,4].indexOf(item.orderState)>-1" @tap.stop="gotowl(item.id)">查看物流</button>
 						<button class="action-btn" v-if="item.orderState==1" :disabled="item.submitDisabled" @tap.stop="cancelOrder(item)">取消订单</button>
 						<button class="action-btn" v-if="item.orderState==3" :disabled="item.submitDisabled" @tap.stop="confirmReceipt(item)">确认收货</button>
 						<button class="action-btn" v-if="item.orderState==4" :disabled="item.submitDisabled" @tap.stop="feedback(item)">售后反馈</button>
+						<button class="action-btn" v-if="item.orderState==4" :disabled="item.submitDisabled" @tap.stop="evaluate(item.id)">评价</button>
 						<button class="action-btn recom" v-if="item.orderState==1" @tap.stop="toPay(item)">立即支付</button>
 					</view>
 				</view>
@@ -267,6 +270,18 @@
 					this.params.orderState=4
 				}
 			},
+			// 理赔
+			gotoClaim(id){
+				uni.navigateTo({
+					url:`/pagesProduct/order/orderClaim?id=${id}`
+				})
+			},
+			//理赔列表
+			gotoClaimList(id){
+				uni.navigateTo({
+					url:`/pagesProduct/order/orderClaimList?id=${id}`
+				})
+			},
 			// 退款
 			gotoRefund(id){
 				uni.navigateTo({
@@ -356,6 +371,11 @@
 			feedback(item){
 				uni.navigateTo({
 					url: `/pagesProduct/order/orderService?orderId=${item.id}&orderNo=${item.orderNo}`
+				})
+			},//订单评价
+			evaluate(id){
+				uni.navigateTo({
+					url: `/pagesProduct/order/orderEvaluate?id=${id}`
 				})
 			},
 			//去支付页面

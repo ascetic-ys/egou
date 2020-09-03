@@ -97,7 +97,10 @@
 		border-radius: 10rpx;
 		font-size: 24rpx;
 		margin: 5rpx 10px;
-
+		
+		button{
+			overflow: visible;/* 防止字体被遮挡 */
+		}
 	}
 	.icon .mix-button-cell.b-b:after{
 		left: 90upx;
@@ -145,10 +148,12 @@
 			flex: 1;
 			font-size: 22rpx;
 			color: $font-color-dark;
+			
 		}
 		.cell-tip{
 			font-size: $font-sm+2upx;
 			color: $font-color-light;
 		}
+		
 	}
 </style>
