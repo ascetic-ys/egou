@@ -9,9 +9,9 @@
 			<!-- <view class="welcome"> 欢迎回来！</view> -->
 			<view class="logo-top">
 				<view class="logo-img">
-					<image src="/static/logo.png"></image>
+					<image src="/static/logo/login-logo.png"></image>
 				</view>
-				<view class="system-tip">柏福车饰网购平台</view>
+				<view class="system-tip">柏福车品网购平台</view>
 				<!-- <view class="login-tip">登录：</view> -->
 			</view>
 			<view class="input-content">
@@ -210,7 +210,7 @@
 			}
 			.system-tip{
 				padding: 30rpx;
-				color: #fa436a;
+				color: #000000;
 				font-size: 50rpx;
 				font-weight: 800;
 				letter-spacing: 10rpx;

@@ -7,6 +7,7 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
 	state: {
 		hasLogin: false,
+		isTemp: false,//游客浏览
 		userInfo: {},
 		weChat:{}
 	},
@@ -43,9 +44,13 @@ const store = new Vuex.Store({
 			uni.removeStorage({//清空用户微信信息
 			    key: 'weChat' 
 			}) 
+		},
+		setIsTemp(state,isTemp){
+			state.isTemp = isTemp
 		}
 	},
 	actions: {
+		
 	},
   plugins: [createLogger()]
 })

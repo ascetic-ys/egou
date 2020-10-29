@@ -15,27 +15,27 @@
 		<view v-else>
 			<!-- 列表 -->
 			<view class="cart-list">
-				<view class="g-header">
+				<!-- <view class="g-header">
 					<view
 						class="yticon icon-xuanzhong2 checkbox"
 						:class="{checked: allChecked}"
 						@click="check('all')"
 					></view>
 					<text class="name">柏福车饰</text>
-				</view>
+				</view> -->
 				<block v-for="(item, index) in cartList" :key="index">
 					<view
 						class="cart-item" 
 						:class="{'b-b': index!==cartList.length-1}"
 					>
-						<!-- <view class="g-header">
+						<view class="g-header">
 							<view
 								class="yticon icon-xuanzhong2 checkbox"
 								:class="{checked: item.checked}"
 								@click="check('item',index)"
 							></view>
-							<text class="name">{{item.factoryShortName}}</text>
-						</view> -->
+							<text class="name">{{item.factoryName}}</text>
+						</view>
 						<view class="product-info" v-for="(product, m) in item.productInfoList" :key="m">
 							<view class="image-wrapper">
 								<image :src="product.imgPath" mode="aspectFill" ></image>
@@ -48,18 +48,27 @@
 							<view class="item-right">
 								<text class="clamp title">{{product.productName}}</text>
 								<text class="attr">{{product.chooseProductColor.color}}</text>
-								<text class="price">¥{{product.chooseProductColor.price}}</text>
-								<uni-number-box 
-									class="step"
-									:min="1" 
-									:max="100"
-									:value="product.productNum>100?100:product.productNum"
-									:isMax="product.productNum>=100?true:false"
-									:isMin="product.productNum===1"
-									:index="index"
-									:mindex="m"
-									@eventChange="numberChange"
-								></uni-number-box>
+								<view class="price-box">
+									<text class="price">¥{{product.chooseProductColor.price}}</text>
+									<view class="number-box">
+										<uni-number-box
+											class="step"
+											:min="1" 
+											:max="100"
+											:value="product.productNum>100?100:product.productNum"
+											:isMax="product.productNum>=100?true:false"
+											:isMin="product.productNum===1"
+											:index="index"
+											:mindex="m"
+											@eventChange="numberChange"
+										></uni-number-box>
+									</view>
+									
+									
+								</view>
+								<view class="raido-box">
+									<u-section title="发货方式" :sub-title="product.chooseDeliveryMethod" :showLine="showLine" :bold="bold" @click="toggleSpec(product)"></u-section>
+								</view>
 							</view>
 							<text class="del-btn yticon icon-fork" @click="deleteCartItem(product,m)"></text>
 						</view>
@@ -89,6 +98,33 @@
 				<button type="primary" class="no-border confirm-btn" @click="createOrder">去结算</button>
 			</view>
 		</view>
+		
+		<view
+			class="popup spec" 
+			:class="specClass"
+			@touchmove.stop.prevent="stopPrevent"
+			@click="toggleSpec" >
+			<!-- 遮罩层 -->
+			<view class="mask"></view>
+			<view class="layer attr-content" @click.stop="stopPrevent">
+				<scroll-view class="attr-list" scroll-y>
+					<text>发运方式</text>
+					<view class="item-list-2">
+						<view 
+							v-for="(item, index) in deliveryMethodList " 
+							:key="index" class="select-box"
+							:class="{selected: item.active}"
+							@click="selectDeliveryMethod(item)"
+						>
+							<template v-if="item.visible">
+								<text class="tit">{{item.name}}</text>
+							</template>
+						</view>
+					</view>
+				</scroll-view>
+				<button class="btn" @click="toggleSpec">确定</button>
+			</view>
+		</view>
 	</view>
 </template>
 
@@ -102,10 +138,19 @@
 		},
 		data() {
 			return {
+				specClass: 'none',
+				showLine: false,
+				bold: false,
 				total: 0, //总价格
 				allChecked: false, //全选状态  true|false
 				empty: false, //空白页显示  true|false
 				cartList: [],
+				tempProduct: {},
+				deliveryMethodList:[
+					{name: '快递',value: 1,active: false, visible:false},
+					{name: '快运',value: 2,active: false, visible:false},
+					{name: '物流',value: 3,active: false, visible:false},
+				],
 			};
 		},
 		created() {
@@ -330,7 +375,7 @@
 						if(e.confirm){
 							let ids = []
 							this.cartList.forEach(e=>{
-								e.forEach(item=>{
+								e.productInfoList.forEach(item=>{
 									ids.push(item.shoppingCartId)
 								})
 							})
@@ -358,17 +403,21 @@
 					})
 				})
 				this.allChecked = checked;
-				this.total = Number(total.toFixed(2));
+				this.total = total;
 			},
 			//创建订单
 			createOrder(){
 				let list = this.cartList;
 				let goodsList = [];
+				let flag = false
 				list.forEach(item=>{
 					if(item.checked){
 						let newItem = item
 						let newProList = []
 						item.productInfoList.forEach(product=>{
+							if(!product.chooseDeliveryMethod){
+								flag = true
+							}
 							if(product.checked){
 								let newPro = product
 								delete newPro.introductory
@@ -379,9 +428,15 @@
 						goodsList.push(newItem)
 					}
 				})
+				
+				if(flag){
+					this.$api.msg('请选择发货方式')
+					return
+				}
+				
 				if(goodsList.length<=0){
 					this.$api.msg('请选择商品')
-					return false
+					return
 				}
 
 				uni.navigateTo({
@@ -391,7 +446,47 @@
 					})}`
 				})
 				// this.$api.msg('跳转下一页 sendData');
-			}
+			},
+			//规格弹窗开关
+			toggleSpec(product) {
+				if(this.specClass === 'show'){
+					this.specClass = 'hide';
+					setTimeout(() => {
+						this.specClass = 'none';
+					}, 250);
+					for(let obj of this.deliveryMethodList){
+						if(obj.active){
+							this.tempProduct.chooseDeliveryMethod = obj.name
+						}
+						
+						obj.visible = false
+						obj.active = false
+					}
+					this.tempProduct = {}
+					
+				}else if(this.specClass === 'none'){
+					this.specClass = 'show';
+					if(product.deliveryMethod){
+						let arr = product.deliveryMethod.split(",")
+						for(let item of arr){
+							for(let obj of this.deliveryMethodList){
+								if(obj.value == item){
+									obj.visible = true
+								}
+							}
+						}
+					}
+					this.tempProduct = product
+				}
+			},
+			selectDeliveryMethod(item){
+				for(let obj of this.deliveryMethodList){
+					obj.active =false
+				}
+				item.active = true
+				
+			},
+			stopPrevent(){}
 		}
 	}
 </script>
@@ -451,13 +546,23 @@
 			text-indent: 45rpx;
 		}
 	}
+	
+	.cart-list {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+	
 	/* 购物车列表项 */
 	.cart-item{
 		display:flex;
 		position:relative;
 		flex-direction: column;
 		background: #FFFFFF;
-		margin-bottom: 20rpx;
+		margin-top: 20rpx;
+		width: 94%;
+		border-radius: 12upx 12upx;
+		/* box-shadow: 12upx 12upx 12upx #d1d6de; */
 		
 		.product-info{
 			background: #FFFFFF;
@@ -508,9 +613,21 @@
 					overflow:hidden;
 					text-overflow:ellipsis;
 				}
-				.price{
-					height: 50upx;
-					line-height:50upx;
+				.price-box{
+					display: flex;
+					align-items: center;
+					.price{
+						height: 50upx;
+						line-height:50upx;
+					}
+					
+					.number-box{
+						margin-left: auto;
+					}
+				}
+				
+				
+				.raido-box {
 				}
 			}
 			.del-btn{
@@ -521,6 +638,187 @@
 			}
 		}
 		
+	}	/* 规格选择弹窗 */
+	.attr-content{
+		padding: 10upx 30upx;
+		.a-t{
+			display: flex;
+			image{
+				width: 170upx;
+				height: 170upx;
+				flex-shrink: 0;
+				margin-top: -40upx;
+				border-radius: 8upx;;
+			}
+			.right{
+				display: flex;
+				flex-direction: column;
+				padding-left: 24upx;
+				font-size: $font-sm + 2upx;
+				color: $font-color-base;
+				line-height: 42upx;
+				.price{
+					font-size: $font-lg;
+					color: $uni-color-primary;
+					margin-bottom: 10upx;
+				}
+				.selected-text{
+					margin-right: 10upx;
+				}
+			}
+		}
+		.attr-list{
+			display: flex;
+			flex-direction: column;
+			font-size: $font-base + 2upx;
+			color: $font-color-base;
+			padding-top: 30upx;
+			padding-left: 10upx;
+			max-height: 600rpx;
+			overflow-y: scroll;
+		}
+		
+		
+		.item-list-2{
+			padding: 20upx 0 0;
+			display: flex;
+			align-items: center;
+			justify-content: left;
+			flex-wrap: wrap;
+			/* height: 550rpx; */
+			margin-bottom: 20upx;
+			
+			
+			
+			.select-box{
+				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				justify-content: center;
+				background: #eee;
+				margin-right: 20upx;
+				margin-bottom: 20upx;
+				border-radius: 10rpx;
+				min-width: 120rpx;
+				height: 60rpx;
+				/* border: 1upx solid $border-color-light; */
+				
+				.line-box {
+					flex-basis: 100%;
+				}
+				.number-box {
+					margin-left: auto;
+				}
+				
+				image{
+					width: 60rpx;
+					height: 60rpx;
+				}
+				text{
+					font-size: 20rpx;
+					/* color: $font-color-dark; */
+					margin: 20rpx;
+				}
+			}
+			
+			.selected{
+				background: #fbebee;
+				text{
+					color: $uni-color-primary;
+					margin: 20rpx;
+		
+				}
+			}
+		}
+	}
+	
+	/*  弹出层 */
+	.popup {
+		position: fixed;
+		left: 0;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		z-index: 99;
+		
+		&.show {
+			display: block;
+			.mask{
+				animation: showPopup 0.2s linear both;
+			}
+			.layer {
+				animation: showLayer 0.2s linear both;
+			}
+		}
+		&.hide {
+			.mask{
+				animation: hidePopup 0.2s linear both;
+			}
+			.layer {
+				animation: hideLayer 0.2s linear both;
+			}
+		}
+		&.none {
+			display: none;
+		}
+		.mask{
+			position: fixed;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			z-index: 1;
+			background-color: rgba(0, 0, 0, 0.4);
+		}
+		.layer {
+			position: fixed;
+			z-index: 99;
+			bottom: 0;
+			width: 100%;
+			min-height: 40vh;
+			border-radius: 10upx 10upx 0 0;
+			background-color: #fff;
+			.btn{
+				height: 66upx;
+				line-height: 66upx;
+				border-radius: 100upx;
+				background: $uni-color-primary;
+				font-size: $font-base + 2upx;
+				color: #fff;
+				margin: 30upx auto 20upx;
+			}
+		}
+		@keyframes showPopup {
+			0% {
+				opacity: 0;
+			}
+			100% {
+				opacity: 1;
+			}
+		}
+		@keyframes hidePopup {
+			0% {
+				opacity: 1;
+			}
+			100% {
+				opacity: 0;
+			}
+		}
+		@keyframes showLayer {
+			0% {
+				transform: translateY(120%);
+			}
+			100% {
+				transform: translateY(0%);
+			}
+		}
+		@keyframes hideLayer {
+			0% {
+				transform: translateY(0);
+			}
+			100% {
+				transform: translateY(120%);
+			}
+		}
 	}
 	
 	/* 底部栏 */
@@ -598,6 +896,8 @@
 			background: $uni-color-primary;
 			box-shadow: 1px 2px 5px rgba(217, 60, 93, 0.72)
 		}
+		
+		
 	}
 	/* 复选框选中状态 */
 	.action-section .checkbox.checked,

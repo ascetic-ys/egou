@@ -5,12 +5,12 @@
 				{{item.orderProductCategory}}
 			</view>
 		</scroll-view>
-		<scroll-view scroll-with-animation scroll-y class="right-aside" @scroll="asideScroll" :scroll-top="tabScrollTop">
-			<view v-for="item in cateLit" :key="item.id" class="s-list" :id="'main-'+item.id">
+		<scroll-view scroll-with-animation scroll-y class="right-aside" >
+			<view v-for="item in childCate" :key="item.id" class="s-list" :id="'main-'+item.id">
 				<text class="s-item">{{item.orderProductCategory}}</text>
 				<view class="t-list">
 					<view class="t-item" v-for="titem in item.categoryList" :key="titem.id" @tap.stop="navToList(titem,item)" >
-						<image :src="titem.imgPath||`/static/temp/Cate4.jpg`"></image>
+						<image :src="titem.imgPath||`/static/logo/category_default.jpg`"></image>
 						<text>{{titem.orderProductCategory}}</text>
 					</view>
 				</view>
@@ -30,7 +30,8 @@
 				sizeCalcState: false,
 				tabScrollTop: 0,
 				currentId: 1,
-				cateLit: []
+				cateLit: [],
+				childCate: [],
 			}
 		},
 		created() {
@@ -58,6 +59,7 @@
 					console.log("请求结果：",r)
 					if(r.code==0){
 						this.cateLit = r.data
+						this.childCate = this.cateLit[0].categoryList
 					}
 					uni.hideLoading();
 				}).catch(e=>{
@@ -68,12 +70,12 @@
 			},
 			//一级分类点击
 			tabtap(item,index){
-				if(!this.sizeCalcState){
+				/* if(!this.sizeCalcState){
 					this.calcSize();
 				}
+				this.tabScrollTop = this.cateLit[index].top; */
 				this.currentId = item.id;
-				// let index = this.cateLit.findIndex(sitem=>sitem.id === item.id);
-				this.tabScrollTop = this.cateLit[index].top;
+				this.childCate = item.categoryList
 			},
 			//右侧栏滚动
 			asideScroll(e){

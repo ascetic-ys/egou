@@ -27,20 +27,20 @@
 						></text> -->
 					</view>
 					<!-- 按厂家分组 -->
-					<!-- <view
+					<view
 						class="goods-box-factory"
 						v-for="(group, groupIndex) in item.groupList" :key="groupIndex"
 					>
 						<view class="b-b"></view>
-						<view class="g-header" v-if="group.factoryShortName">
-							<text class="name">{{group.factoryShortName}}</text>
+						<view class="g-header" v-if="group.factoryName">
+							<text class="name">{{group.factoryName}}</text>
 						</view>
 						<scroll-view v-if="group.orderChildInfoList.length > 1" class="goods-box" scroll-x>
 							<view
 								v-for="(goodsItem, goodsIndex) in group.orderChildInfoList" :key="goodsIndex"
 								class="goods-item"
 							>
-								<image class="goods-img" :src="goodsItem.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
+								<image class="goods-img" :src="goodsItem.imgPath||'/static/errorImage.jpg'" mode="aspectFill"></image>
 							</view>
 						</scroll-view>
 						<view
@@ -48,7 +48,7 @@
 							class="goods-box-single"
 							v-for="(goodsItem, goodsIndex) in group.orderChildInfoList" :key="goodsIndex"
 						>
-							<image class="goods-img" :src="goodsItem.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`" mode="aspectFill"></image>
+							<image class="goods-img" :src="goodsItem.imgPath||'/static/errorImage.jpg'" mode="aspectFill"></image>
 							<view class="right">
 								<text class="title clamp">{{goodsItem.productName}}</text>
 								<text class="attr-box">{{goodsItem.color}}  x {{goodsItem.productNum}}</text>
@@ -67,10 +67,10 @@
 								<text class="yticon icon-you" ></text>
 							</view>
 						</view>
-					</view> -->
+					</view>
 					
 					<!-- 不按厂家分组 -->
-					<view
+					<!-- <view
 						class="goods-box-factory"
 					>
 						<scroll-view v-if="item.orderChildInfoList.length > 1" class="goods-box" scroll-x>
@@ -93,7 +93,7 @@
 								<text class="price">{{goodsItem.totalPrice}}</text>
 							</view>
 						</view>
-					</view>
+					</view> -->
 					
 					<view class="price-box">
 						共
@@ -110,6 +110,7 @@
 						<button class="action-btn" v-if="item.orderState==3" :disabled="item.submitDisabled" @tap.stop="confirmReceipt(item)">确认收货</button>
 						<button class="action-btn" v-if="item.orderState==4" :disabled="item.submitDisabled" @tap.stop="feedback(item)">售后反馈</button>
 						<button class="action-btn" v-if="item.orderState==4" :disabled="item.submitDisabled" @tap.stop="evaluate(item.id)">评价</button>
+						<button class="action-btn" v-if="item.orderState==4"  @tap.stop="downloadImage(item)">电子发票</button>
 						<button class="action-btn recom" v-if="item.orderState==1" @tap.stop="toPay(item)">立即支付</button>
 					</view>
 				</view>
@@ -140,10 +141,10 @@
 				navList: [
 					{state: 0,text: '全部'},
 					{state: 1,text: '待付款'},
-					{state: 2,text: '待确认'},
-					{state: 3,text: '待发货'},
-					{state: 4,text: '待收货'},
-					{state: 5,text: '已完成'}
+					{state: 2,text: '待发货'},
+					{state: 3,text: '待收货'},
+					{state: 4,text: '已完成'},
+					{state: 5,text: '待确认'}
 				],
 				params:{}
 			};
@@ -384,7 +385,50 @@
 					url: `/pagesProduct/money/pay?id=${item.id}`
 				})
 			},
-
+			downloadImage(item){
+				console.log("素材下载：")
+				this.$api.loading("正在保存素材...")
+				this.saveImage(item)
+			},
+			saveImage(item){
+				if(!item.invoiceFile){
+					uni.showToast({title: '商家还未上传电子发票！',icon: "none"})
+					return
+				}
+				const downloadTask = uni.downloadFile({
+					url: item.invoiceFile,
+					success: (res) => {
+						if (res.statusCode === 200) {
+							// console.log('下载成功', res);
+							let filePath = res.tempFilePath;
+							console.log("保存图片路径：", filePath)
+							uni.authorize({
+								scope: 'scope.writePhotosAlbum',
+								success: function() {
+									uni.saveImageToPhotosAlbum({
+										filePath: filePath,
+										success: function() {
+											uni.hideLoading();
+											// console.log('save success');
+											// uni.showToast({title: "图片保存成功",icon: "none"});
+										}
+									});
+								}
+							})
+						} else {
+							uni.showToast({title: '获取图片失败！',icon: "none"})
+						}
+					},
+					fail:(res) => {
+						uni.hideLoading()
+					}
+				});
+				downloadTask.onProgressUpdate((res) => {
+					console.log('image下载进度' + res.progress);
+					console.log('image已经下载的数据长度' + res.totalBytesWritten);
+					console.log('image预期需要下载的数据总长度' + res.totalBytesExpectedToWrite);
+				});
+			},
 			//订单状态文字和颜色
 			orderExp(item){
 				let stateTip = '',

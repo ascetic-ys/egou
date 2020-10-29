@@ -149,15 +149,16 @@
 </script>
 <style>
 	.uni-numbox {
-		position:absolute;
+		/* position:absolute;
 		left: 30upx;
-		bottom: 0;
+		bottom: 0; */
 		display: flex;
 		justify-content: flex-start;
 		align-items: center;
 		width:230upx;
 		height: 70upx;
 		background:#f5f5f5;
+		transform: scale(.7);
 	}
 
 	.uni-numbox-minus,

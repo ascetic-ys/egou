@@ -121,6 +121,18 @@
 				
 				this.show = false
 				this.getProductlist()
+			},
+			navToProductDetailPage(item){
+				/* if(!this.hasLogin){
+					uni.navigateTo({
+						url:'/pagesUser/public/login'
+					})
+					return
+				} */
+				let id = item.id;
+				uni.navigateTo({
+					url: `/pagesProduct/product/product?id=${id}`
+				})
 			}
 		}
 	}

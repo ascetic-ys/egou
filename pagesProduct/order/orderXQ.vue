@@ -16,24 +16,24 @@
 		</navigator>
 
 		<!-- 按厂家分组 -->
-		<!-- <view class="goods-section">
+		 <view class="goods-section">
 			<view class="g-item" v-for="(group,pi) in orderInfo.groupList" :key='pi'>
-				<view style="background: #EEEEEE;height: 4rpx;"></view>
-				<view class="g-header b-b">
-					<text class="name">{{group.factoryShortName}}</text>
+				<view class="g-header">
+					<text class="name">{{group.factoryName}}</text>
 				</view>
 				<view class="goods-box" v-for="(product,pi) in group.orderChildInfoList" :key='pi' @click="navToProductDetailPage(product.productId)">
-					<image :src="product.imgPath||`https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=298298368,1308836146&fm=26&gp=0.jpg`"></image>
+					<image :src="product.imgPath||'/static/errorImage.jpg'"></image>
 					<view class="right">
 						<text class="title clamp">{{product.productName}}</text>
 						<text class="spec">{{product.color}}</text>
 						<view class="price-box">
 							<text class="price">￥{{product.unitPrice}}</text>
 							<text class="number">x {{product.productNum}}</text>
+							<text class="deliveryMethod">发货方式: {{product.deliveryMethod||'-'}}</text>
 						</view>
 					</view>
 				</view>
-				<view class="wuliu-box b-t" @tap.stop="gotowl(orderInfo.id,group.factoryNo)">
+				<!-- <view class="wuliu-box b-t" @tap.stop="gotowl(orderInfo.id,group.factoryNo)">
 					<view class="left-box">
 						<text class="left">配送</text>
 					</view>
@@ -44,13 +44,24 @@
 					<view class="right-box">
 						<text class="yticon icon-you" ></text>
 					</view>
+				</view> -->
+				<view class="wuliu-box b-t" >
+					<view class="left-box">
+						<text class="left">总金额</text>
+					</view>
+					<!-- <view class="middle-box">
+						<text class="top middle" >快递运输</text>
+						<text class="bottom middle" >工作日、双休日与节假日均可送货</text>
+					</view> -->
+					<view class="right-box">
+						<text >￥{{getTotalPrice(group.orderChildInfoList)}}</text>
+					</view>
 				</view>
 			</view>
-		</view> -->
+		</view> 
 		
 		<!-- 不按厂家分组 -->
-		<view class="goods-section">
-			<!-- 商品列表 -->
+		<!-- <view class="goods-section">
 			<view class="g-item">
 				<view class="goods-box" v-for="(product,pi) in orderInfo.orderChildInfoList" :key='pi' @click="navToProductDetailPage(product.productId)">
 					<image :src="product.imgPath"></image>
@@ -76,7 +87,7 @@
 					<text class="yticon icon-you" ></text>
 				</view>
 			</view>
-		</view>
+		</view> -->
 
 		<!-- 金额明细 -->
 		<view class="yt-list">
@@ -283,6 +294,13 @@
 					url: `/pagesProduct/product/product?id=${id}`
 				})
 			},
+			getTotalPrice(orderChildInfoList){
+				let totalPrice = 0
+				for(let item of orderChildInfoList){
+					totalPrice += item.unitPrice * item.productNum
+				}
+				return totalPrice
+			},
 			stopPrevent(){}
 		}
 	}
@@ -355,6 +373,8 @@
 		margin-top: 16upx;
 		background: #fff;
 		padding-bottom: 1px;
+		
+		
 
 		.g-header {
 			display: flex;
@@ -383,6 +403,8 @@
 			display: flex;
 			flex-direction: column;
 			margin: 20upx 30upx;
+			border-bottom: 1upx solid #EEEEEE;
+			
 			.goods-box{
 				display: flex;
 				margin-top: 10rpx;
@@ -425,6 +447,12 @@
 						font-size: 26upx;
 						color: $font-color-base;
 						margin-left: 20upx;
+					}
+					
+					.deliveryMethod {
+						margin-left: auto;
+						font-size: 26upx;
+						color: $font-color-light;
 					}
 				}
 				

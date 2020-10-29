@@ -52,7 +52,7 @@
 			</view>
 			<view class="cate-section" >
 				<view class="cate-item" v-for="(item,i) in naviCateList" :key='i' @tap="toProductList(item)">
-					<image :src="item.imgPath||`/static/temp/Cate1.jpg`"></image>
+					<image :src="item.imgPath||`/static/logo/category_default.jpg`"></image>
 					<text class="cate-text">{{item.orderProductCategory}}</text>
 				</view>
 			</view>
@@ -260,7 +260,7 @@
 		},
 
 		computed: {
-			...mapState(['hasLogin','userInfo','weChat'])
+			...mapState(['hasLogin','userInfo','weChat','isTemp'])
 		},
 		created() {
 			this.loadData();
@@ -271,6 +271,32 @@
 					_this.sHeight=res.windowHeight*2-260
 			    }
 			});
+		},
+		onLoad(option) {
+			let isTemp = this.isTemp
+			if (option.scene) {
+				const scene = decodeURIComponent(option.scene)
+				if(scene.expiredTime){
+					let date = new Date()
+					let now = date.getTime()
+					let day = (now - scene.expiredTime)/(1000*60*60*24)
+					if(day > 7){
+						this.$api.msg("二维码已过期")
+						uni.reLaunch({
+							url:'/pagesUser/public/login'
+						})
+						return
+					}else{
+						isTemp = true
+						this.$store.setIsTemp(isTemp)
+					}
+				}
+			}
+			if(!this.hasLogin&&!isTemp){
+				/* uni.reLaunch({
+					url:'/pagesUser/public/login'
+				}) */
+			}
 		},
 		methods: {
 			toProductList(item){
@@ -824,6 +850,7 @@
 		padding: 30upx 22upx; 
 		background: #fff;
 		.cate-item {
+			flex: 1 1 33%;
 			display: flex;
 			flex-direction: column;
 			align-items: center;

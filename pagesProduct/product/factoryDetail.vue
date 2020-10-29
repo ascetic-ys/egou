@@ -5,8 +5,8 @@
 				<text>公司介绍</text>
 			</view>
 			<scroll-view scroll-x="true" class="imgScroll">
-				<view class="sroll-item" v-for="item in factoryDetail.filePathList" :key="item.id">
-					<image :src="item.filePath"  class="sroll-img"></image>
+				<view class="sroll-item" v-for="(item,index) in factoryDetail.filePathList" :key="item.id">
+					<image :src="item.filePath"  class="sroll-img" @tap="_previewImage(index)"></image>
 				</view>
 			</scroll-view>
 			<view class="address">
@@ -86,6 +86,19 @@
 		},
 		onLoad(option) {
 			this.factoryDetail = JSON.parse(decodeURIComponent(option.factoryDetail))
+		},
+		methods: {
+			_previewImage(index){
+				let imgArr = []
+				for(let item of this.factoryDetail.filePathList){
+					imgArr.push(item.filePath)
+				}
+				//预览图片
+				uni.previewImage({
+					urls: imgArr,
+					current: imgArr[index]
+				})
+			}
 		}
 	}
 </script>

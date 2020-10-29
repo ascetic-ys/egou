@@ -2,22 +2,30 @@
     <view class="container">  
 		
 		<view class="user-section">
-			<image class="bg" src="/static/user-bg.jpg"></image>
+			<!-- <image class="bg" src="/static/user-bg.jpg"></image> -->
 			<view class="user-info-box" @click="navTo('/pagesUser/person/person')">
-				<view>
+				<!-- <view>
 					<image class="portraitBorder" :src="portraitBorderPath"></image>
-				</view>
+				</view> -->
 				<view class="portrait-box">
 					<image class="portrait" :src="userInfo.id?weChat.avatarUrl : '/static/missing-face.png'"></image>
 				</view>
 				<view class="info-box">
-					<text class="username">{{userInfo.userName || '游客'}}</text>
+					<view class="name-box">
+						<text class="username">{{userInfo.userName || '游客'}}</text>
+						<view class="vip-box">
+							<image class="vipImg" mode="scaleToFill" :src="portraitBorderPath"></image>
+						</view>
+					</view>
 					<!-- <text class="address">{{userInfo.province||''}}{{userInfo.city||''}}{{userInfo.district||''}}</text> -->
 					<text class="address">ID:{{bfid}}</text>
 				</view>
 				<view class="code-box" v-if="hasLogin && userInfo.tag==3" @tap.stop="toMyQrCode">
 					<image src="/static/images/qr-code.png"></image>
 				</view>
+				<!-- <view class="code-box"  @tap.stop="toMyQrCode">
+					<image src="/static/images/qr-code.png"></image>
+				</view> -->
 			</view>
 		<!-- 	<view class="vip-card-box">
 				<image class="card-bg" src="/static/vip-card-bg.png" mode=""></image>
@@ -44,7 +52,8 @@
 			</view>
 			
 			<view class="top-bg-img">
-				<image src="http://img0.imgtn.bdimg.com/it/u=2883970925,4093911839&fm=26&gp=0.jpg" mode="scaleToFill"></image>
+				<!-- <image src="http://img0.imgtn.bdimg.com/it/u=2883970925,4093911839&fm=26&gp=0.jpg" mode="scaleToFill"></image> -->
+				<image src="/static/background/user-back1.png" mode="scaleToFill"></image>
 			</view>
 		</view>
 		
@@ -147,6 +156,7 @@
 				<button-cell v-if='[0].indexOf(userInfo.tag)>-1' icon="icon-icon--" iconColor="#6E7070" title="城市渠道商信息" tips="查看已注册的城市渠道商" border="" @eventClick="navTo('/pagesUser/partner/partnerList')"></button-cell>
 				<button-cell v-if='[1].indexOf(userInfo.tag)>-1' icon="icon-shoucang" iconColor="#6E7070" title="会员中心" tips="访问会员中心" border="" @eventClick="navTo('/pagesUser/user/membershipCenter')"></button-cell>
 				<button-cell v-if='[3].indexOf(userInfo.tag)>-1' icon="icon-saomiao" iconColor="#6E7070" title="我的二维码" tips="查看我的二维码" border="" @eventClick="navTo('/pagesUser/user/myQrCode')"></button-cell>
+				<button-cell v-if='[3].indexOf(userInfo.tag)>-1' icon="icon-saomiao" iconColor="#6E7070" title="游客二维码" tips="查看我的二维码" border="" @eventClick="navTo('/pagesUser/user/myQrCode?type=3')"></button-cell>
 				<!-- <button-cell v-if='hasLogin' icon="icon-lishijilu" iconColor="#6E7070" title="浏览足迹" border="" tips="查看我最近浏览过的商品" @eventClick="navTo('/pagesProduct/order/historyList')"></button-cell> -->
 				<!-- <button-cell v-if='hasLogin' icon="icon-shoucang_xuanzhongzhuangtai" iconColor="#6E7070" title="收藏夹" border="" tips="查看我收藏的商品列表" @eventClick="navTo('/pagesProduct/order/favoriteList')"></button-cell> -->
 				<button-cell v-if='hasLogin' icon="icon-dianhua-copy" iconColor="#6E7070" title="意见反馈" border="" tips="查看我反馈的意见" @eventClick="navTo('/pagesProduct/order/opinionList')"></button-cell>
@@ -351,9 +361,9 @@
 				this.bfid=bfid+id
 			},
 			portraitBorderLoad(){
-				this.portraitBorderPath='/static/images/common-head-portrait.png'
+				this.portraitBorderPath='/static/vip/1.png'
 				if(this.userInfo.ifVip==2&&this.userInfo.vipState==1){
-					this.portraitBorderPath='/static/images/vipd-head-portrait.png'
+					this.portraitBorderPath='/static/vip/2.png'
 				}
 			},
 			getFavoriteNum(){
@@ -571,11 +581,17 @@
 	  background: #fff;
 	  border-radius: 10upx;
 	}
+	
+	.container {
+		height: 100%;
+		background-color: #F5F5F5;
+	}
 
 	.user-section{
 		height: 270upx;
 		padding: 10upx 30upx 0;
 		position:relative;
+		background-color: #232323;
 		.bg{
 			position:absolute;
 			left: 0;
@@ -607,18 +623,19 @@
 			right: 0;
 		}
 		.portrait{
-			width: 130upx;
+			width: 120upx;
 			height: 120upx;
 			/* border:5upx solid #fff; */
 			border-radius: 50%;
 			margin-left: 10px;
+			border: 4upx solid #CD723D; 
 		}
 		.info-box{
 			display: flex;
 			flex-direction: column;
 			.username{
 				font-size: $font-lg + 6upx;
-				color: $font-color-dark;
+				color: #C29B41;
 				margin-left: 20upx;
 			}
 			.address{
@@ -627,6 +644,18 @@
 				margin-left: 20rpx;
 				margin-top: 10rpx;
 			}
+			.name-box {
+				display: flex;
+			}
+			.vip-box {
+				margin-top: 10upx;
+				.vipImg {
+					height: 34upx;
+					width: 120upx;
+					transform: scale(0.9);
+				}
+			}
+			
 		}
 		
 		.code-box{
@@ -749,7 +778,7 @@
 			.yticon{
 				font-size: 48upx;
 				margin-bottom: 18upx;
-				color: #fa436a;
+				color: #DF8750;
 			}
 			.icon-shouhoutuikuan{
 				font-size:44upx;
@@ -921,7 +950,7 @@
 			justify-content: space-around;
 			text-align: center;
 			z-index: 1;
-			color: #fa436a;
+			color: #828282;
 			opacity: .8;
 			text{
 				font-size: 26rpx;

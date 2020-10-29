@@ -25,23 +25,32 @@
 		<view class="goods-section">
 
 			<!-- 商品列表 -->
-			<view class="g-header b-b">
+			<!-- <view class="g-header b-b">
 				<text class="name">柏福车饰</text>
-			</view>
-			<view v-for="(item,index) in goodsList" :key='index'>
-				<!-- <view style="background: #EEEEEE;height: 20rpx;"></view> -->
-				<!-- <view class="g-header b-b">
-					<text class="name">{{item.factoryShortName}}</text>
-				</view> -->
+			</view> -->
+			<view v-for="(item,index) in goodsList" :key='index' class="good-box">
+				<view style="background: #EEEEEE;height: 20rpx;"></view>
+				<view class="g-header b-b">
+					<text class="name">{{item.factoryName}}</text>
+				</view>
 				<view class="g-item" v-for="(product,mm) in item.productInfoList" :key='mm'>
-					<image :src="product.imgPath||`https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg`"></image>
+					<image :src="product.imgPath||`/static/errorImage.jpg`"></image>
 					<view class="right">
 						<text class="title clamp">{{product.productName}}</text>
 						<text class="spec">{{product.chooseProductColor.color}}</text>
 						<view class="price-box">
 							<text class="price">￥{{product.chooseProductColor.price}}</text>
 							<text class="number">x {{product.productNum}}</text>
+							<text class="deliveryMethod">发货方式: {{product.chooseDeliveryMethod}}</text>
 						</view>
+					</view>
+				</view>
+				<view class="wuliu-box b-t" >
+					<view class="left-box">
+						<text class="left">总金额</text>
+					</view>
+					<view class="right-box">
+						<text >￥{{getTotalPrice(item.productInfoList)}}</text>
 					</view>
 				</view>
 			</view>
@@ -67,10 +76,10 @@
 		</view>
 		
 		<!-- 发票 -->
-		<navigator url="/pagesInfo/invoice/invoiceOrder?source=1" class="invoice-section yt-list">
+		<navigator :url="`/pagesInfo/invoice/invoiceOrder?invoice=${JSON.stringify(invoice)}`" class="invoice-section yt-list">
 			<view class="yt-list-cell b-b">
 				<text class="cell-tit clamp">发票</text>
-				<text class="cell-tip">{{invoice.companyName||'不开发票'}}</text>
+				<text class="cell-tip">{{showInvoice}}</text>
 				<text class="yticon icon-you"></text>
 			</view>
 		</navigator>
@@ -130,7 +139,11 @@
 				maskState: 0, //优惠券面板显示状态
 				desc: '', //备注
 				addressData: {},
-				invoice:{},
+				invoice:{
+					invoiceType: 0,
+					invoiceTitle: 0,
+				},
+				showInvoice: '不开发票',
 				goodsList:[],
 				totalMoney:null,
 				showImg:'',
@@ -152,8 +165,23 @@
 			this.totalMoney=data.totalMoney
 			this.initData()
 		},
+		watch: {
+			invoice: {
+				handler: function (val, oldVal) { 
+					console.log(val)
+					if(val.invoiceType === 1){
+						this.showInvoice = '电子发票'
+					}else if(val.invoiceType === 2){
+						this.showInvoice = '纸质发票'
+					}else {
+						this.showInvoice = '不开发票'
+					}
+				},
+				deep: true
+			}
+		},
 		computed: {
-			...mapState(['hasLogin','userInfo','weChat'])
+			...mapState(['hasLogin','userInfo','weChat']),
 		},
 		methods: {
 			initData(){
@@ -294,10 +322,10 @@
 					return false
 				}
 				//有定制化商品需要上传行驶证
-				if(this.isCustomizationFlag&&!this.params.filePath){
+				/* if(this.isCustomizationFlag&&!this.params.filePath){
 					this.$api.msg('请上传行驶证')
 					return false
-				}
+				} */
 				if(this.params.orderChildInfoList.length<=0){
 					this.$api.msg('商品信息丢失')
 					return false
@@ -313,14 +341,19 @@
 						let item = {
 							productName:e.productName,//商品名称
 							productNum:e.productNum,//商品数量
-							unitPrice:e.chooseProductColor.price,//单价
-							totalPrice:Number((e.chooseProductColor.price*e.productNum).toFixed(2)),//总价
+							unitPrice:e.chooseProductColor.salePrice,//单价
+							totalPrice:Number(e.chooseProductColor.salePrice*e.productNum),//总价
 							productId:e.id,//商品ID
 							factoryNo:e.factoryNo,
 							factoryName:e.factoryName,
 							factoryShortName:e.factoryShortName,
 							color:e.chooseProductColor.color,
 							imgPath:e.chooseProductColor.imgPath,
+							rebatesMode:e.chooseProductColor.rebatesMode,
+							rebatesProportion:e.chooseProductColor.rebatesProportion,
+							raisePrice:e.chooseProductColor.raisePrice,
+							factoryPrice:e.chooseProductColor.price,
+							deliveryMethod: e.chooseDeliveryMethod
 						}
 						orderChildInfoList.push(item)
 					})
@@ -334,7 +367,9 @@
 					receiverAddress:this.addressData.receiverAddress,//收货地址
 					receiverLinkMan:this.addressData.linkMan,//收货联系人
 					receiverPhoneNumber:this.addressData.phoneNumber,//收货人电话
-					isOpen:this.invoice.companyName?'是':'否',//是否开票（是或否）
+					isOpen:this.invoice.invoiceType!==0?'是':'否',//是否开票（是或否）
+					invoiceType:this.invoice.invoiceType,
+					invoiceTitle:this.invoice.invoiceTitle,
 					companyName:this.invoice.companyName,//公司名称
 					duty:this.invoice.duty,//税号
 					companyPhoneNumber:this.invoice.phoneNumber,//公司电话
@@ -348,6 +383,13 @@
 					vin:this.vin,//车辆识别码
 					vehicleType:this.vehicleType//车辆类型
 				}
+			},
+			getTotalPrice(productInfoList){
+				let totalPrice = 0
+				for(let item of productInfoList){
+					totalPrice += item.chooseProductColor.salePrice*item.productNum
+				}
+				return totalPrice
 			},
 			stopPrevent(){}
 		}
@@ -420,8 +462,17 @@
 
 	.goods-section {
 		margin-top: 16upx;
-		background: #fff;
+		background: #EEEEEE;
 		padding-bottom: 1px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		
+		.good-box {
+			background: #fff;
+			width: 94%;
+			border-radius: 12upx 12upx 12upx 12upx;
+		}
 
 		.g-header {
 			display: flex;
@@ -442,6 +493,31 @@
 			font-size: 30upx;
 			color: $font-color-base;
 			margin-left: 24upx;
+		}
+		
+		.wuliu-box{
+			display:flex;
+			justify-content: space-between;
+			padding: 20rpx;
+			color: #505256;
+			font-size: 28rpx;
+			.left-box{
+				display:flex;
+				justify-content: space-between;
+				margin-left: 24upx;
+			}
+			.middle-box{
+				display:flex;
+				flex-direction: column;
+				text-align: right;
+				flex: 1;
+			}
+			.right-box{
+				text-align: right;
+				line-height: 40rpx;
+				padding-top: 14rpx;
+				padding-left: 10rpx;
+			}
 		}
 
 		.g-item {
@@ -487,6 +563,12 @@
 					color: $font-color-base;
 					margin-left: 20upx;
 				}
+				
+				.deliveryMethod {
+					margin-left: auto;
+					font-size: 26upx;
+					color: $font-color-light;
+				}
 			}
 
 			.step-box {
@@ -507,7 +589,7 @@
 		position: relative;
 
 		&.cell-hover {
-			background: #fafafa;
+			background: #EEEEEE;
 		}
 
 		&.b-b:after {

@@ -79,9 +79,15 @@
 			<view class="c-row b-b" @click="toggleSpec" v-if="product.orderProductColorList.length>0">
 				<text class="tit">已选购</text>
 				<view class="con">
-					<view class="selected-box">
+					<!-- <view class="selected-box">
 						<image :src="specSelected.imgPath||'/static/errorImage.jpg'" mode="aspectFit"></image>
 						<text class="selected-text">{{specSelected.color}}</text>
+					</view> -->
+					<view class="selected-box" v-for="(item,index) in product.orderProductColorList" :key="index">
+						<template v-if="item.shoppingNum">
+							<image :src="item.imgPath||'/static/errorImage.jpg'" mode="aspectFit"></image>
+							<text class="selected-text">{{item.color}}</text>
+						</template>
 					</view>
 				</view>
 				<text class="yticon icon-you"></text>
@@ -252,7 +258,7 @@
 			
 			<view class="action-btn-group">
 				<button type="primary" class=" action-btn no-border buy-now-btn" @click="buy">立即购买</button>
-				<button type="primary" class=" action-btn no-border add-cart-btn" @click="addCart">加入购物车</button>
+				<button type="primary" class=" action-btn no-border add-cart-btn" @click="batchAddCart">加入购物车</button>
 			</view>
 		</view>
 		
@@ -266,16 +272,18 @@
 			<view class="mask"></view>
 			<view class="layer attr-content" @click.stop="stopPrevent">
 				<view class="a-t" v-if="product.orderProductColorList.length>0">
-					<image :src="specSelected.imgPath||product.orderProductColorList[0].imgPath||'/static/errorImage.jpg'" mode="aspectFill"></image>
+					<!-- <image :src="specSelected.imgPath||product.orderProductColorList[0].imgPath||'/static/errorImage.jpg'" mode="aspectFill"></image> -->
+					<image :src="product.imgPath||'/static/errorImage.jpg'" mode="aspectFill"></image>
 					<view class="right">
-						<text class="price">¥{{specSelected.price}}</text>
-						<!-- <text class="stock">库存：188件</text> -->
-						<view class="selected">
+						<text>{{product.product}}</text>
+						<text>¥{{product.factoryPrice}}</text>
+						<!-- <text class="price">¥{{specSelected.price}}</text> -->
+						<!-- <view class="selected">
 							已选：
 							<text class="selected-text">
 								{{specSelected.color}}
 							</text>
-						</view>
+						</view> -->
 					</view>
 				</view>
 				<!-- <view class="attr-list">
@@ -297,13 +305,37 @@
 						<view 
 							v-for="(item, index) in product.orderProductColorList " 
 							:key="index" class="select-box"
-							:class="{selected: item.selected}"
 							@click="selectColor(item)"
 						>
+							<view class="line-box">
+								<u-line></u-line>
+							</view>
 							<image :src="item.imgPath||'/static/errorImage.jpg'" mode="aspectFit"></image>
 							<text class="tit">{{item.color}}</text>
+							<view class="number-box">
+								<text>￥{{item.salePrice||'-'}}</text>
+								<text>库存：{{item.stockNum||'-'}}</text>
+								<u-number-box v-model="item.shoppingNum" :bg-color="bgColor" :color="color" :min="0"
+								:step="step" :disabled="disabled" ></u-number-box>
+							</view>
+							<view class="line-box" v-if="index === product.orderProductColorList.length-1">
+								<u-line></u-line>
+							</view>
 						</view>
 					</view>
+					<!-- <text>发运方式</text>
+					<view class="item-list-2">
+						<view 
+							v-for="(item, index) in deliveryMethodList " 
+							:key="index" class="select-box"
+							:class="{selected: item.active}"
+							@click="selectDeliveryMethod(item)"
+						>
+							<template v-if="item.visible">
+								<text class="tit">{{item.name}}</text>
+							</template>
+						</view>
+					</view> -->
 				</scroll-view>
 				<button class="btn" @click="toggleSpec">完成</button>
 			</view>
@@ -321,18 +353,19 @@
 	import jyfParser from '@/components/jyf-parser/jyf-parser'; // HBuilderX 2.5.5 及以上可以不需要
 	import {mapState} from 'vuex';
 	import share from '@/components/share';
+	//import uNumberBox from '@/components/uview-ui/u-number-box/u-number-box.vue';
 	
 	
 	export default{
 		components: {
 			share,
-			jyfParser
+			jyfParser,
+			//uNumberBox
 		},
 		data() {
 			return {
 				id:null,
 				// videoSrc:'/static/video/banner.mp4',
-				videoSrc:'https://jdvideo.300hu.com/vodtransgzp1251412368/9031868223418300449/v.f30.mp4?dockingId=c59ea11a-f67e-4738-b4c3-2eb105aa528d&storageSource=3',
 				specClass: 'none',
 				specSelected:{},
 				product:{},
@@ -343,7 +376,17 @@
 				desc: ``,
 				sizeList:[],
 				colorList:[],
+				deliveryMethodList:[
+					{name: '快递',value: 1,active: false, visible:false},
+					{name: '快运',value: 2,active: false, visible:false},
+					{name: '物流',value: 3,active: false, visible:false},
+				],
 				tabCurrentIndex:0,
+				bgColor: "#F2F3F5",
+				color: '#323233',
+				disabled: false,
+				step: 1,
+				shoppingNum: 1,
 				navList: [
 					{state: 0,text: '商品介绍'},
 					{state: 1,text: '详细参数'},
@@ -354,7 +397,7 @@
 		computed: {
 			...mapState(['hasLogin','userInfo','weChat'])
 		},
-		async onLoad(options){
+		onLoad(options){
 			//接收传值,id里面放的是标题，因为测试数据并没写id 
 			this.id = options.id;
 			this.initData()
@@ -393,6 +436,18 @@
 						}
 						this.favorite=this.product.isFavorite==1
 						this.$refs.article.setContent(this.product.introductory);
+						console.log("this.product.deliveryMethod>>>"+this.product.deliveryMethod)
+						if(this.product.deliveryMethod){
+							let arr = this.product.deliveryMethod.split(",")
+							for(let item of arr){
+								for(let obj of this.deliveryMethodList){
+									if(obj.value == item){
+										obj.visible = true
+									}
+								}
+							}
+							console.log("this.deliveryMethodList>>>>>"+this.deliveryMethodList)
+						}
 					}else{
 						this.$api.msg('未找到产品信息')
 						uni.navigateBack()
@@ -577,6 +632,12 @@
 					}
 				})
 			},
+			selectDeliveryMethod(item){
+				for(let obj of this.deliveryMethodList){
+					obj.active =false
+				}
+				item.active = true
+			},
 			removeItemSpecSelected(type){
 				this.specSelected.forEach(item=>{
 					if(item.type === type){ 
@@ -667,20 +728,44 @@
 					factoryName:this.product.factoryName,
 					productInfoList:[]
 				}
-				let newPro = this.product
-				newPro.productNum=1
+				
+				/* newPro.productNum=1
 				newPro.productId=this.product.id
 				newPro.chooseProductColor=this.specSelected
 				newPro.color=this.specSelected.color
 				newPro.imgPath=this.specSelected.imgPath
-				delete newPro.introductory
-				goods.productInfoList.push(newPro)
+				delete newPro.introductory */
+				let totalMoney = 0
+				for(let item of this.product.orderProductColorList){
+					if(item.shoppingNum){
+						let newPro = {
+							productName:this.product.productName,//商品名称
+							factoryNo:this.product.factoryNo,
+							factoryName:this.product.factoryName,
+							factoryShortName:this.product.factoryShortName,
+						}
+						newPro.productNum=item.shoppingNum
+						newPro.productId=this.product.id
+						newPro.chooseProductColor=item
+						newPro.color=item.color
+						newPro.imgPath=item.imgPath
+						delete newPro.introductory
+						goods.productInfoList.push(newPro)
+						totalMoney += item.salePrice * item.shoppingNum
+					}
+				}
+				if(goods.productInfoList.length===0){
+					this.$api.msg('请先选择需要购买的商品数量')
+					this.specClass = 'show'
+					return
+				}
 				goodsList.push(goods)
 				console.log("goodsList",goodsList)
 				uni.navigateTo({
 					url: `/pagesProduct/order/createOrder?data=${JSON.stringify({
 						goodsList: goodsList,
-						totalMoney: this.specSelected.price
+						/* totalMoney: this.specSelected.price */
+						totalMoney: totalMoney
 					})}`
 				})
 			},
@@ -708,6 +793,43 @@
 					}else{
 						this.$api.msg(r.msg||'网络错误请重试')
 					}
+					uni.hideLoading()
+				}).catch(e=>{
+					console.log('请求错误：',e)
+					this.$api.msg(e.msg||'网络错误请重试')
+					uni.hideLoading()
+				})
+			},
+			//批量加入购物车
+			batchAddCart(){
+				if(this.userInfo.ifVip!=2||this.userInfo.vipState!=1){
+					//不是vip用户
+					if(this.product.ifVip==2||(this.userInfo.tag==1&&!this.product.isBuy)){
+						this.$api.msg('你没有权限购买该物品，需成为VIP会员后才可购买。')
+						return
+					}
+				}
+				let objList = []
+				for(let item of this.product.orderProductColorList){
+					if(item.shoppingNum){
+						let obj = {
+							userId: this.userInfo.id,
+							productId: this.product.id,
+							productColorId: item.id,
+							productNum: item.shoppingNum
+						}
+						objList.push(obj)
+					}
+				}
+				if(objList.length===0){
+					this.$api.msg('请先选择需要购买的商品数量')
+					this.specClass = 'show'
+					return
+				}
+				this.$api.loading('请求中...')
+				this.$api.httpPost('shoppingCart/api/batchAdd',objList).then(r=>{
+					console.log('请求结果：',r)
+					this.$api.msg(r.msg||'添加成功')
 					uni.hideLoading()
 				}).catch(e=>{
 					console.log('请求错误：',e)
@@ -902,6 +1024,8 @@
 			width: 140upx;
 		}
 		.con{
+			display: flex;
+			flex-wrap: wrap;
 			flex: 1;
 			color: $font-color-dark;
 			.selected-box{
@@ -1157,10 +1281,67 @@
 			/* align-items: center; */
 			justify-content: left;
 			flex-wrap: wrap;
-			height: 550rpx;
+			flex-direction: column;
+			/* height: 550rpx; */
+			margin-bottom: 20upx;
+			
+			
 			
 			.select-box{
 				display: flex;
+				flex-wrap: wrap;
+				align-items: center;
+				justify-content: center;
+				/* background: #eee; */
+				margin-right: 20upx;
+				margin-bottom: 20upx;
+				border-radius: 10rpx;
+				min-width: 120rpx;
+				height: 60rpx;
+				/* border: 1upx solid $border-color-light; */
+				
+				.line-box {
+					flex-basis: 100%;
+				}
+				.number-box {
+					margin-left: auto;
+				}
+				
+				image{
+					width: 60rpx;
+					height: 60rpx;
+				}
+				text{
+					font-size: 20rpx;
+					/* color: $font-color-dark; */
+					margin: 20rpx;
+				}
+			}
+			
+			/* .selected{
+				background: #fbebee;
+				text{
+					color: $uni-color-primary;
+					margin: 20rpx;
+
+				}
+			} */
+		}
+		
+		.item-list-2{
+			padding: 20upx 0 0;
+			display: flex;
+			align-items: center;
+			justify-content: left;
+			flex-wrap: wrap;
+			/* height: 550rpx; */
+			margin-bottom: 20upx;
+			
+			
+			
+			.select-box{
+				display: flex;
+				flex-wrap: wrap;
 				align-items: center;
 				justify-content: center;
 				background: #eee;
@@ -1169,13 +1350,22 @@
 				border-radius: 10rpx;
 				min-width: 120rpx;
 				height: 60rpx;
+				/* border: 1upx solid $border-color-light; */
+				
+				.line-box {
+					flex-basis: 100%;
+				}
+				.number-box {
+					margin-left: auto;
+				}
+				
 				image{
 					width: 60rpx;
 					height: 60rpx;
 				}
 				text{
 					font-size: 20rpx;
-					color: $font-color-dark;
+					/* color: $font-color-dark; */
 					margin: 20rpx;
 				}
 			}
@@ -1185,7 +1375,7 @@
 				text{
 					color: $uni-color-primary;
 					margin: 20rpx;
-
+		
 				}
 			}
 		}

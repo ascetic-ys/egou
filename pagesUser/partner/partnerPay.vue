@@ -149,7 +149,7 @@
 					if(r.code==0){
 						this.$api.msg(r.msg||'操作成功')
 						uni.switchTab({
-							url: `/pagesUser/user/user`
+							url: `/pages/user/user`
 						})
 					}else{
 						this.disabledPay=false

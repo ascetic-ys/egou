@@ -14,7 +14,7 @@
 					<text :class="{active: params.isAsc === 'desc' && params.orderByColumn === 'factoryPrice'}" class="yticon icon-shang xia" @click="tabClick('factoryPrice','desc')"></text>
 				</view>
 			</view>
-			<text class="cate-item yticon icon-fenlei1" @click="toggleCateMask('show')"></text>
+			<text class="cate-item jyticon icon-fenlei1" @click="toggleCateMask('show')"></text>
 		</view>
 		<mescroll-body :up='upOption' @down="downCallback" @up="upCallback" @init="mescrollInit">
 			<view class="goods-list">
@@ -63,7 +63,7 @@
 							</view>
 						</view>
 					</view>
-					<view class="attr-list">
+					<!-- <view class="attr-list">
 						<text>颜色</text>
 						<view class="item-list">
 							<text 
@@ -75,7 +75,7 @@
 								{{item.name}}
 							</text>
 						</view>
-					</view>
+					</view> -->
 					<view class="attr-list" v-for="item in cateList" :key="item.id">
 						<text>{{item.orderProductCategory}}</text>
 						<view class="item-list">
@@ -142,8 +142,8 @@
 			if(options.ifVip){
 				this.params.ifVip=options.ifVip
 			}
-			this.sizeList = await this.$api.json('sizeList')
-			this.colorList = await this.$api.json('colorList')
+			/* this.sizeList = await this.$api.json('sizeList')
+			this.colorList = await this.$api.json('colorList') */
 			this.loadCateList()
 			this.loadData()
 		},
