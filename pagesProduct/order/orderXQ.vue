@@ -214,6 +214,7 @@
 					id:this.orderInfo.id
 				}).then(r=>{
 					console.log('请求结果：',r)
+					uni.hideLoading()
 					if(r.code==0){
 						this.$api.msg(r.msg||'取消成功')
 						uni.navigateTo({
@@ -223,12 +224,11 @@
 						this.submitDisabled=false
 						this.$api.msg(r.msg||'网络错误请重试')
 					}
-					uni.hideLoading()
 				}).catch(e=>{
+					uni.hideLoading()
 					this.submitDisabled=false
 					console.log('请求错误：',e)
 					this.$api.msg(e.msg||'网络错误请重试')
-					uni.hideLoading()
 				})
 			},
 			// 物流

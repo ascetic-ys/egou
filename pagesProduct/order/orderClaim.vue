@@ -235,6 +235,7 @@
 				this.$api.loading('请求中...')
 				this.$api.httpPost('claims/api/save',this.params).then(r=>{
 					console.log('请求结果：',r)
+					uni.hideLoading()
 					if(r.code==0){
 						this.$api.msg(r.msg||'提交成功')
 						uni.navigateTo({
@@ -244,12 +245,11 @@
 						this.submitDisabled=false
 						this.$api.msg(r.msg||'网络错误请重试')
 					}
-					uni.hideLoading()
 				}).catch(e=>{
 					this.submitDisabled=false
+					uni.hideLoading()
 					console.log('请求错误：',e)
 					this.$api.msg(e.msg||'网络错误请重试')
-					uni.hideLoading()
 				})
 			},
 			//订单状态文字和颜色

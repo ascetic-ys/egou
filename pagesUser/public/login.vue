@@ -113,6 +113,7 @@
 					return this.$api.httpPost('userInfo/api/login',this.form)
 				}).then(r=>{
 					console.log('登录请求响应：',r)
+					uni.hideLoading();
 					if(r.code==0){
 						uni.hideLoading();
 						console.log("登录成功：",r)
@@ -126,7 +127,6 @@
 					}else{
 						this.$api.msg(r.msg||'网络异常请重试')
 					}
-					uni.hideLoading();
 				}).catch(e=>{
 					uni.hideLoading();
 					console.log("登录请求错误：",e)

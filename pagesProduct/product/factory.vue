@@ -82,7 +82,8 @@
 					orderByColumn:'',
 					isAsc:'',
 					factoryNo: this.factoryNo,
-					largeCategory: this.category
+					largeCategory: this.category,
+					state: 3
 				}).then(r=>{
 					this.productList = r.rows
 				}).catch(e=>{

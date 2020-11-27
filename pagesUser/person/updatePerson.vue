@@ -116,6 +116,7 @@
 				this.$api.loading('请求中...')
 				this.$api.httpPost('userInfo/api/update',this.userInfo).then(r=>{
 					console.log('修改请求响应：',r)
+					uni.hideLoading();
 					if(r.code==0){
 						this.$api.msg(r.msg||'修改成功')
 						this.login(this.userInfo)
@@ -123,11 +124,10 @@
 					}else{
 						this.$api.msg(r.msg||'网络异常请重试')
 					}
-					uni.hideLoading();
 				}).catch(e=>{
 					console.log("修改请求错误：",e)
-					this.$api.msg(e.msg||'网络异常请重试')
 					uni.hideLoading();
+					this.$api.msg(e.msg||'网络异常请重试')
 				})
 			},
 			//校验参数

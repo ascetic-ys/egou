@@ -124,6 +124,7 @@
 				params.type=1
 				this.$api.httpPost('wechatPayInfo/api/payMoney',params).then(r=>{
 					console.log("支付结果：",r)
+					uni.hideLoading()
 					if(r.code==0){
 						let _this = this
 						uni.requestPayment({
@@ -151,7 +152,6 @@
 						this.$api.msg(r.msg||'网络异常请重试')
 						this.disabledPay=false;
 					}
-					uni.hideLoading()
 				}).catch(e=>{
 					console.log("请求错误：",e)
 					uni.hideLoading()

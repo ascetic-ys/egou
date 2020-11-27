@@ -142,6 +142,9 @@
 			if(options.ifVip){
 				this.params.ifVip=options.ifVip
 			}
+			if(options.isOpenGroup){
+				this.params.isOpenGroup=options.isOpenGroup
+			}
 			/* this.sizeList = await this.$api.json('sizeList')
 			this.colorList = await this.$api.json('colorList') */
 			this.loadCateList()
@@ -221,20 +224,21 @@
 				return this.$api.httpPost('productInfo/api/list',{
 					pageNum,
 					pageSize,
+					state: 3,
 					...this.params
 				}).then(r=>{
 					console.log("请求结果：",r)
+					uni.hideLoading();
 					if(pageNum===1){
 						this.goodsList=r.rows
 					}else{
 						this.goodsList=this.goodsList.concat(r.rows)
 					}
-					uni.hideLoading();
 					return r
 				}).catch(e=>{
 					console.log("请求错误：",e)
-					this.$api.msg(e.msg||'网络异常请重试')
 					uni.hideLoading();
+					this.$api.msg(e.msg||'网络异常请重试')
 				})
 			},
 			//加载分类

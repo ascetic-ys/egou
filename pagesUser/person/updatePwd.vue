@@ -89,6 +89,7 @@
 					this.$api.loading('请求中...')
 					this.$api.httpPost('userInfo/api/updatePassword',this.form).then(r=>{
 						console.log('请求响应：',r)
+						uni.hideLoading();
 						if(r.code==0){
 							this.$api.msg(r.msg||'修改成功')
 							this.logout()
@@ -98,11 +99,10 @@
 						}else{
 							this.$api.msg(r.msg||'网络异常请重试')
 						}
-						uni.hideLoading();
 					}).catch(e=>{
 						console.log("请求错误：",e)
-						this.$api.msg(e.msg||'网络异常请重试')
 						uni.hideLoading();
+						this.$api.msg(e.msg||'网络异常请重试')
 					})
 				}
 			},

@@ -318,8 +318,8 @@
 					uni.hideLoading();
 				}).catch(e=>{
 					console.log("请求错误：",e)
-					this.$api.msg(e.msg||'网络异常请重试')
 					uni.hideLoading();
+					this.$api.msg(e.msg||'网络异常请重试')
 				})
 			},
 			startTimeout(){
@@ -354,6 +354,7 @@
 								})
 					}).then(r=>{
 						console.log('城市渠道商注册请求响应：',r)
+						uni.hideLoading();
 						if(r.code==0){
 							this.partner=r.data
 							// this.$api.msg(r.msg||'注册成功')
@@ -364,12 +365,11 @@
 							this.regBtnDisabled=false
 							this.$api.msg(r.msg||'网络异常请重试')
 						}
-						uni.hideLoading();
 					}).catch(e=>{
 						this.regBtnDisabled=false
 						console.log("注册请求错误：",e)
-						this.$api.msg(e.msg||'网络异常请重试')
 						uni.hideLoading();
+						this.$api.msg(e.msg||'网络异常请重试')
 					})
 				}
 			},

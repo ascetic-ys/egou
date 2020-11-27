@@ -120,6 +120,7 @@
 				this.$api.loading('请求中...')
 				this.$api.httpPost(url,this.form).then(r=>{
 					console.log("请求结果：",r)
+					uni.hideLoading();
 					if(r.code==0){
 						//this.$api.prePage()获取上一页实例，可直接调用上页所有数据和方法，在App.vue定义
 						this.$api.prePage().refreshList();
@@ -127,14 +128,13 @@
 					}else{
 						this.$api.msg(r.msg||'网络异常请重试')
 					}
-					uni.hideLoading();
 					setTimeout(()=>{
 						uni.navigateBack()
 					}, 800)
 				}).catch(e=>{
 					console.log("请求错误：",e)
-					this.$api.msg(e.msg||'网络异常请重试')
 					uni.hideLoading();
+					this.$api.msg(e.msg||'网络异常请重试')
 				})
 			},
 			validateForm(){
@@ -176,6 +176,7 @@
 				this.$api.loading('请求中...')
 				this.$api.httpPost('userInfo/api/deleteConsigneeInfo',{ids:this.form.id}).then(r=>{
 					console.log("请求结果：",r)
+					uni.hideLoading();
 					if(r.code==0){
 						//this.$api.prePage()获取上一页实例，可直接调用上页所有数据和方法，在App.vue定义
 						this.$api.prePage().refreshList();
@@ -183,14 +184,13 @@
 					}else{
 						this.$api.msg(r.msg||'网络异常请重试')
 					}
-					uni.hideLoading();
 					setTimeout(()=>{
 						uni.navigateBack()
 					}, 800)
 				}).catch(e=>{
 					console.log("请求错误：",e)
-					this.$api.msg(e.msg||'网络异常请重试')
 					uni.hideLoading();
+					this.$api.msg(e.msg||'网络异常请重试')
 				})
 			}
 		}

@@ -106,6 +106,7 @@
 							signType: r.data.resp.signType,
 							paySign: r.data.resp.sign,
 							success: function (res) {
+								uni.hideLoading()
 								console.log('success:' + JSON.stringify(res));
 								// this.$api.msg(r.msg||'支付成功')
 								//跳转至支付结果
@@ -114,16 +115,18 @@
 								})
 							},
 							fail: function (err) {
+								uni.hideLoading()
 								console.log('fail:' + JSON.stringify(err));
 								_this.$api.msg(err||'网络异常请重试')
 								_this.disabledPay=false;
 							}
 						});
 					}else{
+						uni.hideLoading()
 						this.$api.msg(r.msg||'网络异常请重试')
 						this.disabledPay=false;
 					}
-					uni.hideLoading()
+					
 				}).catch(e=>{
 					console.log("请求错误：",e)
 					uni.hideLoading()

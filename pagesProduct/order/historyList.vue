@@ -104,6 +104,7 @@
 					...this.params
 				}).then(r=>{
 					console.log("请求结果：",r)
+					uni.hideLoading();
 					let data = []
 					r.rows.forEach(e=>{
 						e.favorite=e.isFavorite==1
@@ -114,12 +115,11 @@
 					}else{
 						this.goodsList=this.goodsList.concat(data)
 					}
-					uni.hideLoading();
 					return r
 				}).catch(e=>{
 					console.log("请求错误：",e)
-					this.$api.msg(e.msg||'网络异常请重试')
 					uni.hideLoading();
+					this.$api.msg(e.msg||'网络异常请重试')
 				})
 			},
 			//详情
@@ -146,17 +146,17 @@
 					userId:this.userInfo.id
 				}).then(r=>{
 					console.log("请求结果：",r)
+					uni.hideLoading();
 					if(r.code==0){
 						item.favorite = !item.favorite;
 						this.$api.msg('收藏成功')
 					}else{
 						this.$api.msg('收藏失败')
 					}
-					uni.hideLoading();
 				}).catch(e=>{
 					console.log("请求错误：",e)
-					this.$api.msg(e.msg||'网络异常请重试')
 					uni.hideLoading();
+					this.$api.msg(e.msg||'网络异常请重试')
 				})
 			},
 			//取消收藏
@@ -167,17 +167,17 @@
 					productId:item.productId
 				}).then(r=>{
 					console.log("请求结果：",r)
+					uni.hideLoading();
 					if(r.code==0){
 						item.favorite = !item.favorite;
 						this.$api.msg('取消收藏成功')
 					}else{
 						this.$api.msg('取消收藏失败')
 					}
-					uni.hideLoading();
 				}).catch(e=>{
 					console.log("请求错误：",e)
-					this.$api.msg(e.msg||'网络异常请重试')
 					uni.hideLoading();
+					this.$api.msg(e.msg||'网络异常请重试')
 				})
 			},
 			stopPrevent(){}

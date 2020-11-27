@@ -23,23 +23,6 @@
 					</view>
 				</swiper-item>
 			</swiper>
-			<!-- <view class="image-wrapper">
-				<image
-					:src="product.imgPath||`http://img5.imgtn.bdimg.com/it/u=1957887963,2553893514&fm=26&gp=0.jpg`" 
-					class="loaded" 
-					mode="aspectFill"
-				></image>
-			</view> -->
-			<!-- <view class="video-wrapper">
-				<video id="myVideo" :src="videoSrc" @error="videoErrorCallback" 
-				controls 
-				autoplay='true' 
-				loop="true" 
-				enable-play-gesture="true" 
-				show-mute-btn="true" 
-				muted="true" 
-				></video>
-			</view> -->
 		</view>
 		
 		<view class="introduce-section">
@@ -53,36 +36,42 @@
 				</view>
 				<view class="image-download"><text class="yticon icon-Group-" @click="downloadImage">素材下载</text></view>
 			</view>
-			<!-- <view class="bot-row">
-				<text>销量: 108</text>
-				<text>库存: 4690</text>
-				<text>浏览量: 768</text>
-			</view> -->
 		</view>
 		
-		<!--  分享 -->
-		<!-- <view class="share-section" @click="share">
-			<view class="share-icon">
-				<text class="yticon icon-xingxing"></text>
-				 返
+		<view class="c-list" v-if="groupMemberHeadList.length>0">
+			<view class="sectionRow b-b">
+				<u-section :show-line="false" font-size="26" :right="false" :bold="false" :title="groupMemberHeadList.length+'人在拼单，可直接参与'" sub-title="查看更多"></u-section>
 			</view>
-			<text class="tit">该商品分享可领49减10红包</text>
-			<text class="yticon icon-bangzhu1"></text>
-			<view class="share-btn">
-				立即分享
-				<text class="yticon icon-you"></text>
-			</view>
+			<block v-for="(item,index) in groupMemberHeadList" :key="index">
+				<template>
+					<view class="c-row b-b">
+						<u-avatar :src="item.imgPath"  size="mini"></u-avatar>
+						<view class="user-name" >{{item.userName}}</view>
+						
+						<view class="toRight">
+							<view class="text-box">
+								<view class="">还差<text style="color: #e60003;">{{item.totalPeople-item.joinPeople}}人</text>拼成</view>
+								
+								<view class="" style="margin-top: 4upx;">
+									还剩
+									<u-count-down font-size="22" :show-days="false" :timestamp="item.leftTime"></u-count-down>
+								</view>
+							</view>
+							<view class="group-btn" @click="openSelect(4,item)">去拼单</view>
+						</view>
+					</view>
+				</template>
+				
+			</block>
 			
-		</view> -->
+
+		</view>
+		
 		
 		<view class="c-list">
-			<view class="c-row b-b" @click="toggleSpec" v-if="product.orderProductColorList.length>0">
+			<view class="c-row b-b" @click="toggleSpec" v-if="!groupProduct&&product.orderProductColorList.length>0">
 				<text class="tit">已选购</text>
 				<view class="con">
-					<!-- <view class="selected-box">
-						<image :src="specSelected.imgPath||'/static/errorImage.jpg'" mode="aspectFit"></image>
-						<text class="selected-text">{{specSelected.color}}</text>
-					</view> -->
 					<view class="selected-box" v-for="(item,index) in product.orderProductColorList" :key="index">
 						<template v-if="item.shoppingNum">
 							<image :src="item.imgPath||'/static/errorImage.jpg'" mode="aspectFit"></image>
@@ -92,33 +81,6 @@
 				</view>
 				<text class="yticon icon-you"></text>
 			</view>
-		<!-- 	<view class="c-row b-b">
-				<text class="tit">优惠券</text>
-				<text class="con t-r red">领取优惠券</text>
-				<text class="yticon icon-you"></text>
-			</view> -->
-			<!-- <view class="c-row b-b">
-				<text class="tit">促销活动</text>
-				<view class="con-list">
-					<text>新人首单送20元无门槛代金券</text>
-					<text>订单满50减10</text>
-					<text>订单满100减30</text>
-					<text>单笔购买满两件免邮费</text>
-				</view>
-			</view> -->
-			<!-- <view class="c-row b-b">
-				<text class="tit">服务</text>
-				<view class="bz-list con">
-					<text>7天无理由退换货 ·</text>
-					<text>假一赔十 ·</text>
-				</view>
-			</view> -->
-			<!-- <view class="c-row b-b">
-				<text class="tit">厂家:</text>
-				<view class="bz-list con">
-					<text>{{product.factoryShortName}}</text>
-				</view>
-			</view> -->
 			<view class="c-row b-b">
 				<text class="tit">保障:</text>
 				<view class="bz-list con">
@@ -127,26 +89,6 @@
 			</view>
 		</view>
 		
-		<!-- 评价 -->
-		<!-- <view class="eva-section">
-			<view class="e-header">
-				<text class="tit">评价</text>
-				<text>(86)</text>
-				<text class="tip">好评率 100%</text>
-				<text class="yticon icon-you"></text>
-			</view> 
-			<view class="eva-box">
-				<image class="portrait" src="http://img3.imgtn.bdimg.com/it/u=1150341365,1327279810&fm=26&gp=0.jpg" mode="aspectFill"></image>
-				<view class="right">
-					<text class="name">Leo yo</text>
-					<text class="con">商品收到了，79元两件，质量不错，试了一下有点瘦，但是加个外罩很漂亮，我很喜欢</text>
-					<view class="bot">
-						<text class="attr">购买类型：XL 红色</text>
-						<text class="time">2019-04-01 19:21</text>
-					</view>
-				</view>
-			</view>
-		</view> -->
 		<view class="navbar">
 			<view 
 				v-for="(item, index) in navList" :key="index" 
@@ -230,19 +172,11 @@
 		</view>
 		
 		<!-- 底部操作菜单 -->
-		<view class="page-bottom" v-if="[1,4].indexOf(userInfo.tag)>-1">
+		<!-- <view class="page-bottom" v-if="[1,4].indexOf(userInfo.tag)>-1">
 			<navigator :url="`/pagesProduct/product/factory?factoryNo=${product.factoryNo}`" open-type="navigate" class="p-b-btn">
 				<text class="yticon icon-xiatubiao--copy"></text>
 				<text>店铺</text>
 			</navigator>
-			<!-- <navigator url="/pages/index/index" open-type="switchTab" class="p-b-btn">
-				<text class="yticon icon-xiatubiao--copy"></text>
-				<text>首页</text>
-			</navigator> -->
-			<!-- <button class="p-b-btn btn-service" open-type="contact" @click="navTo" @contact="getContact">
-				<text class="yticon icon-xiaoxi"></text>
-				<text class="btn-name">客服</text>
-			</button> -->
 			<button class="p-b-btn btn-service" open-type="contact" @click="navTo2">
 				<text class="yticon icon-xiaoxi"></text>
 				<text class="btn-name">客服</text>
@@ -259,6 +193,35 @@
 			<view class="action-btn-group">
 				<button type="primary" class=" action-btn no-border buy-now-btn" @click="buy">立即购买</button>
 				<button type="primary" class=" action-btn no-border add-cart-btn" @click="batchAddCart">加入购物车</button>
+			</view>
+		</view> -->
+		
+		
+		
+		
+		<view class="navigation" v-if="[1,4].indexOf(userInfo.tag)>-1">
+			<view class="left">
+				<view class="item" @click="navTo2">
+					<u-icon name="server-fill" :size="40" :color="$u.color['contentColor']"></u-icon>
+					<view class="text u-line-1">客服</view>
+				</view>
+				<view class="item" @click="goStore">
+					<u-icon name="home" :size="40" :color="$u.color['contentColor']"></u-icon>
+					<view class="text u-line-1">店铺</view>
+				</view>
+				<view class="item car" @click="goCart">
+					<u-badge class="car-num" :count="count" type="error" :offset="[-3, -6]"></u-badge>
+					<u-icon name="shopping-cart" :size="40" :color="$u.color['contentColor']"></u-icon>
+					<view class="text u-line-1">购物车</view>
+				</view>
+			</view>
+			<view class="right" v-if="!groupProduct">
+				<view class="cart btn u-line-1" @click="openSelect(1)">加入购物车</view>
+				<view class="buy btn u-line-1" @click="openSelect(2)">立即购买</view>
+			</view>
+			<view class="right" v-if="groupProduct">
+				<view class="singleBuy btn u-line-1" @click="openSelect(2)">单独购买</view>
+				<view class="group btn u-line-1" @click="openSelect(3)">发起拼团</view>
 			</view>
 		</view>
 		
@@ -300,6 +263,19 @@
 					</view>
 				</view> -->
 				<scroll-view class="attr-list" v-if="product.orderProductColorList.length>0" scroll-y>
+					<text>发运方式</text>
+					<view class="item-list-2">
+						<view 
+							v-for="(item, index) in deliveryMethodList " 
+							:key="index" class="select-box"
+							:class="{selected: item.active}"
+							@click="selectDeliveryMethod(item)"
+						>
+							<template v-if="item.visible">
+								<text class="tit">{{item.name}}</text>
+							</template>
+						</view>
+					</view>
 					<text>颜色</text>
 					<view class="item-list">
 						<view 
@@ -312,40 +288,30 @@
 							</view>
 							<image :src="item.imgPath||'/static/errorImage.jpg'" mode="aspectFit"></image>
 							<text class="tit">{{item.color}}</text>
-							<view class="number-box">
+							<view class="number-box" >
 								<text>￥{{item.salePrice||'-'}}</text>
 								<text>库存：{{item.stockNum||'-'}}</text>
-								<u-number-box v-model="item.shoppingNum" :bg-color="bgColor" :color="color" :min="0"
+								<u-number-box v-model="item.shoppingNum" :long-press="false"   :bg-color="bgColor" :color="color" 
+								
 								:step="step" :disabled="disabled" ></u-number-box>
 							</view>
+							
 							<view class="line-box" v-if="index === product.orderProductColorList.length-1">
 								<u-line></u-line>
 							</view>
 						</view>
 					</view>
-					<!-- <text>发运方式</text>
-					<view class="item-list-2">
-						<view 
-							v-for="(item, index) in deliveryMethodList " 
-							:key="index" class="select-box"
-							:class="{selected: item.active}"
-							@click="selectDeliveryMethod(item)"
-						>
-							<template v-if="item.visible">
-								<text class="tit">{{item.name}}</text>
-							</template>
-						</view>
-					</view> -->
 				</scroll-view>
-				<button class="btn" @click="toggleSpec">完成</button>
+				<button v-if="cartBtnShow" class="btn" @click="batchAddCart">确定</button>
+				<button v-if="buyBtnShow" class="btn" @click="buy">确定</button>
+				<button v-if="groupBtnShow" class="btn" @click="startGroup">确定</button>
+				<button v-if="joinGroupBtnShow" class="btn" @click="joinGroup">确定</button>
+				<view v-if="selectShow" class="btn-group">
+					<view  class="cartBtn" @click="batchAddCart">加入购物车</view>
+					<view  class="buyBtn" @click="buy">立即购买</view>
+				</view>
 			</view>
 		</view>
-		<!-- 分享 -->
-		<!-- <share 
-			ref="share" 
-			:contentHeight="580"
-			:shareList="shareList"
-		></share> -->
 	</view>
 </template>
 
@@ -353,19 +319,15 @@
 	import jyfParser from '@/components/jyf-parser/jyf-parser'; // HBuilderX 2.5.5 及以上可以不需要
 	import {mapState} from 'vuex';
 	import share from '@/components/share';
-	//import uNumberBox from '@/components/uview-ui/u-number-box/u-number-box.vue';
-	
 	
 	export default{
 		components: {
 			share,
 			jyfParser,
-			//uNumberBox
 		},
 		data() {
 			return {
 				id:null,
-				// videoSrc:'/static/video/banner.mp4',
 				specClass: 'none',
 				specSelected:{},
 				product:{},
@@ -377,7 +339,7 @@
 				sizeList:[],
 				colorList:[],
 				deliveryMethodList:[
-					{name: '快递',value: 1,active: false, visible:false},
+					{name: '快递',value: 1,active: true, visible:false},
 					{name: '快运',value: 2,active: false, visible:false},
 					{name: '物流',value: 3,active: false, visible:false},
 				],
@@ -392,7 +354,29 @@
 					{state: 1,text: '详细参数'},
 					{state: 2,text: '服务规则'},
 				],
+				count: 0,//购物车总数
+				selectShow: false,
+				cartBtnShow: false,
+				buyBtnShow: false,
+				groupBtnShow: false,
+				joinGroupBtnShow: false,
+				groupProduct: undefined,//拼团信息,
+				groupMember: undefined,//拼团信息,
+				groupMemberHeadList: [],//拼团团长信息列表
+				freightTemplate: {},//运费模板
+				limitNum: 0,//单独起始购买数量
+				quantityLimit: 0,//拼团起始购买数量
 			};
+		},
+		watch:{
+			groupProduct: {
+				handler: function (val, oldVal) { 
+					if(val){
+						this.getGroupMemberHeadList()
+					}
+				},
+				deep: true
+			},
 		},
 		computed: {
 			...mapState(['hasLogin','userInfo','weChat'])
@@ -401,16 +385,64 @@
 			//接收传值,id里面放的是标题，因为测试数据并没写id 
 			this.id = options.id;
 			this.initData()
-			// this.sizeList = await this.$api.json('sizeList')
-			// this.colorList = await this.$api.json('colorList')
-			//规格 默认选中第一条
-			// this.$set(this.sizeList[0], 'selected', true);
-			// this.$set(this.colorList[0], 'selected', true);
-			// this.specSelected.push(this.sizeList[0]);
-			// this.specSelected.push(this.colorList[0]);
-			// this.shareList = await this.$api.json('shareList');
+			this.getCartCount()
 		},
 		methods:{
+			//获取运费模板
+			getFreightTemplate(){
+				let id = this.product.freightTemplateId
+				if(this.groupProduct){
+					id = this.groupProduct.freightTemplateId
+				}
+				this.$api.httpPost('freightTemplate/api/detail',{
+					id: id,
+				}).then(r=>{
+					this.freightTemplate = r.data
+				}).catch(e=>{
+					this.$api.msg(e.msg||'网络异常请重试')
+				})
+			},
+			//获取拼团列表
+			getGroupMemberHeadList() {
+				this.$api.httpPost('groupMember/api/groupMemberHeadList',{
+					productId:this.groupProduct.productId,
+					groupProductId:this.groupProduct.id
+				}).then(r=>{
+					this.groupMemberHeadList = r.data
+					/* this.groupMemberHeadList = [
+						{id:1,productId:1,groupProductId:1,orderId:1,totalPeople:3,joinPeople:1,
+						startTime:"",endTime:"",leftTime:86400,userName:"张三",province:"广东",city:"中山",district:"小榄",imgPath:"https://zhonghekeep.com/profile//2020/07/29/57b8c6449022b5fb213981e1a9abc8f7.jpg"},
+						{id:1,productId:1,groupProductId:1,orderId:1,totalPeople:3,joinPeople:2,
+						startTime:"",endTime:"",leftTime:86400,userName:"李四",province:"广东",city:"中山",district:"小榄",imgPath:"https://zhonghekeep.com/profile//2020/07/29/57b8c6449022b5fb213981e1a9abc8f7.jpg"},
+					] */
+				}).catch(e=>{
+					this.$api.msg(e.msg||'网络异常请重试')
+				})
+			},
+			openSelect(index,item){
+				console.log(item)
+				if(index===1){
+					this.cartBtnShow = true
+				}else if(index===2){
+					this.buyBtnShow = true
+				}else if(index===3){
+					this.groupBtnShow =true
+				}else if(index===4){
+					this.joinGroupBtnShow = true
+					this.groupMember = item
+				}
+				this.specClass = 'show'
+			},
+			goCart(){
+				uni.switchTab({
+					url: `/pages/cart/cart`
+				})
+			},
+			goStore(){
+				uni.navigateTo({
+					url: `/pagesProduct/product/factory?factoryNo=${this.product.factoryNo}`
+				})
+			},
 			initData(){
 				this.$api.loading('加载中...')
 				this.$api.httpPost('productInfo/api/detail',{
@@ -418,8 +450,17 @@
 					userId:this.userInfo.id
 				}).then(r=>{
 					console.log("请求结果：",r.data)
+					uni.hideLoading();
 					if(r.data){
 						this.product=r.data
+						if(r.data.groupProduct && r.data.groupProduct.isActivity === 0){
+							this.groupProduct = r.data.groupProduct
+						}
+						this.limitNum = this.product.limitNum
+						console.log(this.limitNum)
+						if(this.groupProduct){
+							this.quantityLimit = this.groupProduct.quantityLimit
+						}
 						if(this.product.orderProductColorList&&this.product.orderProductColorList.length>0){
 							console.log("orderProductColorList",this.product.orderProductColorList)
 							this.$set(this.product.orderProductColorList[0], 'selected', true);
@@ -436,7 +477,6 @@
 						}
 						this.favorite=this.product.isFavorite==1
 						this.$refs.article.setContent(this.product.introductory);
-						console.log("this.product.deliveryMethod>>>"+this.product.deliveryMethod)
 						if(this.product.deliveryMethod){
 							let arr = this.product.deliveryMethod.split(",")
 							for(let item of arr){
@@ -446,18 +486,29 @@
 									}
 								}
 							}
-							console.log("this.deliveryMethodList>>>>>"+this.deliveryMethodList)
 						}
 					}else{
 						this.$api.msg('未找到产品信息')
 						uni.navigateBack()
 					}
-					uni.hideLoading();
+					
 				}).catch(e=>{
 					console.log("请求错误：",e)
-					this.$api.msg(e.msg||'网络异常请重试')
 					uni.hideLoading();
+					this.$api.msg(e.msg||'网络异常请重试')
 				})
+			},
+			getCartCount(){
+				if(this.userInfo.id){
+					this.$api.httpPost('shoppingCart/api/selectCount',{
+						userId:this.userInfo.id
+					}).then(r=>{
+						this.count = r.data
+					}).catch(e=>{
+						this.$api.msg(e.msg||'网络异常请重试')
+					})
+				}
+				
 			},
 			//tab点击
 			tabClick(index){
@@ -605,8 +656,15 @@
 					setTimeout(() => {
 						this.specClass = 'none';
 					}, 250);
+					this.selectShow = false
+					this.cartBtnShow = false
+					this.buyBtnShow = false
+					this.groupBtnShow = false
+					this.joinGroupBtnShow = false
+					this.groupMember = undefined
 				}else if(this.specClass === 'none'){
 					this.specClass = 'show';
+					this.selectShow = true
 				}
 			},
 			//选择尺寸
@@ -674,17 +732,17 @@
 					userId:this.userInfo.id
 				}).then(r=>{
 					console.log("请求结果：",r)
+					uni.hideLoading();
 					if(r.code==0){
 						this.favorite = !this.favorite;
 						this.$api.msg(r.msg||'收藏成功')
 					}else{
 						this.$api.msg(r.msg||'收藏失败')
 					}
-					uni.hideLoading();
 				}).catch(e=>{
 					console.log("请求错误：",e)
-					this.$api.msg(e.msg||'网络异常请重试')
 					uni.hideLoading();
+					this.$api.msg(e.msg||'网络异常请重试')
 				})
 			},
 			//收藏
@@ -699,20 +757,56 @@
 					userId:this.userInfo.id
 				}).then(r=>{
 					console.log("请求结果：",r)
+					uni.hideLoading();
 					if(r.code==0){
 						this.favorite = !this.favorite;
 						this.$api.msg(r.msg||'取消收藏成功')
 					}else{
 						this.$api.msg(r.msg||'取消收藏失败')
 					}
-					uni.hideLoading();
 				}).catch(e=>{
 					console.log("请求错误：",e)
-					this.$api.msg(e.msg||'网络异常请重试')
 					uni.hideLoading();
+					this.$api.msg(e.msg||'网络异常请重试')
 				})
 			},
 			buy(){
+				let data = this.initGoodList()
+				uni.navigateTo({
+					url: `/pagesProduct/order/createOrder?data=${JSON.stringify({
+						goodsList: data.goodsList,
+						totalMoney: data.totalMoney,
+						freightTemplate: this.freightTemplate
+					})}`
+				})
+			},
+			//开团
+			startGroup(){
+				let data = this.initGoodList()
+				uni.navigateTo({
+					url: `/pagesProduct/order/createOrder?data=${JSON.stringify({
+						goodsList: data.goodsList,
+						groupProduct: this.groupProduct,
+						totalMoney: data.totalMoney,
+						freightTemplate: this.freightTemplate
+					})}`
+				})
+			},
+			joinGroup(item){
+				let groupMember = this.groupMember
+				console.log(groupMember)
+				let data = this.initGoodList()
+				uni.navigateTo({
+					url: `/pagesProduct/order/createOrder?data=${JSON.stringify({
+						goodsList: data.goodsList,
+						groupProduct: this.groupProduct,
+						groupMember: groupMember,
+						totalMoney: data.totalMoney,
+						freightTemplate: this.freightTemplate
+					})}`
+				})
+			},
+			initGoodList(){
 				if(this.userInfo.ifVip!=2||this.userInfo.vipState!=1){
 					//不是vip用户
 					if(this.product.ifVip==2||(this.userInfo.tag==1&&!this.product.isBuy)){
@@ -720,7 +814,6 @@
 						return
 					}
 				}
-				
 				let goodsList = [];
 				let goods = {
 					factoryShortName:this.product.factoryShortName,
@@ -728,13 +821,6 @@
 					factoryName:this.product.factoryName,
 					productInfoList:[]
 				}
-				
-				/* newPro.productNum=1
-				newPro.productId=this.product.id
-				newPro.chooseProductColor=this.specSelected
-				newPro.color=this.specSelected.color
-				newPro.imgPath=this.specSelected.imgPath
-				delete newPro.introductory */
 				let totalMoney = 0
 				for(let item of this.product.orderProductColorList){
 					if(item.shoppingNum){
@@ -749,6 +835,11 @@
 						newPro.chooseProductColor=item
 						newPro.color=item.color
 						newPro.imgPath=item.imgPath
+						for(let deliveryMethod of this.deliveryMethodList){
+							if(deliveryMethod.active){
+								newPro.chooseDeliveryMethod=deliveryMethod.name
+							}
+						}
 						delete newPro.introductory
 						goods.productInfoList.push(newPro)
 						totalMoney += item.salePrice * item.shoppingNum
@@ -756,18 +847,12 @@
 				}
 				if(goods.productInfoList.length===0){
 					this.$api.msg('请先选择需要购买的商品数量')
-					this.specClass = 'show'
 					return
 				}
 				goodsList.push(goods)
 				console.log("goodsList",goodsList)
-				uni.navigateTo({
-					url: `/pagesProduct/order/createOrder?data=${JSON.stringify({
-						goodsList: goodsList,
-						/* totalMoney: this.specSelected.price */
-						totalMoney: totalMoney
-					})}`
-				})
+				this.toggleSpec()
+				return {goodsList: goodsList,totalMoney: totalMoney}
 			},
 			//加入购物车
 			addCart(){
@@ -785,6 +870,7 @@
 					productColorId:this.specSelected.id
 				}).then(r=>{
 					console.log('请求结果：',r)
+					uni.hideLoading()
 					if(r.code==0){
 						this.$api.msg(r.msg||'添加成功')
 						uni.switchTab({
@@ -793,11 +879,10 @@
 					}else{
 						this.$api.msg(r.msg||'网络错误请重试')
 					}
-					uni.hideLoading()
 				}).catch(e=>{
 					console.log('请求错误：',e)
-					this.$api.msg(e.msg||'网络错误请重试')
 					uni.hideLoading()
+					this.$api.msg(e.msg||'网络错误请重试')
 				})
 			},
 			//批量加入购物车
@@ -823,18 +908,18 @@
 				}
 				if(objList.length===0){
 					this.$api.msg('请先选择需要购买的商品数量')
-					this.specClass = 'show'
 					return
 				}
 				this.$api.loading('请求中...')
 				this.$api.httpPost('shoppingCart/api/batchAdd',objList).then(r=>{
 					console.log('请求结果：',r)
-					this.$api.msg(r.msg||'添加成功')
+					this.toggleSpec()
 					uni.hideLoading()
+					this.$api.msg(r.msg||'添加成功')
 				}).catch(e=>{
 					console.log('请求错误：',e)
-					this.$api.msg(e.msg||'网络错误请重试')
 					uni.hideLoading()
+					this.$api.msg(e.msg||'网络错误请重试')
 				})
 			},
 			stopPrevent(){}
@@ -1019,6 +1104,38 @@
 			align-items:center;
 			padding: 20upx 30upx;
 			position:relative;
+			
+			.toRight {
+				margin-left: auto;
+				display: flex;
+				
+				.text-box {
+					font-size: 22upx;
+					text-align: right;
+					margin-right: 10upx;
+				}
+				
+				.group-btn{
+					font-size: 26upx;
+					background-color: #e60003;
+					height: 60upx;
+					line-height: 60upx;
+					padding: 0 26upx;
+					color: #FFFFFF;
+					letter-spacing: 4upx;
+					border-radius: 12upx;
+				}
+			}
+			
+			.user-name {
+				margin-left: 20upx;
+				margin-bottom: 10upx;
+			}
+		}
+		
+		.sectionRow {
+			padding: 20upx 30upx;
+			position: relative;
 		}
 		.tit{
 			width: 140upx;
@@ -1435,6 +1552,33 @@
 				color: #fff;
 				margin: 30upx auto 20upx;
 			}
+			.btn-group{
+				display: flex;
+				align-items: center;
+				justify-content: space-around;
+				
+				.cartBtn {
+					width: 300upx;
+					text-align: center;
+					line-height: 66rpx;
+					padding: 0 30rpx;
+					border-radius: 36rpx;
+					color: #ffffff;
+					background-color: #ed3f14;
+					margin-right: 30rpx;
+				}
+				.buyBtn {
+					width: 300upx;
+					text-align: center;
+					line-height: 66rpx;
+					padding: 0 30rpx;
+					border-radius: 36rpx;
+					color: #ffffff;
+					background-color: #ff7900;
+				}
+			}
+			
+			
 		}
 		@keyframes showPopup {
 			0% {
@@ -1474,7 +1618,7 @@
 	.page-bottom{
 		position:fixed;
 		left: 30upx;
-		bottom:30upx;
+		bottom:100upx;
 		z-index: 95;
 		display: flex;
 		justify-content: space-around;
@@ -1564,4 +1708,59 @@
 		}
 	}
 	
+	.navigation {
+		width: 100%;
+		z-index: 99;
+		position:fixed;
+		bottom: 0;
+		display: flex;
+		margin-top: 100rpx;
+		border: solid 2rpx #f2f2f2;
+		background-color: #ffffff;
+		
+		.left {
+			display: flex;
+			font-size: 20rpx;
+			padding: 16rpx 0;
+			.item {
+				margin: 0 30rpx;
+				&.car {
+					text-align: center;
+					position: relative;
+					.car-num {
+						position: absolute;
+						top: -10rpx;
+						right: -10rpx;
+					}
+				}
+			}
+		}
+		.right {
+			display: flex;
+			font-size: 28rpx;
+			align-items: center;
+			width: 100%;
+			
+			.btn {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 50%;
+				height: 100%;
+				color: #ffffff;
+			}
+			.cart {
+				background-color: #e60003;
+			}
+			.buy {
+				background-color: #ff7900;
+			}
+			.singleBuy {
+				background-color: #ffb7b8;
+			}
+			.group {
+				background-color: #e60003;
+			}
+		}
+	}
 </style>

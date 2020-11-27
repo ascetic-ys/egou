@@ -125,6 +125,7 @@
 					payImgPath:this.memberPayRecord.payImgPath
 				}).then(r=>{
 					console.log('请求结果：',r)
+					uni.hideLoading()
 					if(r.code==0){
 						this.$api.msg(r.msg||'操作成功')
 						uni.switchTab({
@@ -134,12 +135,11 @@
 						this.disabledPay=false
 						this.$api.msg(r.msg||'网络错误请重试')
 					}
-					uni.hideLoading()
 				}).catch(e=>{
 					this.disabledPay=false
 					console.log('请求错误：',e)
-					this.$api.msg(e.msg||'网络错误请重试')
 					uni.hideLoading()
+					this.$api.msg(e.msg||'网络错误请重试')
 				})
 			},
 			//确认支付
@@ -169,15 +169,17 @@
 							},
 							fail: function (err) {
 								console.log('fail:' + JSON.stringify(err));
+								uni.hideLoading()
 								_this.$api.msg(err||'网络异常请重试')
 								_this.disabledPay=false;
 							}
 						});
 					}else{
+						uni.hideLoading()
 						this.$api.msg(r.msg||'网络异常请重试')
 						this.disabledPay=false;
 					}
-					uni.hideLoading()
+					
 				}).catch(e=>{
 					console.log("请求错误：",e)
 					uni.hideLoading()

@@ -254,7 +254,16 @@
 			"style": {
 				"navigationBarTitleText": "意见反馈详情"
 			}
-		}]
+		}    ,{
+                    "path" : "activity/groupActivity",
+                    "style" :                                                                                    
+                {
+                    "navigationBarTitleText": "活动页面",
+                    "enablePullDownRefresh": false
+                }
+                
+                }
+            ]
 	},{
 		"root": "pagesUser",
 		"pages": [

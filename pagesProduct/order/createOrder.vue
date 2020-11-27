@@ -39,7 +39,7 @@
 						<text class="title clamp">{{product.productName}}</text>
 						<text class="spec">{{product.chooseProductColor.color}}</text>
 						<view class="price-box">
-							<text class="price">￥{{product.chooseProductColor.price}}</text>
+							<text class="price">￥{{product.chooseProductColor.salePrice}}</text>
 							<text class="number">x {{product.productNum}}</text>
 							<text class="deliveryMethod">发货方式: {{product.chooseDeliveryMethod}}</text>
 						</view>
@@ -65,10 +65,10 @@
 				<text class="cell-tip">￥{{totalMoney}}</text>
 			</view>
 
-			<!--<view class="yt-list-cell b-b">
+			<view class="yt-list-cell b-b">
 				<text class="cell-tit clamp">运费</text>
-				<text class="cell-tip">免运费</text>
-			</view> -->
+				<text class="cell-tip">￥{{fare}}</text>
+			</view>
 			<!-- <view class="yt-list-cell desc-cell">
 				<text class="cell-tit clamp">备注</text>
 				<input class="desc" type="text" v-model="desc" maxlength="20" placeholder="请填写备注信息" placeholder-class="placeholder" />
@@ -146,6 +146,9 @@
 				showInvoice: '不开发票',
 				goodsList:[],
 				totalMoney:null,
+				groupProduct:undefined,//拼团信息
+				groupMember:undefined,//拼团团长信息
+				freightTemplate:undefined,//运费模板信息
 				showImg:'',
 				filePath:'',
 				params:{},
@@ -154,7 +157,9 @@
 				model:'',//品牌型号
 				vin:'',//车辆识别码
 				vehicleType:'',//车辆类型,
-				remarks:''
+				remarks:'',
+				fare: 0,//运费
+				noDeliveryReason: null,//不配送原因
 			}
 		},
 		onLoad(option){
@@ -163,6 +168,9 @@
 			console.log(data);
 			this.goodsList=data.goodsList
 			this.totalMoney=data.totalMoney
+			this.groupProduct=data.groupProduct
+			this.groupMember=data.groupMember
+			this.freightTemplate=data.freightTemplate
 			this.initData()
 		},
 		watch: {
@@ -195,6 +203,21 @@
 						}
 					})
 				})
+			},
+			//计算运费
+			countFare(){
+				//优先级 不配送 - 配送 - 包邮
+				for(item of this.freightTemplate.templateDetailList){
+					if(addressData.province == item.cityName){
+						if(item.type==0){
+							//配送
+							this.fare = item.firstPrice
+						}else {
+							//不配送
+							this.noDeliveryReason = '该地区受某些原因不支持配送，敬请谅解'
+						}
+					}
+				}
 			},
 			initAddressInfo(){
 				//获取默认地址
@@ -296,6 +319,7 @@
 				this.$api.httpPost('orderMainInfo/api/save',this.params
 				).then(r=>{
 					console.log('请求结果：',r)
+					uni.hideLoading()
 					if(r.code==0){
 						// this.$api.msg(r.msg||'添加成功')
 						uni.navigateTo({
@@ -305,12 +329,11 @@
 						this.submitDisabled=false
 						this.$api.msg(r.msg||'网络错误请重试')
 					}
-					uni.hideLoading()
 				}).catch(e=>{
+					uni.hideLoading()
 					this.submitDisabled=false
 					console.log('请求错误：',e)
 					this.$api.msg(e.msg||'网络错误请重试')
-					uni.hideLoading()
 				})
 			},
 			//
@@ -343,7 +366,7 @@
 							productNum:e.productNum,//商品数量
 							unitPrice:e.chooseProductColor.salePrice,//单价
 							totalPrice:Number(e.chooseProductColor.salePrice*e.productNum),//总价
-							productId:e.id,//商品ID
+							productId:e.productId,//商品ID
 							factoryNo:e.factoryNo,
 							factoryName:e.factoryName,
 							factoryShortName:e.factoryShortName,
@@ -364,6 +387,9 @@
 					phoneNumber:this.userInfo.phoneNumber,//手机号
 					productNum:productNum,//商品总数量
 					orderPrice:this.totalMoney,//订单金额
+					receiverProvince:this.addressData.province,//省
+					receiverCity:this.addressData.city,//市
+					receiverDistrict:this.addressData.district,//区
 					receiverAddress:this.addressData.receiverAddress,//收货地址
 					receiverLinkMan:this.addressData.linkMan,//收货联系人
 					receiverPhoneNumber:this.addressData.phoneNumber,//收货人电话
@@ -377,11 +403,14 @@
 					openingBank:this.invoice.openingBank,//开户行
 					account:this.invoice.account,//账户
 					userId:this.userInfo.id,//用户ID
+					salesPersonPhoneNumber:this.userInfo.salesPersonPhoneNumber,//销售人员电话
 					filePath:this.filePath,//附件路径
 					orderChildInfoList:orderChildInfoList,//商品信息
 					model:this.model,//品牌型号
 					vin:this.vin,//车辆识别码
-					vehicleType:this.vehicleType//车辆类型
+					vehicleType:this.vehicleType,//车辆类型
+					groupProduct:this.groupProduct,//拼团模板信息
+					groupMember: this.groupMember,//拼团团长信息
 				}
 			},
 			getTotalPrice(productInfoList){

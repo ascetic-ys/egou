@@ -39,9 +39,22 @@
 				<!-- 背景色区域 -->
 				<view class="titleNview-background" :style="{backgroundColor:titleNViewBackground}"></view>
 				<swiper class="carousel" circular autoplay @change="swiperChange">
-					<swiper-item v-for="(item, index) in carouselList" :key="index" class="carousel-item" @click="navToDetailPage({title: '轮播广告'})">
+					<!-- <swiper-item v-for="(item, index) in carouselList" :key="index" class="carousel-item" @click="navToDetailPage({title: '轮播广告'})">
 						<image :src="item.filePath" />
-					</swiper-item>
+					</swiper-item> -->
+					<block v-for="(obj, index) in carouselList" :key="index">
+						<template v-if="obj.linkType===1">
+							<swiper-item v-for="(item, index) in obj.orderFilePathList" :key="index" class="carousel-item" @click="navToGroupActivity(obj)">
+								<image :src="item.filePath" />
+							</swiper-item>
+						</template>
+						<template v-else>
+							<swiper-item v-for="(item, index) in obj.orderFilePathList" :key="index" class="carousel-item" >
+								<image :src="item.filePath" />
+							</swiper-item>
+						</template>
+					</block>
+					
 				</swiper>
 				<!-- 自定义swiper指示器 -->
 				<view class="swiper-dots">
@@ -54,6 +67,10 @@
 				<view class="cate-item" v-for="(item,i) in naviCateList" :key='i' @tap="toProductList(item)">
 					<image :src="item.imgPath||`/static/logo/category_default.jpg`"></image>
 					<text class="cate-text">{{item.orderProductCategory}}</text>
+				</view>
+				<view class="cate-item" @tap="toGroupProductList()">
+					<image :src="`/static/logo/category_default.jpg`"></image>
+					<text class="cate-text">拼购专区</text>
 				</view>
 			</view>
 			
@@ -292,13 +309,19 @@
 					}
 				}
 			}
-			if(!this.hasLogin&&!isTemp){
-				/* uni.reLaunch({
+			if(!this.userInfo&&!isTemp){
+				uni.reLaunch({
 					url:'/pagesUser/public/login'
-				}) */
+				})
 			}
 		},
 		methods: {
+			navToGroupActivity(obj){
+				//跳转拼团活动页面
+				uni.navigateTo({
+					url: `/pagesProduct/activity/groupActivity?homePageId=${obj.id}`
+				})
+			},
 			toProductList(item){
 				if(!this.hasLogin){
 					uni.navigateTo({
@@ -310,6 +333,12 @@
 					/* url: `/pagesProduct/product/list?largeCategory=${item.largeCategory}&littleCategory=${item.littleCategory}` */
 					//修改为大类
 					url: `/pagesProduct/product/list?largeCategory=${item.orderProductCategory}`
+				})
+			},
+			toGroupProductList(){
+				uni.navigateTo({
+					//修改为大类
+					url: `/pagesProduct/product/list?isOpenGroup=${1}`
 				})
 			},
 			//顶部tab点击
@@ -362,12 +391,16 @@
 			},
 			initCarouseList(){
 				this.$api.httpPost('homePage/api/query',{
-					titleType:1
+					titleType: 1,
+					startState: 1,
 				}).then(r=>{
 					// console.log("轮播图片请求结果：",r)
-					this.carouselList=r.data.orderFilePathList
+					this.carouselList=r.data
 					this.titleNViewBackground = "none";
-					this.swiperLength = this.carouselList.length;
+					for(let item of this.carouselList){
+						this.swiperLength += item.orderFilePathList.length
+					}
+					//this.swiperLength = this.carouselList.length;
 				}).catch(e=>{
 					// console.log("请求错误：",e)
 					this.$api.msg(e.msg||'网络异常请重试')
@@ -378,7 +411,7 @@
 					titleType:4//精选区海报
 				}).then(r=>{
 					// console.log("服务图片请求结果：",r)
-					this.serviceImgList1=r.data.orderFilePathList
+					this.serviceImgList1=r.data[0].orderFilePathList
 					this.swiperLength1 = this.serviceImgList1.length;
 				}).catch(e=>{
 					// console.log("请求错误：",e)
@@ -390,7 +423,7 @@
 					titleType:5//品牌区海报
 				}).then(r=>{
 					// console.log("服务图片请求结果：",r)
-					this.serviceImgList2=r.data.orderFilePathList
+					this.serviceImgList2=r.data[0].orderFilePathList
 					this.swiperLength2 = this.serviceImgList2.length;
 				}).catch(e=>{
 					// console.log("请求错误：",e)
@@ -402,7 +435,7 @@
 					titleType:6//自营区海报
 				}).then(r=>{
 					// console.log("服务图片请求结果：",r)
-					this.serviceImgList3=r.data.orderFilePathList
+					this.serviceImgList3=r.data[0].orderFilePathList
 					this.swiperLength3 = this.serviceImgList3.length;
 				}).catch(e=>{
 					// console.log("请求错误：",e)
@@ -414,7 +447,7 @@
 					titleType:2//vip区海报
 				}).then(r=>{
 					// console.log("服务图片请求结果：",r)
-					this.serviceImgList4=r.data.orderFilePathList
+					this.serviceImgList4=r.data[0].orderFilePathList
 					this.swiperLength4 = this.serviceImgList4.length;
 				}).catch(e=>{
 					// console.log("请求错误：",e)
@@ -476,7 +509,8 @@
 					orderByColumn:'orderNum',
 					isAsc:'asc',
 					ifHomePage:1,
-					category:'品牌产品'
+					category:'品牌产品',
+					state: 3
 				}).then(r=>{
 					console.log("品牌产品请求结果：",r)
 					if(r.code==0){
@@ -494,7 +528,8 @@
 					orderByColumn:'orderNum',
 					isAsc:'asc',
 					ifHomePage:1,
-					category:'自营产品'
+					category:'自营产品',
+					state: 3
 				}).then(r=>{
 					console.log("自营产品请求结果：",r)
 					if(r.code==0){
@@ -512,7 +547,8 @@
 					orderByColumn:'orderNum',
 					isAsc:'asc',
 					ifHomePage:1,
-					category:'定制产品'
+					category:'定制产品',
+					state: 3
 				}).then(r=>{
 					console.log("定制产品请求结果：",r)
 					if(r.code==0){
@@ -844,13 +880,13 @@
 	/* 分类 */
 	.cate-section {
 		display: flex;
-		justify-content: space-around;
+		//justify-content: flex-start;
 		align-items: center;
 		flex-wrap:wrap;
 		padding: 30upx 22upx; 
 		background: #fff;
 		.cate-item {
-			flex: 1 1 33%;
+			flex: 0 1 25%;
 			display: flex;
 			flex-direction: column;
 			align-items: center;

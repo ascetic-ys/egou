@@ -49,7 +49,7 @@
 								<text class="clamp title">{{product.productName}}</text>
 								<text class="attr">{{product.chooseProductColor.color}}</text>
 								<view class="price-box">
-									<text class="price">¥{{product.chooseProductColor.price}}</text>
+									<text class="price">¥{{product.chooseProductColor.salePrice}}</text>
 									<view class="number-box">
 										<uni-number-box
 											class="step"
@@ -239,8 +239,8 @@
 					return this.cartList
 				}).catch(e=>{
 					console.log("请求错误：",e)
-					this.$api.msg(e.msg||'网络异常请重试')
 					uni.hideLoading();
+					this.$api.msg(e.msg||'网络异常请重试')
 				})
 			},
 			clickTab(item){
@@ -329,17 +329,17 @@
 					productNum:this.cartList[data.index].productInfoList[data.mindex].productNum
 				}).then(r=>{
 					// console.log('请求结果：',r)
+					uni.hideLoading()
 					if(r.code==0){
 						// this.$api.msg(r.msg||'修改成功')
 						this.calcTotal();
 					}else{
 						this.$api.msg(r.msg||'网络错误请重试')
 					}
-					uni.hideLoading()
 				}).catch(e=>{
 					console.log('请求错误：',e)
-					this.$api.msg(e.msg||'网络错误请重试')
 					uni.hideLoading()
+					this.$api.msg(e.msg||'网络错误请重试')
 				})
 			},
 			//删除
@@ -354,17 +354,17 @@
 					ids:ids.join()
 				}).then(r=>{
 					console.log('请求结果：',r)
+					uni.hideLoading()
 					if(r.code==0){
 						this.$api.msg(r.msg||'删除成功')
 						this.loadData()
 					}else{
 						this.$api.msg(r.msg||'网络错误请重试')
 					}
-					uni.hideLoading()
 				}).catch(e=>{
 					console.log('请求错误：',e)
-					this.$api.msg(e.msg||'网络错误请重试')
 					uni.hideLoading()
+					this.$api.msg(e.msg||'网络错误请重试')
 				})
 			},
 			//清空
@@ -396,7 +396,7 @@
 				list.forEach(item=>{
 					item.productInfoList.forEach(product=>{
 						if(product.checked === true){
-							total += product.chooseProductColor.price * product.productNum;
+							total += product.chooseProductColor.salePrice * product.productNum;
 						}else if(checked === true){
 							checked = false;
 						}

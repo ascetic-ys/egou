@@ -312,6 +312,7 @@
 								id:item.id
 							}).then(r=>{
 								console.log('请求结果：',r)
+								uni.hideLoading()
 								if(r.code==0){
 									_this.$api.msg(r.msg||'操作成功')
 									_this.loadData()
@@ -319,12 +320,11 @@
 									item.submitDisabled=false
 									_this.$api.msg(r.msg||'网络错误请重试')
 								}
-								uni.hideLoading()
 							}).catch(e=>{
+								uni.hideLoading()
 								item.submitDisabled=false
 								console.log('请求错误：',e)
 								item.$api.msg(e.msg||'网络错误请重试')
-								uni.hideLoading()
 							})
 						} else if (res.cancel) {
 							console.log('用户点击取消');
@@ -347,6 +347,7 @@
 								id:item.id
 							}).then(r=>{
 								console.log('请求结果：',r)
+								uni.hideLoading()
 								if(r.code==0){
 									_this.$api.msg(r.msg||'取消成功')
 									_this.loadData()
@@ -354,12 +355,11 @@
 									item.submitDisabled=false
 									_this.$api.msg(r.msg||'网络错误请重试')
 								}
-								uni.hideLoading()
 							}).catch(e=>{
+								uni.hideLoading()
 								item.submitDisabled=false
 								console.log('请求错误：',e)
 								item.$api.msg(e.msg||'网络错误请重试')
-								uni.hideLoading()
 							})
 						} else if (res.cancel) {
 							console.log('用户点击取消');
