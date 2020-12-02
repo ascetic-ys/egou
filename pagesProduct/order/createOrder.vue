@@ -34,7 +34,7 @@
 					<text class="name">{{item.factoryName}}</text>
 				</view>
 				<view class="g-item" v-for="(product,mm) in item.productInfoList" :key='mm'>
-					<image :src="product.imgPath||`/static/errorImage.jpg`"></image>
+					<image :src="product.imgPath||product.parentImgPath||`/static/errorImage.jpg`"></image>
 					<view class="right">
 						<text class="title clamp">{{product.productName}}</text>
 						<text class="spec">{{product.chooseProductColor.color}}</text>

@@ -1,190 +1,190 @@
 <template>
-  <div class="total-wrap">
-    <div class="logistics-title">物流跟踪</div>
-	<view class="logistics-content" v-for="(logist, index) in list" :key="index">
-		<view style="background: #EEEEEE;height: 4rpx;"></view>
-		<view class="logic-company">
-			<view class="info-box">
-				<text class="title">国内承运人：</text>
-				<text class="content">{{logist.logisticsCompany}}</text>
-			</view>
-			<view class="info-box">
-				<text class="title">运单号：</text>
-				<text class="content">{{logist.goodsNumber}}</text>
-			</view>
+	<view class="content">
+		<view class="step-box">
+			<u-steps :list="stepList" :current="1"></u-steps>
 		</view>
 		
-		<view class="goods-section">
-			<!-- 商品列表 -->
-			<view class="goods-box" v-for="(order,pi) in logist.orderChildInfoList" :key='pi'>
-				<image :src="order.imgPath||`https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=298298368,1308836146&fm=26&gp=0.jpg`"></image>
-				<view class="right">
-					<text class="title clamp">{{order.productName}}</text>
-					<text class="spec">{{order.color}}</text>
-					<view class="price-box">
-						<text class="price">￥{{order.unitPrice}}</text>
-						<text class="number">x {{order.productNum}}</text>
-					</view>
-				</view>
-			</view>
+		<view class="wrap">
+			<!-- <view class="title">
+				平台鉴别
+			</view> -->
+			<u-time-line>
+				
+				<u-time-line-item>
+					<template v-slot:content>
+						<view>
+							<view class="u-order-title unacive">待平台发后</view>
+							<view class="u-order-desc">鉴别已通过，正在出仓。</view>
+							<view class="u-order-time">2019-12-02 12:55</view>
+						</view>
+					</template>
+				</u-time-line-item>
+				<u-time-line-item>
+					<template v-slot:content>
+						<view>
+							<view class="u-order-title unacive">平台正在鉴别</view>
+							<view class="u-order-desc">渠道商正在为您鉴别，请耐性等待</view>
+							<view class="u-order-time">2019-12-02 08:23</view>
+						</view>
+					</template>
+				</u-time-line-item>
+				<u-time-line-item nodeTop="0">
+					<template v-slot:node>
+						<view class="u-node">
+							<u-icon name="file-text-fill" color="#fff" :size="24"></u-icon>
+						</view>
+					</template>
+					<template v-slot:content>
+						<view>
+							<view class="u-order-title unacive">平台已收货</view>
+							<view class="u-order-desc">平台已收货，正在安排检查</view>
+							<view class="u-order-time">2019-12-01 07:00</view>
+						</view>
+					</template>
+				</u-time-line-item>
+			</u-time-line>
 		</view>
-		
-		<block v-for="(trace, index2) in logist.newLogistList" :key="index2">
-		  <trackNode :is-first="index2===logist.newLogistList.length-1" :is-newest="index2===0" :is-main-node="trace.isMainNode" :node-data="trace"></trackNode>
-		</block>
-    </view>
-  </div>
+		<view class="wrap">
+			<!-- <view class="title">
+				卖家发货
+			</view> -->
+			<u-time-line>
+				<u-time-line-item nodeTop="2">
+					<template v-slot:node>
+						<view class="u-node">
+							<u-icon name="car-fill" color="#fff" :size="24"></u-icon>
+						</view>
+					</template>
+					<template v-slot:content>
+						<view>
+							<view class="u-order-title unacive">已签收</view>
+							<view class="u-order-desc">您的快件平台已签收</view>
+							<view class="u-order-time">2019-05-07 08:05</view>
+						</view>
+					</template>
+				</u-time-line-item>
+				
+				<u-time-line-item>
+					<template v-slot:content>
+						<view>
+							<view class="u-order-title unacive">运输中</view>
+							<view class="u-order-desc">【深圳市】快件已到达 深圳运转中心</view>
+							<view class="u-order-time">2019-12-04 16:42</view>
+						</view>
+					</template>
+				</u-time-line-item>
+				<u-time-line-item>
+					<template v-slot:content>
+						<view>
+							<view class="u-order-title unacive">运输中</view>
+							<view class="u-order-desc">【郑州市】快件已从郑州运转中心出发，正在发往深圳运转中心</view>
+							<view class="u-order-time">2019-12-02 12:55</view>
+						</view>
+					</template>
+				</u-time-line-item>
+				<u-time-line-item>
+					<template v-slot:content>
+						<view>
+							<view class="u-order-title unacive">运输中</view>
+							<view class="u-order-desc">【郑州市】快件已到达 郑州运转中心</view>
+							<view class="u-order-time">2019-12-02 08:23</view>
+						</view>
+					</template>
+				</u-time-line-item>
+				<u-time-line-item nodeTop="0">
+					<template v-slot:node>
+						<view class="u-node">
+							<u-icon name="file-text-fill" color="#fff" :size="24"></u-icon>
+						</view>
+					</template>
+					<template v-slot:content>
+						<view>
+							<view class="u-order-title unacive">已揽件</view>
+							<view class="u-order-desc">顺丰快递已收取快件，广州市</view>
+							<view class="u-order-time">2019-12-01 07:00</view>
+						</view>
+					</template>
+				</u-time-line-item>
+			</u-time-line>
+		</view>
+	</view>
+	
 </template>
 
 <script>
-import trackNode from '@/components/wuliuInfo/trackNode.vue'
-export default {
-	components: {
-		trackNode
-	},
-	data () {
-		return {
-			orderId:'',
-			factoryNo:'',
-			orderInfo:{},
-			tracesData: [],
-			list:[]
+	export default {
+		data() {
+			return {
+				stepList: [{
+					name: '卖家发货'
+				}, {
+					name: '平台鉴别'
+				}, {
+					name: '平台发货'
+				},],
+			}
 		}
-	},
-	onLoad(options){
-		console.log("options:",options)
-		this.orderId=options.orderId
-		// this.factoryNo=options.factoryNo
-		// this.orderId=223
-		// this.factoryNo='ys'
-		this.initData()
-	},
-	methods:{
-		initData(){
-			this.tracesData=[]
-			this.$api.httpPost('orderMainInfo/api/logisticsDescription',{
-				orderId:this.orderId,
-				factoryNo:this.factoryNo,
-			}).then(r=>{
-				console.log("请求结果：",r)
-				this.list=r.data
-				this.initTraceItem()
-			}).catch(e=>{
-				console.log("请求错误：",e)
-				this.$api.msg(e.msg||'网络异常请重试')
-			})
-		},
-		initTraceItem(){
-			this.list.forEach(x=>{
-				let newLogistList = []
-				x.orderLogisticsDescriptionList.forEach(e=>{
-					let data = {
-						acceptStation: e.description,
-						createTime: e.logisticsDate,
-						status: '',
-						statusName: '',
-						isMainNode: false
-					}
-					newLogistList.push(data)
-				})
-				x.newLogistList=newLogistList
-			})
-		}
-	
 	}
-}
 </script>
 
 <style lang="scss" scoped>
-.total-wrap {
-  width: 100vw;
-  height: auto;
-  box-sizing: border-box;
-  padding: 0upx 40upx 0upx 20upx;
-  .logistics-title {
-    height: 72rpx;
-    box-sizing: border-box;
-    padding: 36rpx 0 8rpx;
-    line-height: 28rpx;
-    color: #4B4B4B;
-    font-size: 26rpx;
-    font-family: 'PingFangSC-Medium';
-    text-align: left;
-  }
-}
-.logistics-content{
-	margin-bottom: 40rpx;
-}
-.logic-company{
-	font-size: 26rpx;
-	line-height: 50rpx;
-	margin-left: 30rpx;
-	margin-top: 20rpx;
-	.info-box{
-		display: flex;
-		justify-content: flex-start;
-		.title{
-			width: 25%;
-		}
-		.content{
-			width: 75%;
-		}
+	.content {
+		background-color: #e6e6e6;
 	}
-}
-
-.goods-section {
-	margin-top: 16upx;
-	background: #fff;
-	padding-bottom: 1px;
-	display: flex;
-	flex-direction: column;
-	margin: 20upx 30upx;
-		
-	.goods-box{
-		display: flex;
-		margin-top: 10rpx;
-		margin-bottom: 20rpx;
-		image {
-			flex-shrink: 0;
-			display: block;
-			width: 140upx;
-			height: 140upx;
-			border-radius: 4upx;
-		}
-		
-		.right {
-			flex: 1;
-			padding-left: 24upx;
-			overflow: hidden;
-		}
+	.step-box {
+		background-color: #fff;
+		padding: 20upx 0;
+	}
+	
+	.wrap {
+		background-color: #fff;
+		//width: 90%;
+		margin-top: 12upx;
+		//border: 1upx solid #dfdfdf;
+		padding: 36rpx 36rpx 36rpx 48rpx;
 		
 		.title {
-			font-size: 30upx;
-			color: $font-color-dark;
+			//padding-left: 10upx;
+			height: 80upx;
+			line-height: 80upx;
+			font-size: 40upx;
+			border: 900;
+			margin-bottom: 20upx;
 		}
-		
-		.spec {
-			font-size: 26upx;
-			color: $font-color-light;
-		}
-		
-		.price-box {
-			display: flex;
-			align-items: center;
-			font-size: 32upx;
-			color: $font-color-dark;
-			padding-top: 10upx;
-		
-			.price {
-				margin-bottom: 4upx;
-			}
-			.number{
-				font-size: 26upx;
-				color: $font-color-base;
-				margin-left: 20upx;
-			}
-		}
-		
 	}
-}
+	
+	.u-node {
+		width: 44rpx;
+		height: 44rpx;
+		border-radius: 100rpx;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background: #d0d0d0;
+	}
+	
+	.u-order-title {
+		color: #333333;
+		font-weight: bold;
+		font-size: 32rpx;
+	}
+	
+	.u-order-title.unacive {
+		color: rgb(150, 150, 150);
+	}
+	
+	.u-order-desc {
+		color: rgb(150, 150, 150);
+		font-size: 28rpx;
+		margin-bottom: 6rpx;
+	}
+	
+	.u-order-time {
+		color: rgb(200, 200, 200);
+		font-size: 26rpx;
+	}
+	
+	.tel {
+		color: $u-type-primary;
+	}
 </style>

@@ -76,7 +76,7 @@
 							</text>
 						</view>
 					</view> -->
-					<view class="attr-list" v-for="item in cateList" :key="item.id">
+					<!-- <view class="attr-list" v-for="item in cateList" :key="item.id">
 						<text>{{item.orderProductCategory}}</text>
 						<view class="item-list">
 							<text 
@@ -88,7 +88,7 @@
 								{{lt.orderProductCategory}}
 							</text>
 						</view>
-					</view>
+					</view> -->
 					<view class="confirm-btn">
 						<button class="confirm" @tap="selectConfirm">确定</button>
 						<button class="reset" @tap="selectCancel">重置</button>

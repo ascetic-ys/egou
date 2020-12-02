@@ -11,8 +11,8 @@ Vue.component('mescroll-body', MescrollBody)
 Vue.component('mescroll-uni', MescrollUni)
 
 // 引入全局uView
-import uView from 'uview-ui'
-Vue.use(uView)
+import uView from "uview-ui";
+Vue.use(uView);
 
 
 

@@ -30,6 +30,7 @@
 				sizeCalcState: false,
 				tabScrollTop: 0,
 				currentId: 1,
+				currentLargeCategory: '',
 				cateLit: [],
 				childCate: [],
 			}
@@ -75,7 +76,9 @@
 				}
 				this.tabScrollTop = this.cateLit[index].top; */
 				this.currentId = item.id;
+				this.currentLargeCategory = item.orderProductCategory
 				this.childCate = item.categoryList
+				console.log(this.childCate)
 			},
 			//右侧栏滚动
 			asideScroll(e){
@@ -114,7 +117,8 @@
 					})
 				}else{
 					uni.navigateTo({
-						url: `/pagesProduct/product/list?largeCategory=${pitem.orderProductCategory}&littleCategory=${item.orderProductCategory}`
+/* 						url: `/pagesProduct/product/list?largeCategory=${this.currentLargeCategory}&littleCategory=${item.orderProductCategory}`
+ */						url: `/pagesProduct/product/list?littleCategory=${item.orderProductCategory}`
 					})
 				}
 				

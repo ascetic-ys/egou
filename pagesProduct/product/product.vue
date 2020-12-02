@@ -265,7 +265,18 @@
 				<scroll-view class="attr-list" v-if="product.orderProductColorList.length>0" scroll-y>
 					<text>发运方式</text>
 					<view class="item-list-2">
-						<view 
+						<block v-for="(item, index) in deliveryMethodList" :key="index"> 
+							<template v-if="item.visible">
+								<view
+									class="select-box"
+									:class="{selected: item.active}"
+									@click="selectDeliveryMethod(item)"
+								>
+										<text class="tit">{{item.name}}</text>
+								</view>
+							</template>
+						</block>
+						<!-- <view 
 							v-for="(item, index) in deliveryMethodList " 
 							:key="index" class="select-box"
 							:class="{selected: item.active}"
@@ -274,7 +285,7 @@
 							<template v-if="item.visible">
 								<text class="tit">{{item.name}}</text>
 							</template>
-						</view>
+						</view> -->
 					</view>
 					<text>颜色</text>
 					<view class="item-list">
@@ -339,7 +350,7 @@
 				sizeList:[],
 				colorList:[],
 				deliveryMethodList:[
-					{name: '快递',value: 1,active: true, visible:false},
+					{name: '快递',value: 1,active: false, visible:false},
 					{name: '快运',value: 2,active: false, visible:false},
 					{name: '物流',value: 3,active: false, visible:false},
 				],
@@ -479,10 +490,15 @@
 						this.$refs.article.setContent(this.product.introductory);
 						if(this.product.deliveryMethod){
 							let arr = this.product.deliveryMethod.split(",")
+							let count = 0
 							for(let item of arr){
 								for(let obj of this.deliveryMethodList){
 									if(obj.value == item){
+										if(count === 0){
+											obj.active = true
+										}
 										obj.visible = true
+										count ++
 									}
 								}
 							}
@@ -835,6 +851,7 @@
 						newPro.chooseProductColor=item
 						newPro.color=item.color
 						newPro.imgPath=item.imgPath
+						newPro.parentImgPath=this.product.imgPath
 						for(let deliveryMethod of this.deliveryMethodList){
 							if(deliveryMethod.active){
 								newPro.chooseDeliveryMethod=deliveryMethod.name

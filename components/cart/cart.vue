@@ -38,7 +38,7 @@
 						</view>
 						<view class="product-info" v-for="(product, m) in item.productInfoList" :key="m">
 							<view class="image-wrapper">
-								<image :src="product.imgPath" mode="aspectFill" ></image>
+								<image :src="product.imgPath||item.imgPath||`/static/errorImage.jpg`" mode="aspectFill" ></image>
 								<view 
 									class="yticon icon-xuanzhong2 checkbox"
 									:class="{checked: product.checked}"
@@ -110,16 +110,18 @@
 				<scroll-view class="attr-list" scroll-y>
 					<text>发运方式</text>
 					<view class="item-list-2">
-						<view 
-							v-for="(item, index) in deliveryMethodList " 
-							:key="index" class="select-box"
-							:class="{selected: item.active}"
-							@click="selectDeliveryMethod(item)"
-						>
+						
+						<block v-for="(item, index) in deliveryMethodList" :key="index">
 							<template v-if="item.visible">
-								<text class="tit">{{item.name}}</text>
+								<view
+									class="select-box"
+									:class="{selected: item.active}"
+									@click="selectDeliveryMethod(item)"
+								>
+										<text class="tit">{{item.name}}</text>
+								</view>
 							</template>
-						</view>
+						</block>
 					</view>
 				</scroll-view>
 				<button class="btn" @click="toggleSpec">确定</button>
