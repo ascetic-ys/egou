@@ -9,6 +9,8 @@
 			<view class="factoryName">{{factoryDetail.factoryName||factoryNo}}</view>
 		</view>
 		<view class="body">
+			<scroll-view scroll-y style="height: 100%;width: 100%;"  @scrolltolower="scrollDown">
+			
 			<view class="guess-section">
 				<view v-for="(item, index) in productList" :key="index" class="guess-item" @click="navToProductDetailPage(item)">
 					<view class="image-wrapper">
@@ -18,15 +20,23 @@
 					<text class="price">￥{{item.factoryPrice||'暂无'}}</text>
 				</view>
 			</view>	
+			<view class="bar-blank">
 				
+			</view>
+			</scroll-view>	
+			
 		</view>
 		
+		
 		<!-- 分类 -->
+		
 		<view class="classify" v-if="show">
 			<view :class="['classify-item',item.active?'active':'']" v-for="item in categoryList" :key="item.id" @click="selectCategory(item)">
 				<text>{{item.orderProductCategory}}</text>
 			</view>
 		</view>
+		
+		
 		
 		<!-- 底部操作菜单 -->
 		<view class="page-bottom" >
@@ -52,10 +62,18 @@
 			return {
 				show: false,
 				factoryNo: '',
+				productTotal: 0,
 				productList: [],
 				factoryDetail: {},
 				categoryList: [],
-				category: ''
+				category: '',
+				queryParams: {
+					pageNum:1,
+					pageSize:4,
+					orderByColumn:'',
+					isAsc:'',
+					state: 3
+				}
 			}
 		},
 		onLoad(option) {
@@ -64,7 +82,35 @@
 			this.getCategory()
 			this.getProductlist()
 		},
+		//下拉属性
+		/* onPullDownRefresh() {
+			console.log('refresh')
+			this.queryParams.pageNum=1
+			this.getProductlist()
+			setTimeout(function () {
+				uni.stopPullDownRefresh();
+			}, 1000);
+		},
+		//上拉加载
+		onReachBottom() {
+			console.log("onReachBottom")
+			if(this.productTotal!==0&&this.productList.length<this.productTotal){
+				this.queryParams.pageNum+=1
+				this.getProductlist()
+			}else{
+				this.$api.msg("没有更多的数据了")
+			}
+			
+		}, */
 		methods: {
+			scrollDown(){
+				if(this.productTotal!==0&&this.productList.length<this.productTotal){
+					this.queryParams.pageNum+=1
+					this.getProductlist()
+				}else{
+					this.$api.msg("没有更多的数据了")
+				}
+			},
 			getCategory() {
 				this.$api.httpGet('productCategory/api/listAll').then(r=>{
 					this.categoryList = r.data
@@ -76,16 +122,15 @@
 				})
 			},
 			getProductlist() {
-				this.$api.httpPost('productInfo/api/list',{
-					pageNum:1,
-					pageSize:4,
-					orderByColumn:'',
-					isAsc:'',
-					factoryNo: this.factoryNo,
-					largeCategory: this.category,
-					state: 3
-				}).then(r=>{
-					this.productList = r.rows
+				this.queryParams.factoryNo = this.factoryNo
+				this.queryParams.largeCategory = this.category
+				this.$api.httpPost('productInfo/api/list',this.queryParams).then(r=>{
+					this.productTotal = r.total
+					if(this.queryParams.pageNum===1){
+						this.productList=r.rows
+					}else{
+						this.productList=this.productList.concat(r.rows)
+					}
 				}).catch(e=>{
 					this.$api.msg(e.msg||'网络异常请重试')
 				})
@@ -142,6 +187,17 @@
 <style lang=scss>
 	.content {
 		background-color: #cdd1d9;
+	}
+	
+	.body {
+		min-height: 80vh;
+		height: 800upx;
+		background: #fff;
+		
+		.bar-blank {
+			margin-top: 20upx;
+			height: 100upx;
+		}
 	}
 	
 	.head {

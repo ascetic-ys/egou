@@ -55,7 +55,9 @@
 								<text class="price">{{goodsItem.totalPrice}}</text>
 							</view>
 						</view>
-						<view class="wuliu-box b-t" v-if="[3,4].indexOf(item.orderState)>-1" @tap.stop="gotowl(item.id,group.factoryNo)">
+						<view class="wuliu-box b-t" 
+						v-if="[3,4].indexOf(item.orderState)>-1&&group.orderChildInfoList[0].logisticsContrastId" 
+						@tap.stop="gotowl(item.id,group.factoryNo)">
 							<view class="left-box">
 								<text class="left">配送</text>
 							</view>
@@ -102,13 +104,13 @@
 						<text class="price">{{item.orderPrice}}</text>
 					</view>
 					<view class="action-box b-t" v-if="item.orderState != 0">
-						<button class="action-btn"  :disabled="item.submitDisabled" @tap.stop="gotoClaim(item.id)">小额理赔</button>
-						<!-- <button class="action-btn"  :disabled="item.submitDisabled" @tap.stop="gotoClaimList(item.id)">理赔列表</button> -->
-						<button class="action-btn" v-if="[2,5].indexOf(item.orderState)>-1" :disabled="item.submitDisabled" @tap.stop="gotoRefund(item.id)">申请退款</button>
-						<button class="action-btn" v-if="[3,4].indexOf(item.orderState)>-1" @tap.stop="gotowl(item.id)">查看物流</button>
+						<button class="action-btn" v-if="item.orderState==4" :disabled="item.submitDisabled" @tap.stop="gotoClaim(item.id)">小额理赔</button>
+						<button class="action-btn" v-if="item.orderState==4" :disabled="item.submitDisabled" @tap.stop="gotoClaimList(item.id)">理赔列表</button>
+						<button class="action-btn" v-if="item.orderState!=1" :disabled="item.submitDisabled" @tap.stop="gotoRefund(item.id)">申请退款</button>
+						<!-- <button class="action-btn" v-if="[3,4].indexOf(item.orderState)>-1" @tap.stop="gotowl(item.id)">查看物流</button> -->
 						<button class="action-btn" v-if="item.orderState==1" :disabled="item.submitDisabled" @tap.stop="cancelOrder(item)">取消订单</button>
 						<button class="action-btn" v-if="item.orderState==3" :disabled="item.submitDisabled" @tap.stop="confirmReceipt(item)">确认收货</button>
-						<button class="action-btn" v-if="item.orderState==4" :disabled="item.submitDisabled" @tap.stop="feedback(item)">售后反馈</button>
+						<!-- <button class="action-btn" v-if="item.orderState==4" :disabled="item.submitDisabled" @tap.stop="feedback(item)">售后反馈</button> -->
 						<button class="action-btn" v-if="item.orderState==4" :disabled="item.submitDisabled" @tap.stop="evaluate(item.id)">评价</button>
 						<button class="action-btn" v-if="item.orderState==4"  @tap.stop="downloadImage(item)">电子发票</button>
 						<button class="action-btn recom" v-if="item.orderState==1" @tap.stop="toPay(item)">立即支付</button>
@@ -149,12 +151,14 @@
 				params:{}
 			};
 		},
-		
+		onShow() {
+			this.tabClick(this.tabCurrentIndex)
+		},
 		async onLoad(options){
 			this.tabCurrentIndex = +options.state||0;
 			this.initParams()
 			this.tabClick(this.tabCurrentIndex);
-			this.loadData()
+			//this.loadData()
 		},
 		computed: {
 			...mapState(['hasLogin','userInfo','weChat'])
@@ -262,13 +266,13 @@
 				}else if(index==1){
 					this.params.orderState=1
 				}else if(index==2){
-					this.params.orderState=5
-				}else if(index==3){
 					this.params.orderState=2
-				}else if(index==4){
+				}else if(index==3){
 					this.params.orderState=3
-				}else if(index==5){
+				}else if(index==4){
 					this.params.orderState=4
+				}else if(index==5){
+					this.params.orderState=5
 				}
 			},
 			// 理赔
@@ -300,8 +304,8 @@
 				let _this = this
 				uni.showModal({
 					title:'温馨提示',
-					content:'您是否收到该订单商品？',
-					cancelText:'未收货',
+					content:'您是否收到订单所有商品？',
+					cancelText:'取消',
 					confirmText:'已收货',
 					success: function (res) {
 						if (res.confirm) {
@@ -324,7 +328,7 @@
 								uni.hideLoading()
 								item.submitDisabled=false
 								console.log('请求错误：',e)
-								item.$api.msg(e.msg||'网络错误请重试')
+								_this.$api.msg(e.msg||'网络错误请重试')
 							})
 						} else if (res.cancel) {
 							console.log('用户点击取消');
@@ -359,7 +363,7 @@
 								uni.hideLoading()
 								item.submitDisabled=false
 								console.log('请求错误：',e)
-								item.$api.msg(e.msg||'网络错误请重试')
+								_this.$api.msg(e.msg||'网络错误请重试')
 							})
 						} else if (res.cancel) {
 							console.log('用户点击取消');

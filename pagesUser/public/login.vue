@@ -11,7 +11,7 @@
 				<view class="logo-img">
 					<image src="/static/logo/login-logo.png"></image>
 				</view>
-				<view class="system-tip">柏福车品网购平台</view>
+				<view class="system-tip">柏福车品服务终端</view>
 				<!-- <view class="login-tip">登录：</view> -->
 			</view>
 			<view class="input-content">

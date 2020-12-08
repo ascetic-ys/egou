@@ -7,7 +7,7 @@
 				<view class="uni-banner">
 					<view class="agreement">
 						<view class="content-box">
-							<view class="title">{{isB==1?'城市渠道商':'城市渠道商B端'}}协议</view>
+							<view class="title">{{isB==1?'城市服务商':'城市服务商B端'}}协议</view>
 							
 							<scroll-view class="content">
 								<view class="user-info">
@@ -30,7 +30,7 @@
 							
 							<view class="notice">
 								<text class="text-box">点击同意即表示您已经阅读并同意</text>
-								<text class="touch-box">《{{isB==1?'城市渠道商':'城市渠道商B端'}}协议》</text>
+								<text class="touch-box">《{{isB==1?'城市服务商':'城市服务商B端'}}协议》</text>
 							</view>
 							<view class="btn-box">
 								<button class="cancel" @tap.stop="agreeNo">不同意</button>
@@ -70,7 +70,7 @@
 					bCard:'',//乙方身份证号
 					content:'',//协议内容
 					signDate:'',//签字日期（yyyy-mm-dd）
-					parentId:'',//城市渠道商ID（销售员）
+					parentId:'',//城市服务商ID（销售员）
 				},
 				protocol:{},
 				partner:{}//注册成功后合作伙伴的信息
@@ -97,7 +97,7 @@
 				this.$api.httpPost('protocol/api/list',{
 					protocolType:this.protocolType
 				}).then(r=>{
-					console.log("城市渠道商协议请求结果：",r)
+					console.log("城市服务商协议请求结果：",r)
 					this.protocol=r.data
 					this.$refs.article.setContent(this.protocol.content);
 				}).catch(e=>{
@@ -109,7 +109,7 @@
 				this.$api.httpPost('partner/api/detail',{
 					id:this.parentId
 				}).then(r=>{
-					console.log("城市渠道商详情请求结果：",r)
+					console.log("城市服务商详情请求结果：",r)
 					this.partner=r.data
 				}).catch(e=>{
 					console.log("请求错误：",e)
@@ -142,7 +142,7 @@
 					bCard:this.partner.cardNumber,//乙方身份证号
 					content:this.protocol.content,//协议内容
 					signDate:this.getDate(),//签字日期（yyyy-mm-dd）
-					parentId:this.partner.id,//城市渠道商ID（销售员）
+					parentId:this.partner.id,//城市服务商ID（销售员）
 				}
 			},
 			agreeYes(){

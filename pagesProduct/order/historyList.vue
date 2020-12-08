@@ -8,11 +8,11 @@
 					@click="navToDetailPage(item)"
 				>
 					<view class="image-wrapper">
-						<image :src="item.productInfo.imgPath||`http://img5.imgtn.bdimg.com/it/u=1957887963,2553893514&fm=26&gp=0.jpg`" mode="aspectFill"></image>
+						<image :src="item.productInfo.imgPath||`/static/errorImage.jpg`" mode="aspectFill"></image>
 					</view>
 					<text class="title clamp">{{item.productInfo.productName}}</text>
 					<view class="price-box">
-						<text class="price">{{item.productInfo.price}}</text>
+						<text class="price">{{item.productInfo.factoryPrice}}</text>
 						<!-- <text @tap.stop='toFavorite(item)' class="yticon icon-shoucang" style="color:#DD524D" v-if="item.favorite"></text> -->
 						<!-- <text @tap.stop='toFavorite(item)' class="yticon icon-shoucang" v-if="!item.favorite"></text> -->
 					</view>

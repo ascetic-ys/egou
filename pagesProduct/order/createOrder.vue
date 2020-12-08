@@ -43,6 +43,9 @@
 							<text class="number">x {{product.productNum}}</text>
 							<text class="deliveryMethod">发货方式: {{product.chooseDeliveryMethod}}</text>
 						</view>
+						<view class="price-box">
+							<text class="deliveryMethod">物流类型: {{product.logisticsTypeName}}</text>
+						</view>
 					</view>
 				</view>
 				<view class="wuliu-box b-t" >
@@ -376,7 +379,8 @@
 							rebatesProportion:e.chooseProductColor.rebatesProportion,
 							raisePrice:e.chooseProductColor.raisePrice,
 							factoryPrice:e.chooseProductColor.price,
-							deliveryMethod: e.chooseDeliveryMethod
+							deliveryMethod: e.chooseDeliveryMethod,
+							logisticsType: e.logisticsTypeVal
 						}
 						orderChildInfoList.push(item)
 					})

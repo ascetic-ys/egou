@@ -76,7 +76,8 @@
 			
 			<view class="ad-1">
 				<swiper class="serviceImg" circular autoplay @change="swiperChange1">
-					<swiper-item v-for="(item, index) in serviceImgList1" :key="index" class="serviceImg-item" @click="navToDetailPage({title: '轮播服务'})">
+					<swiper-item v-for="(item, index) in serviceImgList1" :key="index" class="serviceImg-item" 
+					@tap="navTo('/pagesProduct/product/list')">
 						<image :src="item.filePath" mode="scaleToFill"/>
 					</swiper-item>
 				</swiper>
@@ -115,7 +116,8 @@
 			
 			<view class="ad-1">
 				<swiper class="serviceImg" circular autoplay @change="swiperChange2">
-					<swiper-item v-for="(item, index) in serviceImgList2" :key="index" class="serviceImg-item" @click="navToDetailPage({title: '轮播服务'})">
+					<swiper-item v-for="(item, index) in serviceImgList2" :key="index" class="serviceImg-item" 
+					@tap="navTo('/pagesProduct/product/list')">
 						<image :src="item.filePath" mode="scaleToFill"/>
 					</swiper-item>
 				</swiper>
@@ -192,7 +194,8 @@
 			
 			<view class="ad-1">
 				<swiper class="serviceImg" circular autoplay @change="swiperChange4">
-					<swiper-item v-for="(item, index) in serviceImgList4" :key="index" class="serviceImg-item" @click="navToDetailPage({title: '轮播服务'})">
+					<swiper-item v-for="(item, index) in serviceImgList4" :key="index" class="serviceImg-item" 
+					@tap="navTo('/pagesProduct/product/list?category=品牌产品')">
 						<image :src="item.filePath" mode="scaleToFill"/>
 					</swiper-item>
 				</swiper>

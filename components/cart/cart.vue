@@ -422,6 +422,10 @@
 							}
 							if(product.checked){
 								let newPro = product
+								newPro.productId = newPro.id
+								//暂时 购物车物流类型 设置为直达 后面要修改
+								newPro.logisticsTypeName= '直达'
+								newPro.logisticsTypeVal= 'DIRECT'
 								delete newPro.introductory
 								newProList.push(newPro)
 							}

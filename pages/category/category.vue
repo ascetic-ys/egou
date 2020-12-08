@@ -9,7 +9,11 @@
 			<view v-for="item in childCate" :key="item.id" class="s-list" :id="'main-'+item.id">
 				<text class="s-item">{{item.orderProductCategory}}</text>
 				<view class="t-list">
-					<view class="t-item" v-for="titem in item.categoryList" :key="titem.id" @tap.stop="navToList(titem,item)" >
+					<view class="t-item" @tap.stop="navToList(item,1)" >
+						<image :src="item.imgPath||`/static/logo/category_default.jpg`"></image>
+						<text>{{item.orderProductCategory}}</text>
+					</view>
+					<view class="t-item" v-for="titem in item.categoryList" :key="titem.id" @tap.stop="navToList(titem,2)" >
 						<image :src="titem.imgPath||`/static/logo/category_default.jpg`"></image>
 						<text>{{titem.orderProductCategory}}</text>
 					</view>
@@ -110,17 +114,16 @@
 				})
 				this.sizeCalcState = true;
 			},
-			navToList(item,pitem){
-				if(!this.hasLogin){
-					uni.navigateTo({
-						url:'/pagesUser/public/login'
-					})
-				}else{
-					uni.navigateTo({
-/* 						url: `/pagesProduct/product/list?largeCategory=${this.currentLargeCategory}&littleCategory=${item.orderProductCategory}`
- */						url: `/pagesProduct/product/list?littleCategory=${item.orderProductCategory}`
-					})
+			navToList(item,type){
+				let url = '/pagesProduct/product/list'
+				if(type===1){
+					url += `?middleCategory=${item.orderProductCategory}`
+				}else if(type===2){
+					url += `?littleCategory=${item.orderProductCategory}`
 				}
+				uni.navigateTo({
+					url: url
+				})
 				
 			}
 		}

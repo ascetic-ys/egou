@@ -1,7 +1,8 @@
 <template>
 	<view class="container">
 		<!-- 地址 -->
-		<navigator :url="`/pagesInfo/customer/goodsliu?orderId=${orderInfo.id}`" class="address-section" v-if="orderInfo.orderState != 0">
+<!-- 		<navigator :url="`/pagesInfo/customer/goodsliu?orderId=${orderInfo.id}`" class="address-section" v-if="orderInfo.orderState != 0">
+ -->		<navigator  class="address-section" v-if="orderInfo.orderState != 0">
 			<view class="order-content">
 				<text class="yticon icon-shouhuodizhi"></text>
 				<view class="cen">
@@ -11,7 +12,7 @@
 					</view>
 					<text class="address">{{orderInfo.receiverAddress}}</text>
 				</view>
-				<text class="yticon icon-you"></text>
+				<!-- <text class="yticon icon-you"></text> -->
 			</view>
 		</navigator>
 
@@ -33,7 +34,9 @@
 						</view>
 					</view>
 				</view>
-				<!-- <view class="wuliu-box b-t" @tap.stop="gotowl(orderInfo.id,group.factoryNo)">
+				<view class="wuliu-box b-t" 
+				v-if="[3,4].indexOf(orderInfo.orderState)>-1&&group.orderChildInfoList[0].logisticsContrastId" 
+				@tap.stop="gotowl(orderInfo.id,group.factoryNo)">
 					<view class="left-box">
 						<text class="left">配送</text>
 					</view>
@@ -44,7 +47,7 @@
 					<view class="right-box">
 						<text class="yticon icon-you" ></text>
 					</view>
-				</view> -->
+				</view>
 				<view class="wuliu-box b-t" >
 					<view class="left-box">
 						<text class="left">总金额</text>
@@ -140,7 +143,7 @@
 			</view>
 			<view class="footer-btn">
 				<button class="submit" :disabled="submitDisabled" v-if="orderInfo.orderState==1" @click="cancelOrder">取消订单</button>
-				<button class="submit" :disabled="submitDisabled" v-if="orderInfo.orderState==2" @click="applyRefund">申请退款</button>
+				<!-- <button class="submit" :disabled="submitDisabled" v-if="orderInfo.orderState==2" @click="applyRefund">申请退款</button> -->
 				<button class="submit" :disabled="submitDisabled" v-if="orderInfo.orderState==3" @click="confirmReceipt">确认收货</button>
 				<button class="submit" :disabled="submitDisabled" v-if="orderInfo.orderState==4" @click="applyFeedback">售后反馈</button>
 			</view>
@@ -243,11 +246,47 @@
 			},
 			//确认收货
 			confirmReceipt(){
-				
+				let _this = this
+				uni.showModal({
+					title:'温馨提示',
+					content:'您是否收到订单所有商品？',
+					cancelText:'取消',
+					confirmText:'已收货',
+					success: function (res) {
+						if (res.confirm) {
+							console.log('用户点击确定');
+							_this.submitDisabled=true
+							_this.$api.loading('请求中...')
+							_this.$api.httpPost('orderMainInfo/api/update',{
+								id:_this.orderInfo.id
+							}).then(r=>{
+								console.log('请求结果：',r)
+								uni.hideLoading()
+								if(r.code==0){
+									_this.$api.msg(r.msg||'操作成功')
+									_this.orderInfo.orderState = 4
+									_this.orderInfo = Object.assign(_this.orderInfo, _this.orderExp(_this.orderInfo));
+								}else{
+									_this.submitDisabled=false
+									_this.$api.msg(r.msg||'网络错误请重试')
+								}
+							}).catch(e=>{
+								uni.hideLoading()
+								_this.submitDisabled=false
+								console.log('请求错误：',e)
+								_this.$api.msg(e.msg||'网络错误请重试')
+							})
+						} else if (res.cancel) {
+							console.log('用户点击取消');
+						}
+					}
+				})
 			},
 			//申请售后
 			applyFeedback(){
-				
+				uni.navigateTo({
+					url: `/pagesProduct/order/orderService?orderId=${this.orderInfo.id}&orderNo=${this.orderInfo.orderNo}`
+				})
 			},
 			numberChange(data) {
 				this.number = data.number;

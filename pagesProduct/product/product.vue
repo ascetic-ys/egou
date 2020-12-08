@@ -30,9 +30,7 @@
 			<view class="price-content">
 				<view class="price-box">
 					<text class="price-tip">¥</text>
-					<text class="price">{{specSelected.price||product.factoryPrice}}</text>
-					<!-- <text class="m-price">¥488</text> -->
-					<!-- <text class="coupon-tip">7折</text> -->
+					<text class="price">{{product.factoryPrice}}</text>
 				</view>
 				<view class="image-download"><text class="yticon icon-Group-" @click="downloadImage">素材下载</text></view>
 			</view>
@@ -119,15 +117,11 @@
 			</view>
 			<view class="d-data">
 				<text class="title">颜色</text>
-				<text class="info">{{product.color||'-'}}</text>
+				<text class="info">{{colorAll||'-'}}</text>
 			</view>
 			<view class="d-data">
 				<text class="title">库存数量</text>
-				<text class="info">{{product.stockNum||'-'}}</text>
-			</view>
-			<view class="d-data">
-				<text class="title">商品编号</text>
-				<text class="info">{{product.brand||'-'}}</text>
+				<text class="info">{{stockNumAll||'-'}}</text>
 			</view>
 			<view class="d-data">
 				<text class="title">风格</text>
@@ -170,31 +164,6 @@
 			</view>
 			<view class="d-bottom"></view>
 		</view>
-		
-		<!-- 底部操作菜单 -->
-		<!-- <view class="page-bottom" v-if="[1,4].indexOf(userInfo.tag)>-1">
-			<navigator :url="`/pagesProduct/product/factory?factoryNo=${product.factoryNo}`" open-type="navigate" class="p-b-btn">
-				<text class="yticon icon-xiatubiao--copy"></text>
-				<text>店铺</text>
-			</navigator>
-			<button class="p-b-btn btn-service" open-type="contact" @click="navTo2">
-				<text class="yticon icon-xiaoxi"></text>
-				<text class="btn-name">客服</text>
-			</button>
-			<navigator url="/pages/cart/cart" open-type="switchTab" class="p-b-btn">
-				<text class="yticon icon-gouwuche"></text>
-				<text>购物车</text>
-			</navigator>
-			<view class="p-b-btn" :class="{active: favorite}" @click="toFavorite">
-				<text class="yticon icon-shoucang"></text>
-				<text>收藏</text>
-			</view>
-			
-			<view class="action-btn-group">
-				<button type="primary" class=" action-btn no-border buy-now-btn" @click="buy">立即购买</button>
-				<button type="primary" class=" action-btn no-border add-cart-btn" @click="batchAddCart">加入购物车</button>
-			</view>
-		</view> -->
 		
 		
 		
@@ -249,19 +218,7 @@
 						</view> -->
 					</view>
 				</view>
-				<!-- <view class="attr-list">
-					<text>尺寸</text>
-					<view class="item-list">
-						<text 
-							v-for="(item, index) in sizeList" 
-							:key="index" class="tit"
-							:class="{selected: item.selected}"
-							@click="selectSize(item)"
-						>
-							{{item.name}}
-						</text>
-					</view>
-				</view> -->
+				
 				<scroll-view class="attr-list" v-if="product.orderProductColorList.length>0" scroll-y>
 					<text>发运方式</text>
 					<view class="item-list-2">
@@ -276,16 +233,22 @@
 								</view>
 							</template>
 						</block>
-						<!-- <view 
-							v-for="(item, index) in deliveryMethodList " 
-							:key="index" class="select-box"
-							:class="{selected: item.active}"
-							@click="selectDeliveryMethod(item)"
-						>
+						
+					</view>
+					<text>物流类型</text>
+					<view class="item-list-2">
+						<block v-for="(item, index) in logisticsTypeList" :key="index"> 
 							<template v-if="item.visible">
-								<text class="tit">{{item.name}}</text>
+								<view
+									class="select-box"
+									:class="{selected: item.active}"
+									@click="selectLogisticsType(item)"
+								>
+										<text class="tit">{{item.name}}</text>
+								</view>
 							</template>
-						</view> -->
+						</block>
+						
 					</view>
 					<text>颜色</text>
 					<view class="item-list">
@@ -298,10 +261,13 @@
 								<u-line></u-line>
 							</view>
 							<image :src="item.imgPath||'/static/errorImage.jpg'" mode="aspectFit"></image>
-							<text class="tit">{{item.color}}</text>
+							<text class="tit color-text">{{item.color}}</text>
 							<view class="number-box" >
-								<text>￥{{item.salePrice||'-'}}</text>
-								<text>库存：{{item.stockNum||'-'}}</text>
+								<view class="price-box">
+									<view class=""><text>￥{{item.salePrice||'-'}}</text></view>
+									<view class=""><text>库存：{{item.stockNum||'-'}}</text></view>
+									
+								</view>
 								<u-number-box v-model="item.shoppingNum" :long-press="false"   :bg-color="bgColor" :color="color" 
 								
 								:step="step" :disabled="disabled" ></u-number-box>
@@ -354,6 +320,10 @@
 					{name: '快运',value: 2,active: false, visible:false},
 					{name: '物流',value: 3,active: false, visible:false},
 				],
+				logisticsTypeList: [
+					{name: '直达',value: 'DIRECT',active: false, visible:false},
+					{name: '二次物流',value: 'SECOND',active: false, visible:false},
+				],
 				tabCurrentIndex:0,
 				bgColor: "#F2F3F5",
 				color: '#323233',
@@ -377,6 +347,9 @@
 				freightTemplate: {},//运费模板
 				limitNum: 0,//单独起始购买数量
 				quantityLimit: 0,//拼团起始购买数量
+				colorAll: '',
+				stockNumAll: 0,
+				shoppingNumAll: 0,
 			};
 		},
 		watch:{
@@ -387,7 +360,7 @@
 					}
 				},
 				deep: true
-			},
+			}
 		},
 		computed: {
 			...mapState(['hasLogin','userInfo','weChat'])
@@ -397,6 +370,7 @@
 			this.id = options.id;
 			this.initData()
 			this.getCartCount()
+			this.getGroupProduct()
 		},
 		methods:{
 			//获取运费模板
@@ -420,12 +394,6 @@
 					groupProductId:this.groupProduct.id
 				}).then(r=>{
 					this.groupMemberHeadList = r.data
-					/* this.groupMemberHeadList = [
-						{id:1,productId:1,groupProductId:1,orderId:1,totalPeople:3,joinPeople:1,
-						startTime:"",endTime:"",leftTime:86400,userName:"张三",province:"广东",city:"中山",district:"小榄",imgPath:"https://zhonghekeep.com/profile//2020/07/29/57b8c6449022b5fb213981e1a9abc8f7.jpg"},
-						{id:1,productId:1,groupProductId:1,orderId:1,totalPeople:3,joinPeople:2,
-						startTime:"",endTime:"",leftTime:86400,userName:"李四",province:"广东",city:"中山",district:"小榄",imgPath:"https://zhonghekeep.com/profile//2020/07/29/57b8c6449022b5fb213981e1a9abc8f7.jpg"},
-					] */
 				}).catch(e=>{
 					this.$api.msg(e.msg||'网络异常请重试')
 				})
@@ -454,6 +422,19 @@
 					url: `/pagesProduct/product/factory?factoryNo=${this.product.factoryNo}`
 				})
 			},
+			getGroupProduct(){
+				this.$api.httpPost('groupProduct/api/getGroupProductByProductId',{
+					productId: this.id,
+					isActivity: 0
+				}).then(res=>{
+					if(res.data.id){
+						this.groupProduct = res.data
+						this.quantityLimit = this.groupProduct.quantityLimit
+					}
+				}).catch(error=>{
+					this.$api.msg(error.msg||'网络异常请重试')
+				})
+			},
 			initData(){
 				this.$api.loading('加载中...')
 				this.$api.httpPost('productInfo/api/detail',{
@@ -464,19 +445,16 @@
 					uni.hideLoading();
 					if(r.data){
 						this.product=r.data
-						if(r.data.groupProduct && r.data.groupProduct.isActivity === 0){
-							this.groupProduct = r.data.groupProduct
-						}
 						this.limitNum = this.product.limitNum
-						console.log(this.limitNum)
-						if(this.groupProduct){
-							this.quantityLimit = this.groupProduct.quantityLimit
-						}
 						if(this.product.orderProductColorList&&this.product.orderProductColorList.length>0){
-							console.log("orderProductColorList",this.product.orderProductColorList)
 							this.$set(this.product.orderProductColorList[0], 'selected', true);
 							this.specSelected=this.product.orderProductColorList[0];
 						}
+						for(let productColor of this.product.orderProductColorList){
+							this.colorAll  += ','+productColor.color
+							this.stockNumAll += productColor.stockNum
+						}
+						this.colorAll = this.colorAll.substring(1)
 						if(this.product.filePathList && this.product.filePathList.length>0){
 							this.product.filePathList.forEach(e=>{
 								if(e.type==1){
@@ -488,6 +466,18 @@
 						}
 						this.favorite=this.product.isFavorite==1
 						this.$refs.article.setContent(this.product.introductory);
+						//物流类型
+						if(this.product.logisticsType){
+							let arr = this.product.logisticsType.split(",")
+							for(let item of arr){
+								for(let obj of this.logisticsTypeList){
+									if(obj.value == item){
+										obj.visible = true
+									}
+								}
+							}
+						}
+						//发货方式
 						if(this.product.deliveryMethod){
 							let arr = this.product.deliveryMethod.split(",")
 							let count = 0
@@ -712,6 +702,12 @@
 				}
 				item.active = true
 			},
+			selectLogisticsType(item){
+				for(let obj of this.logisticsTypeList){
+					obj.active =false
+				}
+				item.active = true
+			},
 			removeItemSpecSelected(type){
 				this.specSelected.forEach(item=>{
 					if(item.type === type){ 
@@ -788,6 +784,9 @@
 			},
 			buy(){
 				let data = this.initGoodList()
+				if(!data){
+					return
+				}
 				uni.navigateTo({
 					url: `/pagesProduct/order/createOrder?data=${JSON.stringify({
 						goodsList: data.goodsList,
@@ -799,6 +798,9 @@
 			//开团
 			startGroup(){
 				let data = this.initGoodList()
+				if(!data){
+					return
+				}
 				uni.navigateTo({
 					url: `/pagesProduct/order/createOrder?data=${JSON.stringify({
 						goodsList: data.goodsList,
@@ -810,8 +812,10 @@
 			},
 			joinGroup(item){
 				let groupMember = this.groupMember
-				console.log(groupMember)
 				let data = this.initGoodList()
+				if(!data){
+					return
+				}
 				uni.navigateTo({
 					url: `/pagesProduct/order/createOrder?data=${JSON.stringify({
 						goodsList: data.goodsList,
@@ -827,7 +831,7 @@
 					//不是vip用户
 					if(this.product.ifVip==2||(this.userInfo.tag==1&&!this.product.isBuy)){
 						this.$api.msg('你没有权限购买该物品，需成为VIP会员后才可购买。')
-						return
+						return false
 					}
 				}
 				let goodsList = [];
@@ -838,8 +842,10 @@
 					productInfoList:[]
 				}
 				let totalMoney = 0
+				let shoppingNumAll = 0
 				for(let item of this.product.orderProductColorList){
 					if(item.shoppingNum){
+						shoppingNumAll += item.shoppingNum
 						let newPro = {
 							productName:this.product.productName,//商品名称
 							factoryNo:this.product.factoryNo,
@@ -857,14 +863,30 @@
 								newPro.chooseDeliveryMethod=deliveryMethod.name
 							}
 						}
+						let isSelect = false
+						for(let logisticsType of this.logisticsTypeList){
+							if(logisticsType.active){
+								isSelect = true
+								newPro.logisticsTypeName=logisticsType.name
+								newPro.logisticsTypeVal=logisticsType.value
+							}
+						}
+						if(!isSelect){
+							this.$api.msg('请先选择物流类型')
+							return false
+						}
 						delete newPro.introductory
 						goods.productInfoList.push(newPro)
 						totalMoney += item.salePrice * item.shoppingNum
 					}
 				}
+				if(shoppingNumAll < this.quantityLimit){
+					this.$api.msg('少于起购数量，请购买更多的商品')
+					return false
+				}
 				if(goods.productInfoList.length===0){
 					this.$api.msg('请先选择需要购买的商品数量')
-					return
+					return false
 				}
 				goodsList.push(goods)
 				console.log("goodsList",goodsList)
@@ -1437,8 +1459,19 @@
 				.line-box {
 					flex-basis: 100%;
 				}
+				
+				.color-text {
+					width: 180upx;
+				}
+				
 				.number-box {
 					margin-left: auto;
+					display: flex;
+					align-items: center;
+					
+					.price-box {
+						text-align: right;
+					}
 				}
 				
 				image{
@@ -1500,7 +1533,7 @@
 				text{
 					font-size: 20rpx;
 					/* color: $font-color-dark; */
-					margin: 20rpx;
+					margin-right: 20rpx;
 				}
 			}
 			

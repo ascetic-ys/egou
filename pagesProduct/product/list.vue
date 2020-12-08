@@ -16,7 +16,31 @@
 			</view>
 			<text class="cate-item jyticon icon-fenlei1" @click="toggleCateMask('show')"></text>
 		</view>
-		<mescroll-body :up='upOption' @down="downCallback" @up="upCallback" @init="mescrollInit">
+		<view class="goods-box">
+			<scroll-view scroll-y style="height: 100%;width: 100%;"  @scrolltolower="scrollDown">
+				<view class="goods-list">
+					<view 
+						v-for="(item, index) in goodsList" :key="index"
+						class="goods-item"
+						@click="navToDetailPage(item)"
+					>
+						<view class="image-wrapper">
+							<image :src="item.imgPath||`/static/errorImage.jpg`" mode="aspectFill"></image>
+						</view>
+						<text class="title clamp">{{item.productName}}</text>
+						<view class="price-box">
+							<text class="price">{{item.factoryPrice}}</text>
+						</view>
+					</view>
+				</view>
+				<view class="load-more">
+					<u-loadmore :status="loadStatus" ></u-loadmore>
+				</view>
+			</scroll-view>
+		</view>
+		
+		
+		<!-- <mescroll-body :up='upOption' @down="downCallback" @up="upCallback" @init="mescrollInit">
 			<view class="goods-list">
 				<view 
 					v-for="(item, index) in goodsList" :key="index"
@@ -24,16 +48,15 @@
 					@click="navToDetailPage(item)"
 				>
 					<view class="image-wrapper">
-						<image :src="item.imgPath||`http://img5.imgtn.bdimg.com/it/u=1957887963,2553893514&fm=26&gp=0.jpg`" mode="aspectFill"></image>
+						<image :src="item.imgPath||`/static/errorImage.jpg`" mode="aspectFill"></image>
 					</view>
 					<text class="title clamp">{{item.productName}}</text>
 					<view class="price-box">
 						<text class="price">{{item.factoryPrice}}</text>
-						<!-- <text>已售 {{item.sales||0}}</text> -->
 					</view>
 				</view>
 			</view>
-		</mescroll-body>
+		</mescroll-body> -->
 		
 		<view class="cate-mask" :class="cateMaskState===0 ? 'none' : cateMaskState===1 ? 'show' : ''" @click="toggleCateMask">
 			<view class="cate-content" @click.stop.prevent="stopPrevent" @touchmove.stop.prevent="stopPrevent">
@@ -117,18 +140,39 @@
 				cateList: [],
 				goodsList: [],
 				ifVip:1,//是否会员商品（1：否、2：是）
-				params:{},
+				goodsTotal: 0,
+				loadStatus: 'loadmore', //loadmore,loading,nomore
+				params:{
+					pageNum: 1,
+					pageSize: 10,
+					orderByColumn: 'orderNum',
+					isAsc:'asc',
+					state: 3,//已发布的商品
+					
+					brand:'',
+					largeCategory:'',
+					middleCategory:'',
+					littleCategory:'',
+					color:'',
+					ifVip:'',
+					lowPrice:'',
+					highPrice:'',
+					productName:'',
+					category:''
+				},
 				sizeList:[],
 				colorList:[]
 			};
 		},
 		
 		async onLoad(options){
-			this.initParams()
 			// #ifdef H5
 			this.headerTop = document.getElementsByTagName('uni-page-head')[0].offsetHeight+'px';
 			// #endif
 			this.params.largeCategory=options.largeCategory
+			if(options.middleCategory){
+				this.params.middleCategory=options.middleCategory
+			}
 			if(options.littleCategory){
 				this.params.littleCategory=options.littleCategory
 			}
@@ -159,87 +203,39 @@
 			}
 		},
 		methods: {
-			initParams(){
-				this.params={
-					brand:'',
-					largeCategory:'',
-					littleCategory:'',
-					orderByColumn:'',
-					isAsc:'',
-					color:'',
-					ifVip:'',
-					lowPrice:'',
-					highPrice:'',
-					productName:'',
-					category:''
-				}
-			},
-			/*下拉刷新的回调 */
-			downCallback() {
-				//联网加载数据
-				this.loadData().then(data => {
-					//联网成功的回调,隐藏下拉刷新的状态
-					this.mescroll.endSuccess();
-				}).catch(()=>{
-					//联网失败的回调,隐藏下拉刷新的状态
-					this.mescroll.endErr();
-				})
-			},
-			/*上拉加载的回调: 其中page.num:当前页 从1开始, page.size:每页数据条数,默认10 */
-			upCallback(page) {
-				//联网加载数据
-				let pageNum = page.num; // 页码, 默认从1开始
-				let pageSize = page.size; // 页长, 默认每页10条
-				this.loadData({pageNum,pageSize}).then(r=>{
-					//联网成功的回调,隐藏下拉刷新和上拉加载的状态;
-					//mescroll会根据传的参数,自动判断列表如果无任何数据,则提示空;列表无下一页数据,则提示无更多数据;
-								
-					//方法一(推荐): 后台接口有返回列表的总页数 totalPage
-					// this.mescroll.endByPage(r.length, t.total); //必传参数(当前页的数据个数, 总页数)
-								
-					//方法二(推荐): 后台接口有返回列表的总数据量 totalSize
-					this.mescroll.endBySize(this.goodsList.length, r.total); //必传参数(当前页的数据个数, 总数据量)
-								
-					//方法三(推荐): 您有其他方式知道是否有下一页 hasNext
-					//this.mescroll.endSuccess(curPageData.length, hasNext); //必传参数(当前页的数据个数, 是否有下一页true/false)
-								
-					//方法四 (不推荐),会存在一个小问题:比如列表共有20条数据,每页加载10条,共2页.如果只根据当前页的数据个数判断,则需翻到第三页才会知道无更多数据
-					// this.mescroll.endSuccess(r.length)
-				}).catch(()=>{
-					this.mescroll.endErr()
-				})
-			},
-			//加载商品 ，带下拉刷新和上滑加载
-			loadData(data={}) {
-				const {pageNum=1,pageSize=10}=data
-				if(!this.params.orderByColumn){
-					/* delete this.params.orderByColumn
-					delete this.params.isAsc */
-					this.params.orderByColumn='orderNum'
-					this.params.isAsc='asc'
-				}
-				
-				delete this.params.size
+			loadData() {
+				this.loadStatus = 'loadmore'
 				this.$api.loading('加载中...')
-				return this.$api.httpPost('productInfo/api/list',{
-					pageNum,
-					pageSize,
-					state: 3,
-					...this.params
-				}).then(r=>{
-					console.log("请求结果：",r)
+				return this.$api.httpPost('productInfo/api/list',this.params).then(r=>{
 					uni.hideLoading();
-					if(pageNum===1){
-						this.goodsList=r.rows
-					}else{
-						this.goodsList=this.goodsList.concat(r.rows)
+					this.goodsList=r.rows
+					this.goodsTotal = r.total
+					if(this.goodsTotal===0||this.goodsTotal===this.goodsList.length){
+						this.loadStatus = 'nomore'
 					}
 					return r
 				}).catch(e=>{
-					console.log("请求错误：",e)
 					uni.hideLoading();
 					this.$api.msg(e.msg||'网络异常请重试')
 				})
+			},
+			
+			scrollDown(){
+				if(this.goodsTotal!==0&&this.goodsList.length<this.goodsTotal){
+					this.params.pageNum += 1
+					this.loadStatus = 'loading'
+					this.$api.httpPost('productInfo/api/list',this.params).then(r=>{
+						this.goodsList=this.goodsList.concat(r.rows)
+						this.goodsTotal = r.total
+						this.loadStatus = 'loadmore'
+					}).catch(e=>{
+						this.loadStatus = 'loadmore'
+						this.$api.msg(e.msg||'网络异常请重试')
+					})
+				}else{
+					this.loadStatus = 'nomore'
+				}
+				
 			},
 			//加载分类
 			async loadCateList(){
@@ -319,12 +315,25 @@
 	}
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 	page, .content{
 		background: $page-color-base;
 	}
 	.content{
 		padding-top: 96upx;
+	}
+	
+	.goods-box {
+		min-height: 100vh;
+		height: 1200upx;
+		
+		.load-more {
+			//margin-top: 20upx;
+			height: 80upx;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
 	}
 
 	.navbar{

@@ -15,23 +15,52 @@
 			</view>
 			</navigator>
 
-		<view class="goods-section">
-			<view class="g-header b-b">
-				<text class="name">商品信息</text>
-			</view>
-			<!-- 商品列表 -->
-			<view class="g-item" v-for="(product,pi) in orderInfo.orderChildInfoList" :key='pi'>
-				<image :src="product.productInfo.imgPath||`https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=298298368,1308836146&fm=26&gp=0.jpg`"></image>
-				<view class="right">
-					<text class="title clamp">{{product.productInfo.brand}}{{product.productInfo.productName}}{{product.productInfo.largeCategory}}{{product.productInfo.littleCategory}}</text>
-					<text class="spec">{{product.productInfo.color}}</text>
-					<view class="price-box">
-						<text class="price">￥{{product.unitPrice}}</text>
-						<text class="number">x {{product.productNum}}</text>
+		<!-- 按厂家分组 -->
+		 <view class="goods-section">
+			<view class="g-item" v-for="(group,pi) in orderInfo.groupList" :key='pi'>
+				<view class="g-header">
+					<text class="name">{{group.factoryName}}</text>
+				</view>
+				<view class="goods-box" v-for="(product,pi) in group.orderChildInfoList" :key='pi' >
+					<image :src="product.imgPath||'/static/errorImage.jpg'"></image>
+					<view class="right">
+						<text class="title clamp">{{product.productName}}</text>
+						<text class="spec">{{product.color}}</text>
+						<view class="price-box">
+							<text class="price">￥{{product.unitPrice}}</text>
+							<text class="number">x {{product.productNum}}</text>
+							<text class="deliveryMethod">发货方式: {{product.deliveryMethod||'-'}}</text>
+						</view>
+					</view>
+				</view>
+				<!-- <view class="wuliu-box b-t" 
+				v-if="[3,4].indexOf(orderInfo.orderState)>-1&&group.orderChildInfoList[0].logisticsContrastId" 
+				@tap.stop="gotowl(orderInfo.id,group.factoryNo)">
+					<view class="left-box">
+						<text class="left">配送</text>
+					</view>
+					<view class="middle-box">
+						<text class="top middle" >快递运输</text>
+						<text class="bottom middle" >工作日、双休日与节假日均可送货</text>
+					</view>
+					<view class="right-box">
+						<text class="yticon icon-you" ></text>
+					</view>
+				</view> -->
+				<view class="wuliu-box b-t" >
+					<view class="left-box">
+						<text class="left">总金额</text>
+					</view>
+					<!-- <view class="middle-box">
+						<text class="top middle" >快递运输</text>
+						<text class="bottom middle" >工作日、双休日与节假日均可送货</text>
+					</view> -->
+					<view class="right-box">
+						<text >￥{{getTotalPrice(group.orderChildInfoList)}}</text>
 					</view>
 				</view>
 			</view>
-		</view>
+		</view> 
 
 		<!-- 金额明细 -->
 		<view class="yt-list">
@@ -84,6 +113,13 @@
 			this.initData()
 		},
 		methods: {
+			getTotalPrice(orderChildInfoList){
+				let totalPrice = 0
+				for(let item of orderChildInfoList){
+					totalPrice += item.unitPrice * item.productNum
+				}
+				return totalPrice
+			},
 			initData(){
 				this.$api.httpPost('orderMainInfo/api/detail',{id:this.id}).then(r=>{
 					console.log("请求结果：",r)
@@ -226,75 +262,116 @@
 		margin-top: 16upx;
 		background: #fff;
 		padding-bottom: 1px;
-
+		
+		
+	
 		.g-header {
 			display: flex;
 			align-items: center;
 			height: 84upx;
-			padding: 0 30upx;
 			position: relative;
+			.name {
+				margin-left: 0upx;
+			}
 		}
-
+	
 		.logo {
 			display: block;
 			width: 50upx;
 			height: 50upx;
 			border-radius: 100px;
 		}
-
+	
 		.name {
 			font-size: 30upx;
 			color: $font-color-base;
 			margin-left: 24upx;
 		}
-
+	
 		.g-item {
 			display: flex;
+			flex-direction: column;
 			margin: 20upx 30upx;
-
-			image {
-				flex-shrink: 0;
-				display: block;
-				width: 140upx;
-				height: 140upx;
-				border-radius: 4upx;
-			}
-
-			.right {
-				flex: 1;
-				padding-left: 24upx;
-				overflow: hidden;
-			}
-
-			.title {
-				font-size: 30upx;
-				color: $font-color-dark;
-			}
-
-			.spec {
-				font-size: 26upx;
-				color: $font-color-light;
-			}
-
-			.price-box {
+			border-bottom: 1upx solid #EEEEEE;
+			
+			.goods-box{
 				display: flex;
-				align-items: center;
-				font-size: 32upx;
-				color: $font-color-dark;
-				padding-top: 10upx;
-
-				.price {
-					margin-bottom: 4upx;
+				margin-top: 10rpx;
+				margin-bottom: 20rpx;
+				image {
+					flex-shrink: 0;
+					display: block;
+					width: 140upx;
+					height: 140upx;
+					border-radius: 4upx;
 				}
-				.number{
+				
+				.right {
+					flex: 1;
+					padding-left: 24upx;
+					overflow: hidden;
+				}
+				
+				.title {
+					font-size: 30upx;
+					color: $font-color-dark;
+				}
+				
+				.spec {
 					font-size: 26upx;
-					color: $font-color-base;
-					margin-left: 20upx;
+					color: $font-color-light;
+				}
+				
+				.price-box {
+					display: flex;
+					align-items: center;
+					font-size: 32upx;
+					color: $font-color-dark;
+					padding-top: 10upx;
+				
+					.price {
+						margin-bottom: 4upx;
+					}
+					.number{
+						font-size: 26upx;
+						color: $font-color-base;
+						margin-left: 20upx;
+					}
+					
+					.deliveryMethod {
+						margin-left: auto;
+						font-size: 26upx;
+						color: $font-color-light;
+					}
+				}
+				
+				.step-box {
+					position: relative;
 				}
 			}
-
-			.step-box {
-				position: relative;
+			
+		}
+		.wuliu-box{
+			display:flex;
+			justify-content: space-between;
+			padding: 20rpx;
+			color: #505256;
+			font-size: 28rpx;
+			.left-box{
+				display:flex;
+				justify-content: space-between;
+			}
+			.middle-box{
+				display:flex;
+				flex-direction: column;
+				text-align: right;
+				flex: 1;
+			}
+			.right-box{
+				text-align: right;
+				line-height: 40rpx;
+				padding-top: 14rpx;
+				padding-left: 10rpx;
 			}
 		}
 	}

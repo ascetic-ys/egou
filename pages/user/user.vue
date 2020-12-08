@@ -151,9 +151,9 @@
 				</view>
 			</view>
 			<view class="mybtn-section ">
-				<button-cell v-if='!userInfo.id || [1,4].indexOf(userInfo.tag)>-1' icon="icon-icon--" iconColor="#6E7070" title="城市渠道商注册" border="" @eventClick="navTo('/pagesUser/partner/partner?isB=1',true)"></button-cell>
+				<button-cell v-if='!userInfo.id || [1,4].indexOf(userInfo.tag)>-1' icon="icon-icon--" iconColor="#6E7070" title="城市服务商注册" border="" @eventClick="navTo('/pagesUser/partner/partner?isB=1',true)"></button-cell>
 				<button-cell v-if='!userInfo.id || [1,4].indexOf(userInfo.tag)>-1' icon="icon-fenlei" iconColor="#6E7070" title="渠道商B端注册" border="" @eventClick="navTo('/pagesUser/partner/partner?isB=2',true)"></button-cell>
-				<button-cell v-if='[0].indexOf(userInfo.tag)>-1' icon="icon-icon--" iconColor="#6E7070" title="城市渠道商信息" tips="查看已注册的城市渠道商" border="" @eventClick="navTo('/pagesUser/partner/partnerList')"></button-cell>
+				<button-cell v-if='[0].indexOf(userInfo.tag)>-1' icon="icon-icon--" iconColor="#6E7070" title="城市服务商信息" tips="查看已注册的城市服务商" border="" @eventClick="navTo('/pagesUser/partner/partnerList')"></button-cell>
 				<button-cell v-if='[1].indexOf(userInfo.tag)>-1' icon="icon-shoucang" iconColor="#6E7070" title="会员中心" tips="访问会员中心" border="" @eventClick="navTo('/pagesUser/user/membershipCenter')"></button-cell>
 				<button-cell v-if='[3].indexOf(userInfo.tag)>-1' icon="icon-saomiao" iconColor="#6E7070" title="我的二维码" tips="查看我的二维码" border="" @eventClick="navTo('/pagesUser/user/myQrCode')"></button-cell>
 				<button-cell v-if='[3].indexOf(userInfo.tag)>-1' icon="icon-saomiao" iconColor="#6E7070" title="游客二维码" tips="查看我的二维码" border="" @eventClick="navTo('/pagesUser/user/myQrCode?type=3')"></button-cell>
@@ -167,9 +167,9 @@
 				<button-cell v-if='userInfo.tag==0' icon="icon-share" iconColor="#6E7070" title="订单统计" border="" tips="查看最近订单图表信息" @eventClick="navTo('/pagesProduct/orderTj/orderTj?state=0')"></button-cell>
 				<!-- <button-cell v-if='userInfo.tag==0' icon="icon-pinglun-copy" iconColor="#6E7070" title="待办事项" tips="有新的消息" @eventClick="navTo('/pagesInfo/notice/notice')"></button-cell> -->
 				<button-cell icon="icon-pinglun-copy" iconColor="#6E7070" title="通知消息" tips="我的消息" border="" @eventClick="navTo('/pagesInfo/notice/message')"></button-cell>
-				<button-cell v-if='userInfo.tag==3 && userInfo.isB==1' icon="icon-fenlei" iconColor="#6E7070" title="城市渠道商B端" border="" tips="查看我的城市渠道商B端信息" @eventClick="navTo('/pagesInfo/myUser/myBUser?state=0')"></button-cell>
+				<button-cell v-if='userInfo.tag==3 && userInfo.isB==1' icon="icon-fenlei" iconColor="#6E7070" title="城市服务商B端" border="" tips="查看我的城市服务商B端信息" @eventClick="navTo('/pagesInfo/myUser/myBUser?state=0')"></button-cell>
 				<button-cell v-if='userInfo.tag==3' icon="icon-tuandui" iconColor="#6E7070" title="我的客户" border="" tips="查看我的客户信息" @eventClick="navTo('/pagesInfo/myUser/myUser?state=0')"></button-cell>
-				<button-cell v-if='userInfo.tag==3' icon="icon-bianji" iconColor="#6E7070" title="城市渠道商协议" border="" tips="查看曾签订的协议" @eventClick="navTo('/pagesUser/partner/partnerProtocol')"></button-cell>
+				<button-cell v-if='userInfo.tag==3' icon="icon-bianji" iconColor="#6E7070" title="城市服务商协议" border="" tips="查看曾签订的协议" @eventClick="navTo('/pagesUser/partner/partnerProtocol')"></button-cell>
 				<button-cell v-if='userInfo.tag==3' icon="icon-iconfontweixin" iconColor="#6E7070" title="会员费用支付" tips="查看会员续费记录" border="" @eventClick="navTo('/pagesUser/partner/partnerVipPay')"></button-cell>
 				<button-cell icon="icon-shezhi1" iconColor="#6E7070" title="设置" border="" @eventClick="navTo('/pagesUser/set/set')"></button-cell>
 				<button-cell icon="icon-iLinkapp-" iconColor="#6E7070" title="服务须知" border="" @eventClick="navTo('/pagesUser/set/service')"></button-cell>

@@ -28,7 +28,7 @@
 		</view>
 		<view class="change-qrcode" v-if="userInfo.isB!=2&&type!=3">
 			<button class="code-img img-left" :class="[type==1?'show':'hide']" @click="changeType(1)">用户注册二维码</button>
-			<button class="code-img img-right" :class="[type==2?'show':'hide']" @click="changeType(2)">城市渠道商B端注册二维码</button>
+			<button class="code-img img-right" :class="[type==2?'show':'hide']" @click="changeType(2)">城市服务商B端注册二维码</button>
 		</view>
 		<!-- <view class="change-qrcode" v-if="type==3">
 			<button class="code-img-1 show" >游客临时访问二维码</button>
@@ -44,7 +44,7 @@
 			return {
 				type:1,
 				qrCodeImage1: '',//用户注册二维码
-				qrCodeImage2: '',//城市渠道商B端注册二维码
+				qrCodeImage2: '',//城市服务商B端注册二维码
 				qrCodeImage3: '',//临时访问商城二维码
 				access_token:'',
 				expires_in:0,
@@ -53,7 +53,7 @@
 		onLoad(option){
 			// this.createQrCode()
 			if(this.userInfo.isB==2){
-				//是城市渠道商B端,只显示一个二维码
+				//是城市服务商B端,只显示一个二维码
 				this.type=1
 			}
 			if(option.type){

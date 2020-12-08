@@ -77,7 +77,7 @@
         },{
             "path" : "myUser/myBUser",
             "style" : {
-        		"navigationBarTitleText": "我的城市渠道商B端"
+        		"navigationBarTitleText": "我的城市服务商B端"
         	}
         },{
             "path" : "myAchievement/myAchievement",
@@ -116,7 +116,7 @@
 		"pages": [{
             "path" : "product/list",
             "style" : {
-				"enablePullDownRefresh": true,
+				"enablePullDownRefresh": false,
 				"navigationBarTitleText": "商品列表"
 			}
         },{
@@ -217,7 +217,8 @@
 		},{
 			"path": "product/factory",
 			"style": {
-				"navigationBarTitleText": "厂家详情展示"
+				"navigationBarTitleText": "厂家详情展示",
+				"enablePullDownRefresh": false
 			}
 		},{
 			"path": "product/factoryDetail",
@@ -289,7 +290,7 @@
 		{
 			"path": "set/protocolPartner",
 			"style": {
-				"navigationBarTitleText": "城市渠道商协议"
+				"navigationBarTitleText": "城市服务商协议"
 			}
 		},
 		{
@@ -381,17 +382,17 @@
         },{
             "path" : "partner/partnerPay",
             "style" : {
-            	"navigationBarTitleText": "城市渠道商会员费用支付"
+            	"navigationBarTitleText": "城市服务商会员费用支付"
             }
         },{
             "path" : "partner/partnerPayEdit",
             "style" : {
-            	"navigationBarTitleText": "城市渠道商会员费用支付"
+            	"navigationBarTitleText": "城市服务商会员费用支付"
             }
         },{
             "path" : "partner/partnerProtocol",
             "style" : {
-            	"navigationBarTitleText": "城市渠道商协议"
+            	"navigationBarTitleText": "城市服务商协议"
             }
         },{
             "path" : "partner/partnerVipPay",
@@ -416,17 +417,17 @@
         },{
             "path" : "partner/partnerProtocolAgree",
             "style" : {
-            	"navigationBarTitleText": "城市渠道商协议"
+            	"navigationBarTitleText": "城市服务商协议"
             }
         },{
             "path" : "partner/partnerList",
             "style" : {
-            	"navigationBarTitleText": "城市渠道商列表"
+            	"navigationBarTitleText": "城市服务商列表"
             }
         },{
             "path" : "partner/partnerDetail",
             "style" : {
-            	"navigationBarTitleText": "城市渠道商详情"
+            	"navigationBarTitleText": "城市服务商详情"
             }
         }]
 	}],
