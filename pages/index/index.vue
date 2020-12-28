@@ -69,7 +69,7 @@
 					<text class="cate-text">{{item.orderProductCategory}}</text>
 				</view>
 				<view class="cate-item" @tap="toGroupProductList()">
-					<image :src="`/static/logo/category_default.jpg`"></image>
+					<image :src="`/static/logo/pingou.png`"></image>
 					<text class="cate-text">拼购专区</text>
 				</view>
 			</view>
@@ -77,7 +77,7 @@
 			<view class="ad-1">
 				<swiper class="serviceImg" circular autoplay @change="swiperChange1">
 					<swiper-item v-for="(item, index) in serviceImgList1" :key="index" class="serviceImg-item" 
-					@tap="navTo('/pagesProduct/product/list')">
+					@tap="navTo('/pagesProduct/product/list?isRecommend=1')">
 						<image :src="item.filePath" mode="scaleToFill"/>
 					</swiper-item>
 				</swiper>
@@ -116,8 +116,10 @@
 			
 			<view class="ad-1">
 				<swiper class="serviceImg" circular autoplay @change="swiperChange2">
+					<!-- <swiper-item v-for="(item, index) in serviceImgList2" :key="index" class="serviceImg-item" 
+					@tap="navTo('/pagesProduct/product/list?category=品牌产品')"> -->
 					<swiper-item v-for="(item, index) in serviceImgList2" :key="index" class="serviceImg-item" 
-					@tap="navTo('/pagesProduct/product/list')">
+					@tap="navTo('/pagesProduct/product/brandList')">
 						<image :src="item.filePath" mode="scaleToFill"/>
 					</swiper-item>
 				</swiper>
@@ -195,7 +197,7 @@
 			<view class="ad-1">
 				<swiper class="serviceImg" circular autoplay @change="swiperChange4">
 					<swiper-item v-for="(item, index) in serviceImgList4" :key="index" class="serviceImg-item" 
-					@tap="navTo('/pagesProduct/product/list?category=品牌产品')">
+					@tap="navTo('/pagesProduct/product/list?ifVip=2')">
 						<image :src="item.filePath" mode="scaleToFill"/>
 					</swiper-item>
 				</swiper>
@@ -549,8 +551,9 @@
 					pageSize:4,
 					orderByColumn:'orderNum',
 					isAsc:'asc',
+					ifVip: 2,
 					ifHomePage:1,
-					category:'定制产品',
+					/* category:'定制产品', */
 					state: 3
 				}).then(r=>{
 					console.log("定制产品请求结果：",r)

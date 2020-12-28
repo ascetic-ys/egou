@@ -1,0 +1,78 @@
+.content{
+	color: #56565a;
+}
+
+.content .box{
+	font-size: 28upx;
+	margin-bottom: 20upx;
+	background-color: #FFFFFF;
+}
+
+.item{
+	/* height: 100upx;
+	line-height: 100upx; */
+	padding: 25upx 0;
+	border-bottom: 1upx solid #e7e7f1;
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	
+}
+
+.item .item-label{
+	padding-left: 30upx;
+}
+.item .item-content{
+	margin-left: auto;
+	padding-right: 30upx;
+	text-align: right;
+	width: 55%;
+}
+.item input {
+	margin-left: auto;
+	font-size: 28upx;
+	padding-right: 30upx;
+	text-align: right;
+	
+}
+
+.item switch {
+	margin-left: auto;
+	transform:scale(0.7);
+}
+
+.item .pl{
+	font-size: 24upx;
+	color: #bfbfc8;
+}
+
+.item .errorMsg {
+	color: #ff0000;
+	font-size: 12upx;
+	text-align: right;
+	flex-basis: 100%;
+	padding-right: 30upx;
+} 
+
+
+.item .item-btn{
+	margin: auto;
+	width: 90%;
+	
+}
+
+.item-btn .receiveBtn{
+	font-size: 28upx;
+	color: #606266;
+	border-color: #c0c4cc;
+	background-color: #FFFFFF;
+
+}
+.item-btn .receiveBtnHover{
+	background-color: #ecf5ff;
+	color: #2b85e4;
+	border-color: #2b85e4;
+}
+
+
+		

@@ -6,7 +6,7 @@
 				<image class="factoryIcon" :src="factoryDetail.factoryIcon||'/static/errorImage.jpg'" mode="aspectFill"></image>
 				<image class="icardIcon" src="/static/images/qr-code-1.png" mode="aspectFill" ></image>
 			</view>
-			<view class="factoryName">{{factoryDetail.factoryName||factoryNo}}</view>
+			<view class="factoryName">{{factoryDetail.factoryName||factoryName}}</view>
 		</view>
 		<view class="body">
 			<scroll-view scroll-y style="height: 100%;width: 100%;"  @scrolltolower="scrollDown">
@@ -62,6 +62,7 @@
 			return {
 				show: false,
 				factoryNo: '',
+				factoryName: '',
 				productTotal: 0,
 				productList: [],
 				factoryDetail: {},
@@ -78,6 +79,7 @@
 		},
 		onLoad(option) {
 			this.factoryNo = option.factoryNo
+			this.factoryName = option.factoryName
 			this.getFactoryDetail()
 			this.getCategory()
 			this.getProductlist()
@@ -146,6 +148,10 @@
 				})
 			},
 			toFactoryDetail() {
+				if(!this.factoryDetail.id){
+					this.$api.msg("店铺太懒了，没有上传信息。")
+					return
+				}
 				uni.navigateTo({
 					url: `/pagesProduct/product/factoryDetail?factoryDetail=${encodeURIComponent(JSON.stringify(this.factoryDetail))}`
 				})
@@ -166,6 +172,7 @@
 				}
 				
 				this.show = false
+				this.queryParams.pageNum=1
 				this.getProductlist()
 			},
 			navToProductDetailPage(item){

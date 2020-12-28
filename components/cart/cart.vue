@@ -45,30 +45,26 @@
 									@click="check('product',index, m)"
 								></view>
 							</view>
+							
 							<view class="item-right">
 								<text class="clamp title">{{product.productName}}</text>
 								<text class="attr">{{product.chooseProductColor.color}}</text>
+								<text class="attr" v-if="product.isCustomization===1">定制商品</text>
+								<view class="raido-box">
+									<u-section title="发货方式" :sub-title="product.chooseDeliveryMethod" :showLine="showLine" :bold="bold" @click="toggleSpec(product)"></u-section>
+								</view>
 								<view class="price-box">
 									<text class="price">¥{{product.chooseProductColor.salePrice}}</text>
 									<view class="number-box">
-										<uni-number-box
-											class="step"
-											:min="1" 
-											:max="100"
-											:value="product.productNum>100?100:product.productNum"
-											:isMax="product.productNum>=100?true:false"
-											:isMin="product.productNum===1"
-											:index="index"
-											:mindex="m"
-											@eventChange="numberChange"
-										></uni-number-box>
+								
+										<u-number-box  v-model="product.productNum" :step="product.chooseProductColor.increaseNum||1" 
+										:min="product.chooseProductColor.increaseNum||1"
+										:disabled-input="product.chooseProductColor.increaseNum&&product.chooseProductColor.increaseNum>1"></u-number-box>
 									</view>
 									
 									
 								</view>
-								<view class="raido-box">
-									<u-section title="发货方式" :sub-title="product.chooseDeliveryMethod" :showLine="showLine" :bold="bold" @click="toggleSpec(product)"></u-section>
-								</view>
+								
 							</view>
 							<text class="del-btn yticon icon-fork" @click="deleteCartItem(product,m)"></text>
 						</view>
@@ -388,6 +384,8 @@
 			},
 			//计算总价
 			calcTotal(){
+				//解决浮点精度丢失问题
+				var Decimal = require('decimal.js');
 				let list = this.cartList;
 				if(list.length === 0){
 					this.empty = true;
@@ -398,20 +396,23 @@
 				list.forEach(item=>{
 					item.productInfoList.forEach(product=>{
 						if(product.checked === true){
-							total += product.chooseProductColor.salePrice * product.productNum;
+							let salePrice = new Decimal(product.chooseProductColor.salePrice)
+							total = salePrice.mul(product.productNum).plus(total)
 						}else if(checked === true){
 							checked = false;
 						}
 					})
 				})
 				this.allChecked = checked;
-				this.total = total;
+				this.total = total.toString();
 			},
 			//创建订单
 			createOrder(){
 				let list = this.cartList;
 				let goodsList = [];
 				let flag = false
+				let onlyBuy = false
+				let onlyBuyCount = 0
 				list.forEach(item=>{
 					if(item.checked){
 						let newItem = item
@@ -421,24 +422,35 @@
 								flag = true
 							}
 							if(product.checked){
+								if(product.isCustomization===1){
+									onlyBuy = true
+								}
+								onlyBuyCount++
 								let newPro = product
 								newPro.productId = newPro.id
-								//暂时 购物车物流类型 设置为直达 后面要修改
-								newPro.logisticsTypeName= '直达'
-								newPro.logisticsTypeVal= 'DIRECT'
 								delete newPro.introductory
 								newProList.push(newPro)
 							}
 						})
+						if(onlyBuy&&onlyBuyCount>1){
+							return
+						}
+						if(flag){
+							return
+						}
 						newItem.productInfoList=newProList
 						goodsList.push(newItem)
 					}
 				})
-				
+				if(onlyBuy&&onlyBuyCount>1){
+					this.$api.msg('定制商品请单独购买')
+					return
+				}
 				if(flag){
 					this.$api.msg('请选择发货方式')
 					return
 				}
+				
 				
 				if(goodsList.length<=0){
 					this.$api.msg('请选择商品')
@@ -622,9 +634,12 @@
 				.price-box{
 					display: flex;
 					align-items: center;
+					margin-top: 20rpx;
 					.price{
 						height: 50upx;
 						line-height:50upx;
+						font-size: 26px;
+						color: $uni-color-primary;
 					}
 					
 					.number-box{

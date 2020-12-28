@@ -225,7 +225,16 @@
 			"style": {
 				"navigationBarTitleText": "厂家详情展示"
 			}
+		},{
+			"path" : "product/brandList",
+			"style" :                                                                                    
+			{
+				"navigationBarTitleText": "品牌列表",
+				"enablePullDownRefresh": false
+			}
+		
 		},
+		
 		{
 			"path": "order/favoriteList",
 			"style": {
@@ -264,6 +273,7 @@
                 }
                 
                 }
+                
             ]
 	},{
 		"root": "pagesUser",
@@ -429,7 +439,16 @@
             "style" : {
             	"navigationBarTitleText": "城市服务商详情"
             }
-        }]
+        }    ,{
+                    "path" : "public/findPwd",
+                    "style" :                                                                                    
+                {
+                    "navigationBarTitleText": "找回密码",
+                    "enablePullDownRefresh": false
+                }
+                
+                }
+            ]
 	}],
 	"globalStyle": {
 		"navigationBarTextStyle": "white",

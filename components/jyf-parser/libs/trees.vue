@@ -314,7 +314,7 @@
 	}
 
 	._img {
-		display: inline-block;
+		display: block;
 		max-width: 100%;
 		position: relative;
 	}

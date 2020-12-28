@@ -4,16 +4,17 @@
 			<view class="nav-item" :class="{current: params.orderByColumn === ''}" @click="tabClick('')">
 				综合排序
 			</view>
-			<!-- <view class="nav-item" :class="{current: params.orderByColumn === 'sales'}" @click="tabClick('sales')">
+			<view class="nav-item" :class="{current: params.orderByColumn === 'salesVolume'}" @click="tabClick('salesVolume')">
 				销量优先
-			</view> -->
-			<view class="nav-item" :class="{current: params.orderByColumn === 'factoryPrice'}" @click="tabClick('factoryPrice')">
+				
+			</view>
+			<!-- <view class="nav-item" :class="{current: params.orderByColumn === 'factoryPrice'}" @click="tabClick('factoryPrice')">
 				<text>价格</text>
 				<view class="p-box">
-					<text :class="{active: params.isAsc === 'asc' && params.orderByColumn === 'factoryPrice'}" class="yticon icon-shang" @click="tabClick('factoryPrice','asc')"></text>
-					<text :class="{active: params.isAsc === 'desc' && params.orderByColumn === 'factoryPrice'}" class="yticon icon-shang xia" @click="tabClick('factoryPrice','desc')"></text>
+					<text :class="{active: params.isAsc === 'asc' && params.orderByColumn === 'factoryPrice'}" class="yticon icon-shang" ></text>
+					<text :class="{active: params.isAsc === 'desc' && params.orderByColumn === 'factoryPrice'}" class="yticon icon-shang xia" ></text>
 				</view>
-			</view>
+			</view> -->
 			<text class="cate-item jyticon icon-fenlei1" @click="toggleCateMask('show')"></text>
 		</view>
 		<view class="goods-box">
@@ -28,7 +29,7 @@
 							<image :src="item.imgPath||`/static/errorImage.jpg`" mode="aspectFill"></image>
 						</view>
 						<text class="title clamp">{{item.productName}}</text>
-						<view class="price-box">
+						<view class="price-box" v-if="hasLogin">
 							<text class="price">{{item.factoryPrice}}</text>
 						</view>
 					</view>
@@ -61,20 +62,20 @@
 		<view class="cate-mask" :class="cateMaskState===0 ? 'none' : cateMaskState===1 ? 'show' : ''" @click="toggleCateMask">
 			<view class="cate-content" @click.stop.prevent="stopPrevent" @touchmove.stop.prevent="stopPrevent">
 				<scroll-view scroll-y class="cate-list">
-					<!-- <view class="attr-list">
-						<text>尺寸</text>
+					<view class="attr-list">
+						<text>品牌</text>
 						<view class="item-list">
 							<text 
-								v-for="(item, index) in sizeList" 
-								:key="item.name" class="tit"
-								:class="{selected: item.name===params.size}"
-								@click="selectSize(item.name)"
+								v-for="(item, index) in brandList" 
+								:key="index" class="tit"
+								:class="{selected: item.dictValue===params.ibm}"
+								@click="selectIbm(item.dictValue)"
 							>
-								{{item.name}}
+								{{item.dictValue}}
 							</text>
 						</view>
-					</view> -->
-					<view class="attr-list">
+					</view>
+					<!-- <view class="attr-list">
 						<text>价格</text>
 						<view class="input-range">
 							<view class="input-info">
@@ -85,7 +86,7 @@
 								<input type="number" v-model="params.highPrice" placeholder="最高价" @input="inputChangeHighPrice"/>
 							</view>
 						</view>
-					</view>
+					</view> -->
 					<!-- <view class="attr-list">
 						<text>颜色</text>
 						<view class="item-list">
@@ -158,13 +159,18 @@
 					lowPrice:'',
 					highPrice:'',
 					productName:'',
-					category:''
+					category:'',
+					isRecommend: '',
+					ibm: ''
 				},
 				sizeList:[],
-				colorList:[]
+				colorList:[],
+				brandList: []
 			};
 		},
-		
+		computed: {
+			...mapState(['hasLogin'])
+		},
 		async onLoad(options){
 			// #ifdef H5
 			this.headerTop = document.getElementsByTagName('uni-page-head')[0].offsetHeight+'px';
@@ -189,10 +195,17 @@
 			if(options.isOpenGroup){
 				this.params.isOpenGroup=options.isOpenGroup
 			}
+			if(options.isRecommend){
+				this.params.isRecommend=options.isRecommend
+			}
+			if(options.ibm){
+				this.params.ibm=options.ibm
+			}
 			/* this.sizeList = await this.$api.json('sizeList')
 			this.colorList = await this.$api.json('colorList') */
 			this.loadCateList()
 			this.loadData()
+			this.getBrandList()
 		},
 		onPageScroll(e){
 			//兼容iOS端下拉时顶部漂移
@@ -203,6 +216,14 @@
 			}
 		},
 		methods: {
+			getBrandList(){
+				this.$api.httpPost('common/api/getDictByKey',{key:'productInfo_ibm'}).then(r=>{
+					this.brandList = r.data
+					
+				}).catch(e=>{
+					this.$api.msg(e.msg||'网络异常请重试')
+				})
+			},
 			loadData() {
 				this.loadStatus = 'loadmore'
 				this.$api.loading('加载中...')
@@ -251,11 +272,16 @@
 			},
 			//排序点击
 			tabClick(orderByColumn,isAsc){
-				if(orderByColumn){
-					this.params.orderByColumn = orderByColumn;
-				}
-				if(isAsc){
-					this.params.isAsc = isAsc;
+				this.params.orderByColumn = orderByColumn;
+				if(orderByColumn==="factoryPrice"){
+					if(this.params.isAsc==="asc"){
+						this.params.isAsc = "desc"
+					}else{
+						this.params.isAsc = "asc"
+					}
+					
+				}else{
+					this.params.isAsc = "desc"
 				}
 				this.loadData();
 			},
@@ -275,6 +301,10 @@
 				// this.toggleCateMask();
 				// this.loadData();
 			},
+			selectIbm(ibm){
+				this.params.ibm=ibm
+				this.loadData();
+			},
 			//分类点击
 			selectSize(name){
 				this.params.size=name
@@ -289,16 +319,18 @@
 			},
 			//分类点击
 			selectConfirm(){
-				if(Number(this.params.lowPrice)>Number(this.params.highPrice)){
+				/* if(Number(this.params.lowPrice)>Number(this.params.highPrice)){
 					this.$api.msg('最低价要小于最高价')
 					return 
-				}
+				} */
 				this.toggleCateMask();
 				this.loadData();
 			},
 			//分类点击
 			selectCancel(){
-				this.initParams()
+				this.params.ibm = ''
+				this.params.highPrice = ''
+				this.params.lowPrice = ''
 				this.toggleCateMask();
 				this.loadData();
 			},
@@ -472,8 +504,9 @@
 			padding-top: 30upx;
 			padding-left: 10upx;
 			.input-range{
+				margin-top: 30upx;
 				display: flex;
-				justify-content: center;
+				justify-content: space-between;
 				line-height: 70rpx;
 				view{
 					line-height: 70rpx;
