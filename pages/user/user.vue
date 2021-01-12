@@ -53,7 +53,7 @@
 			
 			<view class="top-bg-img">
 				<!-- <image src="http://img0.imgtn.bdimg.com/it/u=2883970925,4093911839&fm=26&gp=0.jpg" mode="scaleToFill"></image> -->
-				<image src="/static/background/user-back1.png" mode="scaleToFill"></image>
+				<image src="/static/background/user-back3.png" mode="scaleToFill"></image>
 			</view>
 		</view>
 		
@@ -113,7 +113,7 @@
 					</view>
 				</view>
 			</view>
-			<view class="today-section" v-if='[0,3].indexOf(userInfo.tag)>-1'>
+			<view class="today-section" v-if='[0,3,5].indexOf(userInfo.tag)>-1'>
 				<view class="info-box">
 					<text class="info-title">今日数据</text>
 					<view class="info-more">
@@ -121,7 +121,7 @@
 					</view>
 				</view>
 				<view class="btn-box">
-					<view class="today-item" v-if='[0,3].indexOf(userInfo.tag)>-1' hover-class="common-hover"  :hover-stay-time="50">
+					<view class="today-item" v-if='[0,3,5].indexOf(userInfo.tag)>-1' hover-class="common-hover"  :hover-stay-time="50">
 						<text class="num">{{todayOrderNum}}</text>
 						<text>今日订单数</text>
 						<view class="change">较昨日
@@ -130,7 +130,7 @@
 							</text>
 						</view>
 					</view>
-					<view class="today-item" v-if='[0,3].indexOf(userInfo.tag)>-1' hover-class="common-hover" :hover-stay-time="50">
+					<view class="today-item" v-if='[0,3,5].indexOf(userInfo.tag)>-1' hover-class="common-hover" :hover-stay-time="50">
 						<text class="num">{{todayOrderPrice}}</text>
 						<text>今日订单额</text>
 						<view class="change">较昨日
@@ -151,9 +151,9 @@
 				</view>
 			</view>
 			<view class="mybtn-section ">
-				<button-cell v-if='!userInfo.id || [1,4].indexOf(userInfo.tag)>-1' icon="icon-icon--" iconColor="#6E7070" title="城市服务商注册" border="" @eventClick="navTo('/pagesUser/partner/partner?isB=1',true)"></button-cell>
-				<button-cell v-if='!userInfo.id || [1,4].indexOf(userInfo.tag)>-1' icon="icon-fenlei" iconColor="#6E7070" title="渠道商B端注册" border="" @eventClick="navTo('/pagesUser/partner/partner?isB=2',true)"></button-cell>
-				<button-cell v-if='[0].indexOf(userInfo.tag)>-1' icon="icon-icon--" iconColor="#6E7070" title="城市服务商信息" tips="查看已注册的城市服务商" border="" @eventClick="navTo('/pagesUser/partner/partnerList')"></button-cell>
+				<!-- <button-cell v-if='!userInfo.id || [1,4].indexOf(userInfo.tag)>-1' icon="icon-icon--" iconColor="#6E7070" title="城市服务商注册" border="" @eventClick="navTo('/pagesUser/partner/partner?isB=1',true)"></button-cell> -->
+				<!-- <button-cell v-if='!userInfo.id || [1,4].indexOf(userInfo.tag)>-1' icon="icon-fenlei" iconColor="#6E7070" title="渠道商B端注册" border="" @eventClick="navTo('/pagesUser/partner/partner?isB=2',true)"></button-cell> -->
+				<button-cell v-if='[0,5].indexOf(userInfo.tag)>-1' icon="icon-icon--" iconColor="#6E7070" title="城市服务商信息" tips="查看已注册的城市服务商" border="" @eventClick="navTo('/pagesUser/partner/partnerList')"></button-cell>
 				<button-cell v-if='[1].indexOf(userInfo.tag)>-1' icon="icon-shoucang" iconColor="#6E7070" title="会员中心" tips="访问会员中心" border="" @eventClick="navTo('/pagesUser/user/membershipCenter')"></button-cell>
 				<button-cell v-if='[3].indexOf(userInfo.tag)>-1' icon="icon-saomiao" iconColor="#6E7070" title="我的二维码" tips="查看我的二维码" border="" @eventClick="navTo('/pagesUser/user/myQrCode')"></button-cell>
 				<button-cell v-if='[3].indexOf(userInfo.tag)>-1' icon="icon-saomiao" iconColor="#6E7070" title="游客二维码" tips="查看我的二维码" border="" @eventClick="navTo('/pagesUser/user/myQrCode?type=3')"></button-cell>
@@ -164,10 +164,10 @@
 				<button-cell v-if='[1,4].indexOf(userInfo.tag)>-1' icon="icon-shouye" iconColor="#6E7070" title="发票管理" border="" tips="查看我记录的发票信息" @eventClick="navTo('/pagesInfo/invoice/invoice')"></button-cell>
 				<button-cell v-if='[1,4].indexOf(userInfo.tag)>-1' icon="icon-pingjia" iconColor="#6E7070" title="售后反馈" border="" tips="查看我的售后反馈申请" @eventClick="navTo('/pagesProduct/order/serviceList')"></button-cell>
 				<button-cell v-if='userInfo.tag==2' icon="icon-shouye" iconColor="#6E7070" title="我的订单" border="" tips="查看我提交的订单" @eventClick="navTo('/pagesInfo/myOrder/myOrder')"></button-cell>
-				<button-cell v-if='userInfo.tag==0' icon="icon-share" iconColor="#6E7070" title="订单统计" border="" tips="查看最近订单图表信息" @eventClick="navTo('/pagesProduct/orderTj/orderTj?state=0')"></button-cell>
+				<button-cell v-if='[0,5].indexOf(userInfo.tag)>-1' icon="icon-share" iconColor="#6E7070" title="订单统计" border="" tips="查看最近订单图表信息" @eventClick="navTo('/pagesProduct/orderTj/orderTj?state=0')"></button-cell>
 				<!-- <button-cell v-if='userInfo.tag==0' icon="icon-pinglun-copy" iconColor="#6E7070" title="待办事项" tips="有新的消息" @eventClick="navTo('/pagesInfo/notice/notice')"></button-cell> -->
 				<button-cell icon="icon-pinglun-copy" iconColor="#6E7070" title="通知消息" tips="我的消息" border="" @eventClick="navTo('/pagesInfo/notice/message')"></button-cell>
-				<button-cell v-if='userInfo.tag==3 && userInfo.isB==1' icon="icon-fenlei" iconColor="#6E7070" title="城市服务商B端" border="" tips="查看我的城市服务商B端信息" @eventClick="navTo('/pagesInfo/myUser/myBUser?state=0')"></button-cell>
+				<!-- <button-cell v-if='userInfo.tag==3 && userInfo.isB==1' icon="icon-fenlei" iconColor="#6E7070" title="城市服务商B端" border="" tips="查看我的城市服务商B端信息" @eventClick="navTo('/pagesInfo/myUser/myBUser?state=0')"></button-cell> -->
 				<button-cell v-if='userInfo.tag==3' icon="icon-tuandui" iconColor="#6E7070" title="我的客户" border="" tips="查看我的客户信息" @eventClick="navTo('/pagesInfo/myUser/myUser?state=0')"></button-cell>
 				<button-cell v-if='userInfo.tag==3' icon="icon-bianji" iconColor="#6E7070" title="城市服务商协议" border="" tips="查看曾签订的协议" @eventClick="navTo('/pagesUser/partner/partnerProtocol')"></button-cell>
 				<button-cell v-if='userInfo.tag==3' icon="icon-iconfontweixin" iconColor="#6E7070" title="会员费用支付" tips="查看会员续费记录" border="" @eventClick="navTo('/pagesUser/partner/partnerVipPay')"></button-cell>
@@ -323,7 +323,7 @@
         methods: {
 			initData(){
 				this.initPageTitle()
-				if(this.userInfo.tag==0){
+				if(this.userInfo.tag==0||this.userInfo.tag==5){
 					this.getNewOrder()
 				}else if(this.userInfo.tag==3){
 					this.getNewUser()
@@ -353,7 +353,7 @@
 				
 			 },
 			bfidLoad(){
-				const id=this.userInfo.id.toString()
+				const id=this.userInfo.id||'' + ''
 				let bfid='BF'
 				for(let i=id.length;i<6;i++){
 					bfid+='0'
@@ -497,7 +497,7 @@
 				})
 			},
 			initPageTitle(){
-				if(this.userInfo&&[0,2].indexOf(this.userInfo.tag)>-1){
+				if(this.userInfo&&[0,2,5].indexOf(this.userInfo.tag)>-1){
 					uni.setTabBarItem({
 					  index: 2,
 					  text: '订单',

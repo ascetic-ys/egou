@@ -67,7 +67,7 @@
 		
 		
 		<view class="c-list">
-			<view class="c-row b-b" @click="toggleSpec" v-if="!groupProduct&&product.orderProductColorList.length>0">
+			<view class="c-row b-b" @click="toggleSpec" v-if="[1,4].indexOf(userInfo.tag)>-1&&!groupProduct&&product.orderProductColorList.length>0">
 				<text class="tit">已选购</text>
 				<view class="con">
 					<view class="selected-box" v-for="(item,index) in product.orderProductColorList" :key="index">
@@ -83,6 +83,16 @@
 				<text class="tit">保障:</text>
 				<view class="bz-list con">
 					<text>付款后{{product.guarantee||60}}天内发货</text>
+				</view>
+			</view>
+			<view class="c-row b-b" v-if="product.precautions">
+				<!-- <text class="tit">注意事项:</text> -->
+				<view class="bz-list con precautions">
+					<!-- <text>{{product.precautions||'-'}}</text> -->
+					<u-read-more :shadow-style="shadowStyle" :text-indent="0" :toggle="true" :show-height="150">
+						<text>{{product.precautions}}</text>
+						<!-- <rich-text :nodes="product.precautions"></rich-text> -->
+					</u-read-more>
 				</view>
 			</view>
 		</view>
@@ -103,7 +113,7 @@
 			</view>
 			<jyf-parser domain="https://6874-html-foe72-1259071903.tcb.qcloud.la" gesture-zoom lazy-load ref="article" selectable
 			 show-with-animation use-anchor @error="error" @imgtap="imgtap" @linkpress="linkpress" @parse="parse" @ready="ready">加载中...</jyf-parser>
-			<view class="d-bottom"></view>
+			 <view class="d-bottom"></view>
 		</view>
 		<view class="detail-params" v-show="tabCurrentIndex==1">
 			<!-- 商品编号、风格、主要材质、工艺、功能、体积、面料、适用场景 -->
@@ -151,7 +161,6 @@
 				<text class="title">适用场景</text>
 				<text class="info">{{product.adapter||'-'}}</text>
 			</view>
-			<view class="d-bottom"></view>
 		</view>
 		<view class="detail-service" v-show="tabCurrentIndex==2">
 			<view class="d-data" @click="navTo('/pagesUser/set/protocolCommon?flag=1')">
@@ -162,7 +171,6 @@
 				<text class="title">包邮服务及物流费用说明</text>
 				<text class="yticon icon-you"></text>
 			</view>
-			<view class="d-bottom"></view>
 		</view>
 		
 		
@@ -235,21 +243,7 @@
 						</block>
 						
 					</view>
-					<text>物流类型</text>
-					<view class="item-list-2">
-						<block v-for="(item, index) in logisticsTypeList" :key="index"> 
-							<template v-if="item.visible">
-								<view
-									class="select-box"
-									:class="{selected: item.active}"
-									@click="selectLogisticsType(item)"
-								>
-										<text class="tit">{{item.name}}</text>
-								</view>
-							</template>
-						</block>
-						
-					</view>
+					
 					<text>颜色</text>
 					<view class="item-list">
 						<view 
@@ -264,13 +258,12 @@
 							<text class="tit color-text">{{item.color}}</text>
 							<view class="number-box" >
 								<view class="price-box">
-									<view class=""><text>￥{{item.salePrice||'-'}}</text></view>
-									<view class=""><text>库存：{{item.stockNum||'-'}}</text></view>
+									<view class="price-box-item"><text>￥{{item.salePrice||'-'}}</text></view>
+									<view class="price-box-item"><text>库存：{{item.stockNum||'-'}}</text></view>
 									
 								</view>
-								<u-number-box v-model="item.shoppingNum" :long-press="false"   :bg-color="bgColor" :color="color" 
-								
-								:step="step" :disabled="disabled" ></u-number-box>
+								<u-number-box  v-model="item.shoppingNum" :long-press="false"   :bg-color="bgColor" :color="color" 
+								:step="item.increaseNum||1" :disabled-input="item.increaseNum&&item.increaseNum>1"></u-number-box>
 							</view>
 							
 							<view class="line-box" v-if="index === product.orderProductColorList.length-1">
@@ -304,6 +297,11 @@
 		},
 		data() {
 			return {
+				shadowStyle: {
+					backgroundImage: "none",
+					paddingTop: "0",
+					marginTop: "20rpx"
+				},
 				id:null,
 				specClass: 'none',
 				specSelected:{},
@@ -320,10 +318,7 @@
 					{name: '快运',value: 2,active: false, visible:false},
 					{name: '物流',value: 3,active: false, visible:false},
 				],
-				logisticsTypeList: [
-					{name: '直达',value: 'DIRECT',active: false, visible:false},
-					{name: '二次物流',value: 'SECOND',active: false, visible:false},
-				],
+				
 				tabCurrentIndex:0,
 				bgColor: "#F2F3F5",
 				color: '#323233',
@@ -345,11 +340,10 @@
 				groupMember: undefined,//拼团信息,
 				groupMemberHeadList: [],//拼团团长信息列表
 				freightTemplate: {},//运费模板
-				limitNum: 0,//单独起始购买数量
-				quantityLimit: 0,//拼团起始购买数量
+				limitNum: 0,//起始购买数量
 				colorAll: '',
 				stockNumAll: 0,
-				shoppingNumAll: 0,
+				shoppingNumAll: 0
 			};
 		},
 		watch:{
@@ -366,6 +360,12 @@
 			...mapState(['hasLogin','userInfo','weChat'])
 		},
 		onLoad(options){
+			if(!this.hasLogin){
+				uni.reLaunch({
+					url:'/pagesUser/public/login'
+				})
+				return
+			}
 			//接收传值,id里面放的是标题，因为测试数据并没写id 
 			this.id = options.id;
 			this.initData()
@@ -373,6 +373,7 @@
 			this.getGroupProduct()
 		},
 		methods:{
+			
 			//获取运费模板
 			getFreightTemplate(){
 				let id = this.product.freightTemplateId
@@ -419,7 +420,7 @@
 			},
 			goStore(){
 				uni.navigateTo({
-					url: `/pagesProduct/product/factory?factoryNo=${this.product.factoryNo}`
+					url: `/pagesProduct/product/factory?factoryNo=${this.product.factoryNo}&factoryName=${this.product.factoryName}`
 				})
 			},
 			getGroupProduct(){
@@ -429,7 +430,7 @@
 				}).then(res=>{
 					if(res.data.id){
 						this.groupProduct = res.data
-						this.quantityLimit = this.groupProduct.quantityLimit
+						this.limitNum = this.groupProduct.quantityLimit
 					}
 				}).catch(error=>{
 					this.$api.msg(error.msg||'网络异常请重试')
@@ -445,7 +446,9 @@
 					uni.hideLoading();
 					if(r.data){
 						this.product=r.data
-						this.limitNum = this.product.limitNum
+						if(!this.groupProduct){
+							this.limitNum = this.product.limitNum
+						}
 						if(this.product.orderProductColorList&&this.product.orderProductColorList.length>0){
 							this.$set(this.product.orderProductColorList[0], 'selected', true);
 							this.specSelected=this.product.orderProductColorList[0];
@@ -466,17 +469,7 @@
 						}
 						this.favorite=this.product.isFavorite==1
 						this.$refs.article.setContent(this.product.introductory);
-						//物流类型
-						if(this.product.logisticsType){
-							let arr = this.product.logisticsType.split(",")
-							for(let item of arr){
-								for(let obj of this.logisticsTypeList){
-									if(obj.value == item){
-										obj.visible = true
-									}
-								}
-							}
-						}
+						
 						//发货方式
 						if(this.product.deliveryMethod){
 							let arr = this.product.deliveryMethod.split(",")
@@ -702,12 +695,7 @@
 				}
 				item.active = true
 			},
-			selectLogisticsType(item){
-				for(let obj of this.logisticsTypeList){
-					obj.active =false
-				}
-				item.active = true
-			},
+			
 			removeItemSpecSelected(type){
 				this.specSelected.forEach(item=>{
 					if(item.type === type){ 
@@ -827,6 +815,7 @@
 				})
 			},
 			initGoodList(){
+				var Decimal = require('decimal.js');
 				if(this.userInfo.ifVip!=2||this.userInfo.vipState!=1){
 					//不是vip用户
 					if(this.product.ifVip==2||(this.userInfo.tag==1&&!this.product.isBuy)){
@@ -851,6 +840,7 @@
 							factoryNo:this.product.factoryNo,
 							factoryName:this.product.factoryName,
 							factoryShortName:this.product.factoryShortName,
+							logisticsType:this.product.logisticsType,
 						}
 						newPro.productNum=item.shoppingNum
 						newPro.productId=this.product.id
@@ -863,25 +853,17 @@
 								newPro.chooseDeliveryMethod=deliveryMethod.name
 							}
 						}
-						let isSelect = false
-						for(let logisticsType of this.logisticsTypeList){
-							if(logisticsType.active){
-								isSelect = true
-								newPro.logisticsTypeName=logisticsType.name
-								newPro.logisticsTypeVal=logisticsType.value
-							}
-						}
-						if(!isSelect){
-							this.$api.msg('请先选择物流类型')
-							return false
-						}
+						
 						delete newPro.introductory
 						goods.productInfoList.push(newPro)
-						totalMoney += item.salePrice * item.shoppingNum
+						//浮点数精度丢失的问题
+						
+						let salePrice = new Decimal(item.salePrice)
+						totalMoney = salePrice.mul(item.shoppingNum).plus(totalMoney)
 					}
 				}
-				if(shoppingNumAll < this.quantityLimit){
-					this.$api.msg('少于起购数量，请购买更多的商品')
+				if(shoppingNumAll < this.limitNum){
+					this.$api.msg('少于起购数量:'+ this.limitNum+'，请购买更多的商品')
 					return false
 				}
 				if(goods.productInfoList.length===0){
@@ -891,7 +873,7 @@
 				goodsList.push(goods)
 				console.log("goodsList",goodsList)
 				this.toggleSpec()
-				return {goodsList: goodsList,totalMoney: totalMoney}
+				return {goodsList: goodsList,totalMoney: totalMoney.toString()}
 			},
 			//加入购物车
 			addCart(){
@@ -1042,6 +1024,8 @@
 			padding: 10upx 0;
 			font-size: 26upx;
 			color:$uni-color-primary;
+			
+			
 		}
 		.price{
 			font-size: $font-lg + 2upx;
@@ -1205,6 +1189,7 @@
 			}
 			
 		}
+		
 		.bz-list{
 			height: 40upx;
 			font-size: $font-sm+2upx;
@@ -1223,6 +1208,14 @@
 		}
 		.red{
 			color: $uni-color-primary;
+		}
+		.precautions {
+			height: auto;
+			
+			text {
+				font-weight: 900;
+				color: #e70000;
+			}
 		}
 	}
 	
@@ -1314,7 +1307,15 @@
 				}
 			}
 		}
+		
+		
 	}
+	
+	.d-bottom{
+		width: 100%;
+		height: 100rpx;
+	}
+	
 	/*  详情 */
 	.detail-desc{
 		background: #fff;
@@ -1345,9 +1346,6 @@
 				border-bottom: 1px solid #ccc; 
 			}
 		}
-		.d-bottom{
-			height: 200rpx;
-		}
 	}
 	/* 详细参数 */
 	.detail-params{
@@ -1370,9 +1368,6 @@
 				float: left;
 			}
 		}
-		.d-bottom{
-			height: 200rpx;
-		}
 	}
 	.detail-service{
 		background: #fff;
@@ -1386,9 +1381,6 @@
 			line-height: 80rpx;
 			border-bottom: 1rpx solid #F5F5F5;
 			font-size: 24rpx;
-		}
-		.d-bottom{
-			height: 200rpx;
 		}
 	}
 	
@@ -1432,7 +1424,7 @@
 			overflow-y: scroll;
 		}
 		.item-list{
-			padding: 20upx 0 0;
+			margin: 20upx 0 0;
 			display: flex;
 			/* align-items: center; */
 			justify-content: left;
@@ -1470,7 +1462,15 @@
 					align-items: center;
 					
 					.price-box {
-						text-align: right;
+						margin: 10rpx 0;
+						
+						.price-box-item {
+							display: flex;
+							
+							text {
+								margin-left: auto;
+							}
+						}
 					}
 				}
 				
@@ -1481,7 +1481,7 @@
 				text{
 					font-size: 20rpx;
 					/* color: $font-color-dark; */
-					margin: 20rpx;
+					margin-left: 20rpx;
 				}
 			}
 			

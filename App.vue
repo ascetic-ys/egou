@@ -18,7 +18,7 @@
 						this.login(res.data);
 					}
 				});
-				if([0,2].indexOf(userInfo.tag)>-1){
+				if([0,2,5].indexOf(userInfo.tag)>-1){
 					uni.setTabBarItem({
 					  index: 2,
 					  text: '订单',

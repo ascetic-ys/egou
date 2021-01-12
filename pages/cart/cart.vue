@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<StaticalOrder ref='staticalOrder' v-if='userInfo.tag==0'></StaticalOrder>
+		<StaticalOrder ref='staticalOrder' v-if='[0,5].indexOf(userInfo.tag)>-1'></StaticalOrder>
 		<Cart ref='cart' :tag='userInfo.tag' v-if='!userInfo.id||[1,4].indexOf(userInfo.tag)>-1'></Cart>
 		<MyOrder ref='myOrder' v-if='userInfo.tag==2'></MyOrder>
 		<MyAchievement ref='myAchievement' v-if='userInfo.tag==3'></MyAchievement>
@@ -50,9 +50,9 @@
 					this.$nextTick(() => {
 						this.$refs.cart.initData()
 					})
-				}else if(this.userInfo.id&&[0,2].indexOf(this.userInfo.tag)>-1){
+				}else if(this.userInfo.id&&[0,2,5].indexOf(this.userInfo.tag)>-1){
 					let title = '订单统计'
-					if(this.userInfo.tag==0){
+					if(this.userInfo.tag==0||this.userInfo.tag==5){
 						title='订单统计'
 					}else{
 						title='我的订单'

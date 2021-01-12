@@ -64,6 +64,7 @@
 					console.log("请求结果：",r)
 					if(r.code==0){
 						this.cateLit = r.data
+						this.currentId = this.cateLit[0].id
 						this.childCate = this.cateLit[0].categoryList
 					}
 					uni.hideLoading();

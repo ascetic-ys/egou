@@ -1,0 +1,98 @@
+.head {
+	margin-left: 10px;
+	margin-top: 20upx;
+	font-size: 32upx;
+}
+
+.card {
+	margin-top: 40upx;
+	border-bottom: 1upx solid #f1f1f1;
+	padding-bottom: 40upx;
+}
+
+.card .title {
+	letter-spacing: 1upx;
+	margin-left: 10px;
+	font-size: 26upx;
+}
+.card .main {
+	font-size: 20upx;
+	display: flex;
+	flex-wrap: wrap;
+	letter-spacing: 1upx;
+}
+
+.card .main .item {
+	margin-left: 15upx;
+	margin-top: 20upx;
+	padding: 12upx 30upx;
+	border-radius: 30upx;
+	background-color: #f5f5f5;
+	border: 2upx solid rgba($color: #000000, $alpha: 0);
+}
+.card .main .active {
+	
+	border: 2upx solid #ff0004;
+	color: #ff0004;
+	background-color: #ffe2e3;
+}
+
+.card .main .remark {
+	margin-left: 15upx;
+	font-size: 20upx;
+	margin-top: 20upx;
+	color: #aaaaaa;
+	width: 90%;
+}
+
+.card .main .item-input {
+	flex: 1 1 100%;
+	display: flex;
+	align-items: center;
+	font-size: 22upx;
+	margin-left: 15upx;
+	margin-top: 20upx;
+}
+
+.item-input input {
+	margin-left: 10upx;
+	
+}
+
+.item-input .selectImg{
+	width: 35upx;
+	height: 35upx;
+} 
+ 
+
+
+.card .main .across {
+	margin-left: 40upx;
+	flex-basis: 100%;
+}
+
+.confirm-btn {
+	font-size: 24upx;
+	height: 60upx;
+	/* width: 90%; */
+	border-radius: 32upx;
+	margin: 0 auto;
+	color: #FFFFFF;
+	background-color: #e8370a;
+	
+	position: fixed;
+	left: 30upx;
+	right: 30upx;
+	bottom: 16upx;
+	z-index: 95;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 690upx;
+}
+
+	
+.card .pl {
+	font-size: 20upx;
+	color: #aaaaaa;
+}

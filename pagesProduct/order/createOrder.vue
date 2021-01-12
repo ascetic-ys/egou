@@ -25,9 +25,7 @@
 		<view class="goods-section">
 
 			<!-- 商品列表 -->
-			<!-- <view class="g-header b-b">
-				<text class="name">柏福车饰</text>
-			</view> -->
+			
 			<view v-for="(item,index) in goodsList" :key='index' class="good-box">
 				<view style="background: #EEEEEE;height: 20rpx;"></view>
 				<view class="g-header b-b">
@@ -44,7 +42,7 @@
 							<text class="deliveryMethod">发货方式: {{product.chooseDeliveryMethod}}</text>
 						</view>
 						<view class="price-box">
-							<text class="deliveryMethod">物流类型: {{product.logisticsTypeName}}</text>
+							<text class="deliveryMethod">物流类型: {{product.logisticsType|getLogisticsType}}</text>
 						</view>
 					</view>
 				</view>
@@ -163,6 +161,17 @@
 				remarks:'',
 				fare: 0,//运费
 				noDeliveryReason: null,//不配送原因
+			}
+		},
+		filters: {
+			getLogisticsType: function(value){
+				if(value === 'DIRECT'){
+					return '直达'
+				}else if(value === 'SECOND'){
+					return '二次物流'
+				}else {
+					return value
+				}
 			}
 		},
 		onLoad(option){
@@ -415,14 +424,18 @@
 					vehicleType:this.vehicleType,//车辆类型
 					groupProduct:this.groupProduct,//拼团模板信息
 					groupMember: this.groupMember,//拼团团长信息
+					isCustomization: this.isCustomizationFlag?1:0,//是否定制
 				}
 			},
 			getTotalPrice(productInfoList){
+				//解决浮点精度丢失问题
+				var Decimal = require('decimal.js');
 				let totalPrice = 0
 				for(let item of productInfoList){
-					totalPrice += item.chooseProductColor.salePrice*item.productNum
+					let salePrice = new Decimal(item.chooseProductColor.salePrice)
+					totalPrice = salePrice.mul(item.productNum).plus(totalPrice)
 				}
-				return totalPrice
+				return totalPrice.toString()
 			},
 			stopPrevent(){}
 		}

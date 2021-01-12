@@ -1,10 +1,10 @@
-let URL_API = 'https://zhonghekeep.com/'
-let URL_SHOW='https://zhonghekeep.com/'
-let COMPANY_NAME='柏福车饰'
+let URL_API = 'https://jj.bofuchepin.com/'
+let URL_SHOW='https://jj.bofuchepin.com/'
+let COMPANY_NAME='柏福地板'
 
 if(process.env.NODE_ENV === 'development'){
-	URL_API = 'http://localhost:8080/'
-	URL_SHOW='http://localhost:8080/'
+	/* URL_API = 'http://localhost:8080/'
+	URL_SHOW='http://localhost:8080/' */
 }
 
 export const RESOURCE = {

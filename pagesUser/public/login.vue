@@ -9,18 +9,17 @@
 			<!-- <view class="welcome"> 欢迎回来！</view> -->
 			<view class="logo-top">
 				<view class="logo-img">
-					<image src="/static/logo/login-logo.png"></image>
+					<image src="/static/logo/login-logo3.png"></image>
 				</view>
-				<view class="system-tip">柏福车品服务终端</view>
+				<view class="system-tip">柏福地板供应链平台</view>
 				<!-- <view class="login-tip">登录：</view> -->
 			</view>
 			<view class="input-content">
 				<view class="input-item">
-					<text class="tit">手机号码</text>
+					<text class="tit">账号</text>
 					<input 
-						type="number" 
 						:value="form.phoneNumber" 
-						placeholder="请输入手机号码"
+						placeholder="请输入手机号码/账号"
 						maxlength="11"
 						data-key="phoneNumber"
 						@input="inputChange"
@@ -44,9 +43,13 @@
 				忘记密码?
 			</view> -->
 		</view>
-		<view class="register-section">
+		<view class="register-section2">
 			<text>还没有账号?</text>
 			<button open-type="getUserInfo" withCredentials="true" lang="zh_CN" @getuserinfo="toRegist">马上注册</button>
+		</view>
+		<view class="register-section1">
+			<text>密码不见了?</text>
+			<button open-type="getUserInfo" withCredentials="true" lang="zh_CN" @getuserinfo="toFindPwd">找回密码</button>
 		</view>
 		<view class="company-section">
 			<text>平台技术：北京中和在线科技有限公司</text>
@@ -80,6 +83,11 @@
 			},
 			navBack(){
 				uni.navigateBack();
+			},
+			toFindPwd(){
+				uni.navigateTo({
+					url:'/pagesUser/public/findPwd'
+				})
 			},
 			//先授权微信信息，再跳转注册页面
 			toRegist(){
@@ -134,7 +142,7 @@
 				})
 			},
 			changeTabBar(tag){
-				if([0,2].indexOf(tag)>-1){
+				if([0,2,5].indexOf(tag)>-1){
 					uni.setTabBarItem({
 					  index: 2,
 					  text: '订单',
@@ -164,10 +172,10 @@
 					this.$api.msg('请输入手机号')
 					return false
 				}
-				if(!isMobile(this.form.phoneNumber)){
+				/* if(!isMobile(this.form.phoneNumber)){
 					this.$api.msg('手机号格式不正确')
 					return false
-				}
+				} */
 				if(!this.form.userPassword){
 					this.$api.msg('请输入密码')
 					return false
@@ -341,7 +349,7 @@
 			line-height: 80rpx;
 		}
 	}
-	.register-section{
+	.register-section1{
 		position:absolute;
 		left: 0;
 		bottom: 100upx;
@@ -369,6 +377,38 @@
 		}
 		
 	}
+	
+	.register-section2{
+		position:absolute;
+		left: 0;
+		bottom: 150upx;
+		width: 100%;
+		font-size: $font-sm+2upx;
+		color: $font-color-base;
+		text-align: center;
+		display: flex;
+		justify-content:center;
+		text{
+			margin-left: 10upx;
+			flex: 1;
+			line-height: 80rpx;
+			text-align: right;
+		}
+		button{
+			color: $font-color-spec;
+			flex: 1;
+			background: none;
+			font-size: 26rpx;
+			text-align: left;
+		}
+		button::after{
+			border: none;
+		}
+		
+	}
+	
+	
+	
 	.paddingno{
 		padding-top: 0rpx !important;
 	}

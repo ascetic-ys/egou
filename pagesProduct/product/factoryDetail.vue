@@ -51,7 +51,7 @@
 					<view class="right">{{factoryDetail.registAuthority||'-'}}</view>
 				</view>
 			</view>
-			<view class="card">
+			<!-- <view class="card">
 				<view class="card-title">
 					<text>工厂信息</text>
 				</view>
@@ -72,7 +72,7 @@
 					<view class="right">{{factoryDetail.monthlyOutput||'-'}}</view>
 				</view>
 				
-			</view>
+			</view> -->
 		</view>
 	</view>
 </template>
