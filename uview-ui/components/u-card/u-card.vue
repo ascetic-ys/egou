@@ -278,7 +278,7 @@ export default {
 			}
 			
 			&__title {
-				max-width: 400rpx;
+				/* max-width: 400rpx; */
 			}
 		}
 

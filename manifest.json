@@ -62,10 +62,6 @@
             "ocr-plugin" : {
                 "version" : "3.0.3",
                 "provider" : "wx4418e3e031e551be"
-            },
-            "ykfchat" : {
-                "version" : "2.0.11",
-                "provider" : "wx1fdc8c9f3a3a05e4"
             }
         },
         "appid" : "wx2c839feb9aeb8fe9",

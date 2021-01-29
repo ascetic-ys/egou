@@ -6,10 +6,10 @@
 		'u-mode-' + mode + '-' + type
 	]"
 	 class="u-tag" :style="[customStyle]" @tap="clickTag">
-		{{text}}
+		<text>{{text}}</text>
 		<view class="u-icon-wrap" @tap.stop>
 			<u-icon @click="close" size="22" v-if="closeable" :color="closeIconColor" 
-			name="close" class="u-close-icon" :style="[iconStyle]"></u-icon>
+			:name="iconName" class="u-close-icon" :style="[iconStyle]"></u-icon>
 		</view>
 	</view>
 </template>
@@ -101,6 +101,10 @@
 			show: {
 				type: Boolean,
 				default: true
+			},
+			iconName: {
+				type: String,
+				default: 'close'
 			}
 		},
 		data() {

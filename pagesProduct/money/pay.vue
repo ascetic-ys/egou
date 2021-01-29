@@ -37,10 +37,16 @@
 				</view>
 			</view>
 			
-			<view class="price-box">
+			<view class="price-box" v-if="orderInfo.orderState===1">
 				共
 				<text class="num">{{orderInfo.productNum}}</text>
-				件商品 实付款
+				件商品 定金
+				<text class="price">{{orderInfo.orderPrice}}</text>
+			</view>
+			<view class="price-box" v-if="orderInfo.orderState===8">
+				共
+				<text class="num">{{orderInfo.productNum}}</text>
+				件商品 尾款
 				<text class="price">{{orderInfo.orderPrice}}</text>
 			</view>
 		</view>

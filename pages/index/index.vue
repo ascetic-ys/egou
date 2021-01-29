@@ -22,8 +22,8 @@
 				<view 
 					v-for="(item, index) in navList" :key="index" 
 					class="nav-item" 
-					:class="{current: tabCurrentIndex === index}"
-					@click="tabClick(index)"
+					:class="{current: tabCurrentIndex === item.state}"
+					@click="tabClick(item.state)"
 				>
 					{{item.text}}
 				</view>
@@ -32,6 +32,14 @@
 		<view class="space-header"></view>
 		
 		<scroll-view scroll-with-animation scroll-y class="right-aside"  :scroll-into-view='scrollntoView' :style="{'height':'1600rpx'}">
+			<view class="cate-section no-padding no-wrap" >
+				<view class="cate-item" v-for="(item,i) in naviCateList" :key='i' @tap="toProductList(item)">
+					<image :src="item.imgPath||`/static/logo/category_default.jpg`"></image>
+					<text class="cate-text">{{item.orderProductCategory}}</text>
+				</view>
+			</view>
+			
+			
 			<!-- 头部轮播 -->
 			<view class="carousel-section">
 				<!-- 标题栏和状态栏占位符 -->
@@ -39,9 +47,7 @@
 				<!-- 背景色区域 -->
 				<view class="titleNview-background" :style="{backgroundColor:titleNViewBackground}"></view>
 				<swiper class="carousel" circular autoplay @change="swiperChange">
-					<!-- <swiper-item v-for="(item, index) in carouselList" :key="index" class="carousel-item" @click="navToDetailPage({title: '轮播广告'})">
-						<image :src="item.filePath" />
-					</swiper-item> -->
+					
 					<block v-for="(obj, index) in carouselList" :key="index">
 						<template v-if="obj.linkType===1">
 							<swiper-item v-for="(item, index) in obj.orderFilePathList" :key="index" class="carousel-item" @click="navToGroupActivity(obj)">
@@ -63,16 +69,65 @@
 					<text class="num">{{swiperLength}}</text>
 				</view>
 			</view>
-			<view class="cate-section" >
-				<view class="cate-item" v-for="(item,i) in naviCateList" :key='i' @tap="toProductList(item)">
-					<image :src="item.imgPath||`/static/logo/category_default.jpg`"></image>
-					<text class="cate-text">{{item.orderProductCategory}}</text>
+			
+			<view class="guess-section no-padding">
+				<swiper class="carousel" @change="swiperChangeFactory">
+					<swiper-item v-for="(one, oneIndex) in factoryList" :key="oneIndex">
+						<view class="cate-section no-padding" >
+							<view class="cate-item brand" v-for="(second,secondIndex) in one" :key='secondIndex' @tap="brandClick(second)">
+								<image :src="second.factoryIcon"></image>
+							</view>
+						</view>
+					</swiper-item>
+				</swiper>
+				<view class="swiper-factory-box">
+					<view class="u-indicator-item-round" :class="{ 'u-indicator-item-round-active': index == swiperCurrentFactory }" v-for="(item, index) in factoryList"
+					 :key="index"></view>
 				</view>
-				<view class="cate-item" @tap="toGroupProductList()">
-					<image :src="`/static/logo/pingou.png`"></image>
-					<text class="cate-text">拼购专区</text>
+				
+				
+			</view>	
+			
+			
+			<view class="ad-1">
+				<swiper class="serviceImg" circular autoplay @change="swiperChange4">
+					<swiper-item v-for="(item, index) in serviceImgList4" :key="index" class="serviceImg-item" 
+					@tap="navTo('/pagesProduct/product/list?ifVip=2')">
+						<image :src="item.filePath" mode="scaleToFill"/>
+					</swiper-item>
+				</swiper>
+				<!-- 自定义swiper指示器 -->
+				<view class="swiper-dots">
+					<text class="num">{{swiperCurrent4+1}}</text>
+					<text class="sign">/</text>
+					<text class="num">{{swiperLength4}}</text>
 				</view>
 			</view>
+			
+			
+			<!-- VIP区 -->
+			<view class="f-header m-t" @tap="navTo('/pagesProduct/product/list?ifVip=2')" id="main-0">
+				<image src="/static/indexImage/logo.png" class="vipImg"></image>
+				<view class="tit-box">
+					<text class="tit">VIP专区</text>
+				</view>
+				<text class="yticon icon-you"></text>
+			</view>
+			
+			<view class="guess-section">
+				<view 
+					v-for="(item, index) in goodsList4" :key="index"
+					class="guess-item"
+					@click="navToProductDetailPage(item)"
+				>
+					<view class="image-wrapper">
+						<image :src="item.imgPath" mode="aspectFill"></image>
+					</view>
+					<text class="title clamp">{{item.productName}}</text>
+					<text class="price" v-if="hasLogin">￥{{item.factoryPrice||'暂无'}}</text>
+				</view>
+			</view>	
+			
 			
 			<view class="ad-1">
 				<swiper class="serviceImg" circular autoplay @change="swiperChange1">
@@ -90,12 +145,11 @@
 			</view>
 			
 			
-			
-			<!-- 推荐商品 -->
-			<view class="f-header m-t" @tap="navTo('/pagesProduct/product/list')" id="main-0">
+			<!-- 普通会员商品 -->
+			<view class="f-header m-t" @tap="navTo('/pagesProduct/product/list')" id="main-1">
 				<image src="/static/indexImage/hot.png"></image>
 				<view class="tit-box">
-					<text class="tit">热门推荐</text>
+					<text class="tit">普通会员商品</text>
 				</view>
 				<text class="yticon icon-you"></text>
 			</view>
@@ -132,107 +186,39 @@
 			</view>
 
 
-			<!-- 品牌区 -->
-			<view class="f-header m-t" @tap="navTo('/pagesProduct/product/list?category=品牌产品')" id="main-1">
+			<!-- 知识区 -->
+			<view class="f-header m-t" @tap="navTo('/pagesInfo/article/articleList')" id="main-2">
 				<image src="/static/indexImage/brund.png"></image>
 				<view class="tit-box">
-					<text class="tit">品牌区</text>
+					<text class="tit">知识区</text>
 				</view>
 				<text class="yticon icon-you"></text>
 			</view>
 			
-			<view class="guess-section">
-				<view 
-					v-for="(item, index) in goodsList2" :key="index"
-					class="guess-item"
-					@click="navToProductDetailPage(item)"
-				>
-					<view class="image-wrapper">
-						<image :src="item.imgPath" mode="aspectFill"></image>
-					</view>
-					<text class="title clamp">{{item.productName}}</text>
-					<text class="price" v-if="hasLogin">￥{{item.factoryPrice||'暂无'}}</text>
-				</view>
+			<view class="guess-section guess-card no-padding" >
+				<block v-for="(item, index) in articleList" :key="index">
+					<u-card :title="item.title"  border-radius="0" margin="8rpx 0" padding="15" :border="false" :head-border-bottom="false" @click="index=>{toArticleDetail(index,item)}">
+						<view class="" slot="body">
+							<view class="video-wrapper" v-if="item.filePath">
+								<video id="myVideo" :src="item.filePath" @error="videoErrorCallback" 
+								controls 
+								show-center-play-btn="true" 
+								enable-play-gesture="true" 
+								show-mute-btn="true" 
+								muted="true" 
+								@click.stop="avoid"
+								></video>
+							</view>
+							<view class="u-body-item u-flex  u-col-between u-p-t-0">
+								<view class="u-body-item-title u-line-2">{{item.content|filtersText}}</view>
+								
+							</view>
+						</view>
+						<!-- <view class="" slot="foot"><u-icon name="chat-fill" size="34" color="" label="30评论"></u-icon></view> -->
+					</u-card>
+					
+				</block>
 			</view>		
-
-			<!-- <view class="ad-1">
-				<swiper class="serviceImg" circular autoplay @change="swiperChange3">
-					<swiper-item v-for="(item, index) in serviceImgList3" :key="index" class="serviceImg-item" @click="navToDetailPage({title: '轮播服务'})">
-						<image :src="item.filePath" mode="scaleToFill"/>
-					</swiper-item>
-				</swiper>
-				
-				<view class="swiper-dots">
-					<text class="num">{{swiperCurrent3+1}}</text>
-					<text class="sign">/</text>
-					<text class="num">{{swiperLength3}}</text>
-				</view>
-			</view> -->
-
-
-			<!-- 推荐商品 -->
-			<!-- <view class="f-header m-t" @tap="navTo('/pagesProduct/product/list?category=自营产品')" id="main-2">
-				<image src="/static/indexImage/self.png"></image>
-				<view class="tit-box">
-					<text class="tit">商城自运营区</text>
-				</view>
-				<text class="yticon icon-you"></text>
-			</view>
-			
-			<view class="guess-section">
-				<view 
-					v-for="(item, index) in goodsList3" :key="index"
-					class="guess-item"
-					@click="navToProductDetailPage(item)"
-				>
-					<view class="image-wrapper">
-						<image :src="item.imgPath" mode="aspectFill"></image>
-					</view>
-					<text class="title clamp">{{item.productName}}</text>
-					<text class="price" v-if="hasLogin">￥{{item.price||'暂无'}}</text>
-				</view>
-			</view> -->	
-			
-			
-			<view class="ad-1">
-				<swiper class="serviceImg" circular autoplay @change="swiperChange4">
-					<swiper-item v-for="(item, index) in serviceImgList4" :key="index" class="serviceImg-item" 
-					@tap="navTo('/pagesProduct/product/list?ifVip=2')">
-						<image :src="item.filePath" mode="scaleToFill"/>
-					</swiper-item>
-				</swiper>
-				<!-- 自定义swiper指示器 -->
-				<view class="swiper-dots">
-					<text class="num">{{swiperCurrent4+1}}</text>
-					<text class="sign">/</text>
-					<text class="num">{{swiperLength4}}</text>
-				</view>
-			</view>
-			
-			
-			<!-- VIP区 -->
-			<view class="f-header m-t" @tap="navTo('/pagesProduct/product/list?ifVip=2')" id="main-2">
-				<image src="/static/indexImage/logo.png" class="vipImg"></image>
-				<view class="tit-box">
-					<text class="tit">VIP区</text>
-				</view>
-				<text class="yticon icon-you"></text>
-			</view>
-			
-			<view class="guess-section">
-				<view 
-					v-for="(item, index) in goodsList4" :key="index"
-					class="guess-item"
-					@click="navToProductDetailPage(item)"
-				>
-					<view class="image-wrapper">
-						<image :src="item.imgPath" mode="aspectFill"></image>
-					</view>
-					<text class="title clamp">{{item.productName}}</text>
-					<text class="price" v-if="hasLogin">￥{{item.factoryPrice||'暂无'}}</text>
-				</view>
-			</view>	
-				
 				
 		</scroll-view>
 	</view>
@@ -258,27 +244,39 @@
 				swiperLength3: 0,
 				swiperCurrent4: 0,
 				swiperLength4: 0,
+				swiperCurrentFactory: 0,
 				carouselList: [],
 				serviceImgList1: [],
 				serviceImgList2: [],
-				serviceImgList3: [],
 				serviceImgList4: [],
 				goodsList: [],
-				goodsList2: [],
-				goodsList3: [],
 				goodsList4: [],
 				navList:[
-					{state: 0,text: '精选'},
-					{state: 1,text: '品牌区'},
-					/* {state: 2,text: '商城自营区'}, */
-					{state: 2,text: 'VIP区'}
+					{state: 1,text: '精选'},
+					{state: 0,text: 'VIP专区'},
+					{state: 2,text: '知识区'},
 				],
 				scrollntoView:'',
 				tabCurrentIndex:0,
 				sHeight:980,
 				cateList:[],//分类
-				naviCateList:[]//导航分类
+				naviCateList:[],//导航分类,
+				articleList: [],//文章列表
+				factoryList: []
 			};
+		},
+		filters: {
+			filtersText(val) {
+				if(val){
+					var re1 = new RegExp("<.+?>","g");//匹配html标签的正则表达式，"g"是搜索匹配多个符合的内容
+					var text = val.replace(re1,'');//执行替换成空字符
+					if(text.length>60){
+						return text.substr(0,60)
+					}
+					return text;
+				}
+				return val
+			}
 		},
 
 		computed: {
@@ -321,6 +319,25 @@
 			}
 		},
 		methods: {
+			brandClick(item){
+				uni.navigateTo({
+					url: `/pagesProduct/product/factory?factoryNo=${item.factoryNo}&factoryName=${item.factoryName}`
+				})
+			},
+			avoid(){
+				console.log("avoid")
+			},
+			videoErrorCallback: function(e) {
+				uni.showModal({
+					content: e.target.errMsg,
+					showCancel: false
+				})
+			},
+			toArticleDetail(index,item){
+				uni.navigateTo({
+					url: `/pagesInfo/article/articleDetail?id=${item.id}`
+				})
+			},
 			navToGroupActivity(obj){
 				//跳转拼团活动页面
 				uni.navigateTo({
@@ -338,12 +355,6 @@
 					/* url: `/pagesProduct/product/list?largeCategory=${item.largeCategory}&littleCategory=${item.littleCategory}` */
 					//修改为大类
 					url: `/pagesProduct/product/list?largeCategory=${item.orderProductCategory}`
-				})
-			},
-			toGroupProductList(){
-				uni.navigateTo({
-					//修改为大类
-					url: `/pagesProduct/product/list?isOpenGroup=${1}`
 				})
 			},
 			//顶部tab点击
@@ -386,13 +397,32 @@
 				this.initCarouseList()
 				this.initServiceImgList1()
 				this.initServiceImgList2()
-				this.initServiceImgList3()
 				this.initServiceImgList4()
 				this.initCateList()
 				this.initRecommendGoodsList()
-				this.initGoodsList2()
-				this.initGoodsList3()
 				this.initGoodsList4()
+				this.initArticleList()
+				this.initFactoryList()
+			},
+			initFactoryList(){
+				this.$api.httpPost('factoryDetail/api/list',{
+					submitState: 1
+				}).then(r=>{
+					let factoryList = r.data
+					//8个一组
+					let count = Math.floor(factoryList.length/8)
+					let arr = []
+					for (var i = 0; i < count; i++) {
+						arr.push(factoryList.slice(8*i,8*(i+1)))
+					}
+					if(count*8<factoryList.length){
+						arr.push(factoryList.slice(count*8,factoryList.length))
+					}
+					this.factoryList = arr
+					
+				}).catch(e=>{
+					this.$api.msg(e.msg||'网络异常请重试')
+				})
 			},
 			initCarouseList(){
 				this.$api.httpPost('homePage/api/query',{
@@ -435,18 +465,7 @@
 					this.$api.msg(e.msg||'网络异常请重试')
 				})
 			},
-			initServiceImgList3(){
-				this.$api.httpPost('homePage/api/query',{
-					titleType:6//自营区海报
-				}).then(r=>{
-					// console.log("服务图片请求结果：",r)
-					this.serviceImgList3=r.data[0].orderFilePathList
-					this.swiperLength3 = this.serviceImgList3.length;
-				}).catch(e=>{
-					// console.log("请求错误：",e)
-					this.$api.msg(e.msg||'网络异常请重试')
-				})
-			},
+			
 			initServiceImgList4(){
 				this.$api.httpPost('homePage/api/query',{
 					titleType:2//vip区海报
@@ -466,20 +485,7 @@
 						this.cateList = r.data
 						this.naviCateList=[]
 						this.cateList.forEach(e=>{
-							/* e.littleCategorylist.forEach(en=>{
-								if(this.naviCateList.length<10){
-									let item = {
-										"id": en.id,
-										"littleCategory": en.littleCategory,
-										"parentId": en.parentId,
-										"filePath": en.filePath,
-										"largeCategory": e.largeCategory,
-										"imgPath": e.imgPath,
-									}
-									this.naviCateList.push(item)
-								}
-								
-							}) */
+							
 							//修改为显示大类
 							if(this.naviCateList.length<10){
 								let item = {
@@ -507,53 +513,15 @@
 					this.$api.msg(e.msg||'网络异常请重试')
 				})
 			},
-			initGoodsList2(){
-				this.$api.httpPost('productInfo/api/list',{
-					pageNum:1,
-					pageSize:4,
-					orderByColumn:'orderNum',
-					isAsc:'asc',
-					ifHomePage:1,
-					category:'品牌产品',
-					state: 3
-				}).then(r=>{
-					console.log("品牌产品请求结果：",r)
-					if(r.code==0){
-						this.goodsList2 = r.rows
-					}
-				}).catch(e=>{
-					// console.log("请求错误：",e)
-					this.$api.msg(e.msg||'网络异常请重试')
-				})
-			},
-			initGoodsList3(){
-				this.$api.httpPost('productInfo/api/list',{
-					pageNum:1,
-					pageSize:4,
-					orderByColumn:'orderNum',
-					isAsc:'asc',
-					ifHomePage:1,
-					category:'自营产品',
-					state: 3
-				}).then(r=>{
-					console.log("自营产品请求结果：",r)
-					if(r.code==0){
-						this.goodsList3 = r.rows
-					}
-				}).catch(e=>{
-					// console.log("请求错误：",e)
-					this.$api.msg(e.msg||'网络异常请重试')
-				})
-			},
+			
 			initGoodsList4(){
 				this.$api.httpPost('productInfo/api/list',{
 					pageNum:1,
-					pageSize:4,
+					pageSize:10,
 					orderByColumn:'orderNum',
 					isAsc:'asc',
 					ifVip: 2,
 					ifHomePage:1,
-					/* category:'定制产品', */
 					state: 3
 				}).then(r=>{
 					console.log("定制产品请求结果：",r)
@@ -562,6 +530,17 @@
 					}
 				}).catch(e=>{
 					// console.log("请求错误：",e)
+					this.$api.msg(e.msg||'网络异常请重试')
+				})
+			},
+			initArticleList(){
+				this.$api.httpPost('article/api/list',{
+					pageNum:1,
+					pageSize:5,
+					isHome:1
+				}).then(r=>{
+					this.articleList = r.rows
+				}).catch(e=>{
 					this.$api.msg(e.msg||'网络异常请重试')
 				})
 			},
@@ -580,29 +559,15 @@
 				const index = e.detail.current;
 				this.swiperCurrent2 = index;
 			},
-			swiperChange3(e) {
-				const index = e.detail.current;
-				this.swiperCurrent3 = index;
-			},
+			
 			swiperChange4(e) {
 				const index = e.detail.current;
 				this.swiperCurrent4 = index;
 			},
-			//详情页
-			navToDetailPage(item) {
-				if(!this.hasLogin){
-					uni.navigateTo({
-						url:'/pagesUser/public/login'
-					})
-					return
-				}
-				//测试数据没有写id，用title代替
-				let id = item.title;
-				uni.navigateTo({
-					// url: `/pagesProduct/product/product?id=${id}`
-					url: `/pagesProduct/product/factoryPage?id=${id}`
-				})
+			swiperChangeFactory(e) {
+				this.swiperCurrentFactory = e.detail.current;
 			},
+			
 			navToProductDetailPage(item){
 				if(!this.hasLogin){
 					uni.navigateTo({
@@ -645,6 +610,8 @@
 </script>
 
 <style lang="scss">
+	
+	
 	.jj{
 		font-size: $font-sm;
 		color: $font-color-light;
@@ -789,12 +756,12 @@
 		}
 	}
 	page{
-		.cate-section{
+		/* .cate-section{
 			position:relative;
 			z-index:5;
 			border-radius:16rpx;
 			margin: 12rpx;
-		}
+		} */
 		.carousel-section{
 			padding: 0;
 			.titleNview-placing {
@@ -897,13 +864,13 @@
 		padding: 30upx 22upx; 
 		background: #fff;
 		.cate-item {
-			flex: 0 1 25%;
+			flex: 0 1 50%;
 			display: flex;
 			flex-direction: column;
 			align-items: center;
 			font-size: $font-sm + 2upx;
 			color: $font-color-dark;
-			margin-bottom: 20rpx;
+			margin: 10rpx 0;
 			.cate-text{
 				width: 120rpx;
 				overflow: hidden;
@@ -914,10 +881,14 @@
 				text-align: center;
 			}
 		}
+		.brand {
+			flex: 0 1 25%;
+		}
+		
 		/* 原图标颜色太深,不想改图了,所以加了透明度 */
 		image {
-			width: 110rpx;
-			height: 110rpx;
+			width: 140rpx;
+			height: 140rpx;
 			margin-bottom: 14rpx;
 			/* box-shadow: 4rpx 4rpx 4rpx rgba(70,70,70, 0.7); */
 			border-radius: 50%;
@@ -944,66 +915,7 @@
 			}
 		}
 	}
-	/* 秒杀专区 */
-	.seckill-section{
-		padding: 4upx 30upx 24upx;
-		background: #fff;
-		.s-header{
-			display:flex;
-			align-items:center;
-			height: 92upx;
-			line-height: 1;
-			.s-img{
-				width: 140upx;
-				height: 30upx;
-			}
-			.tip{
-				font-size: $font-base;
-				color: $font-color-light;
-				margin: 0 20upx 0 40upx;
-			}
-			.timer{
-				display:inline-block;
-				width: 40upx;
-				height: 36upx;
-				text-align:center;
-				line-height: 36upx;
-				margin-right: 14upx;
-				font-size: $font-sm+2upx;
-				color: #fff;
-				border-radius: 2px;
-				background: rgba(0,0,0,.8);
-			}
-			.icon-you{
-				font-size: $font-lg;
-				color: $font-color-light;
-				flex: 1;
-				text-align: right;
-			}
-		}
-		.floor-list{
-			white-space: nowrap;
-		}
-		.scoll-wrapper{
-			display:flex;
-			align-items: flex-start;
-		}
-		.floor-item{
-			width: 150upx;
-			margin-right: 20upx;
-			font-size: $font-sm+2upx;
-			color: $font-color-dark;
-			line-height: 1.8;
-			image{
-				width: 150upx;
-				height: 150upx;
-				border-radius: 6upx;
-			}
-			.price{
-				color: $uni-color-primary;
-			}
-		}
-	}
+	
 	
 	.f-header{
 		display:flex;
@@ -1215,6 +1127,19 @@
 				opacity: 1;
 			}
 		}
+		
+		.video-wrapper {
+			height: 330upx;
+			width: 100%;
+			overflow: hidden;
+			margin-bottom: 20rpx;
+			video {
+				width: 100%;
+				height: 100%;
+				opacity: 1;
+			}
+		}
+		
 		.title{
 			font-size: $font-lg;
 			color: $font-color-dark;
@@ -1227,5 +1152,41 @@
 		}
 	}
 	
+	.swiper-factory-box {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		margin-bottom: 20upx;
+	}
+	
+	.guess-card {
+		display: flex;
+		flex-wrap: nowrap;
+		flex-direction: column;
+		background-color: #f0f0f0;
+	}
+	
+	.no-padding {
+		padding: 0;
+	}
+	
+	.no-wrap {
+		flex-wrap: nowrap;
+	}
+	
+	.u-indicator-item-round {
+		width: 14rpx;
+		height: 14rpx;
+		margin: 0 6rpx;
+		border-radius: 20rpx;
+		transition: all 0.5s;
+		background-color: rgba(0, 0, 0, 0.3);
+	}
+	
+	.u-indicator-item-round-active {
+		width: 34rpx;
+		background-color: rgba(0, 0, 0, 1);
+	}
 
 </style>

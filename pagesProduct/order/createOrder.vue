@@ -35,7 +35,38 @@
 					<image :src="product.imgPath||product.parentImgPath||`/static/errorImage.jpg`"></image>
 					<view class="right">
 						<text class="title clamp">{{product.productName}}</text>
-						<text class="spec">{{product.chooseProductColor.color}}</text>
+						<view class="subTitle-box">
+							<view class="subTitle-box-item">
+								<text>颜色：{{product.chooseProductColor.color}}</text>
+							</view>
+							<view class="subTitle-box-item">
+								<text>规格：{{product.chooseProductColor.colorSpecification}}m²/包</text>
+							</view>
+							<view class="subTitle-box-item" v-if="product.chooseProductColor.installFee&&product.isInstall===1">
+								<text>安装费用：{{product.chooseProductColor.installFee}}￥/m²</text>
+							</view>
+							<view class="subTitle-box-item" v-if="product.chooseProductColor.keelInstallationFee&&product.isKeelInstall===1">
+								<text>龙骨安装费：{{product.chooseProductColor.keelInstallationFee}}￥/m²</text>
+							</view>
+							<view class="subTitle-box-item">
+								<text>发货：{{product|getLogisticsType}}</text>
+							</view>
+						</view>
+						<!-- <view class="tag-box">
+							<u-tag :text="product.chooseProductColor.color +'，'+ product.chooseProductColor.colorSpecification + 'm²/包'" 
+							 border-color="#ffffff"  type="info" shape="circle" mode="light" />
+							 <u-tag :text=" product|getLogisticsType"
+							 border-color="#ffffff"  type="info" shape="circle" mode="light" />
+						</view> -->
+						<view class="price-box">
+							<text class="price">{{product.chooseProductColor.salePrice}}￥/m²</text>
+							<text class="number">x {{product.chooseProductColor.colorSpecification}}m²/包</text>
+							<text class="number">x {{product.productNum}}</text>
+						</view>
+						<view class="install-box">
+							<text>定金：{{product.deposit}}%</text>
+						</view>
+						<!-- <text class="spec">{{product.chooseProductColor.color}}</text>
 						<view class="price-box">
 							<text class="price">￥{{product.chooseProductColor.salePrice}}</text>
 							<text class="number">x {{product.productNum}}</text>
@@ -43,12 +74,12 @@
 						</view>
 						<view class="price-box">
 							<text class="deliveryMethod">物流类型: {{product.logisticsType|getLogisticsType}}</text>
-						</view>
+						</view> -->
 					</view>
 				</view>
 				<view class="wuliu-box b-t" >
 					<view class="left-box">
-						<text class="left">总金额</text>
+						<text class="left">商品金额</text>
 					</view>
 					<view class="right-box">
 						<text >￥{{getTotalPrice(item.productInfoList)}}</text>
@@ -62,8 +93,8 @@
 		<!-- 金额明细 -->
 		<view class="yt-list">
 			<view class="yt-list-cell b-b">
-				<text class="cell-tit clamp">订单金额</text>
-				<text class="cell-tip">￥{{totalMoney}}</text>
+				<text class="cell-tit clamp">商品总金额</text>
+				<text class="cell-tip">￥{{productTotalPrice}}</text>
 			</view>
 
 			<view class="yt-list-cell b-b">
@@ -84,6 +115,39 @@
 				<text class="yticon icon-you"></text>
 			</view>
 		</navigator>
+		
+		<view class="yt-list" v-if="invoice.invoiceType!==0">
+			<view class="yt-list-cell b-b">
+				<text class="cell-tit clamp">发票税点金额</text>
+				<text class="cell-tip">￥{{taxPointPrice}}</text>
+			</view>
+		</view>
+		<view class="yt-list">
+			<view class="yt-list-cell b-b">
+				<text class="cell-tit clamp">安装费用</text>
+				<text class="cell-tip">￥{{installFeeTotal}}</text>
+			</view>
+		</view>
+		<view class="yt-list">
+			<view class="yt-list-cell b-b">
+				<text class="cell-tit clamp">龙骨安装费</text>
+				<text class="cell-tip">￥{{keelInstallationFeeTotal}}</text>
+			</view>
+		</view>
+		
+		<view class="yt-list">
+			<view class="yt-list-cell b-b">
+				<text class="cell-tit clamp">定金总金额</text>
+				<text class="cell-tip">￥{{totalDepositAmount}}</text>
+			</view>
+		</view>
+		
+		<view class="yt-list">
+			<view class="yt-list-cell b-b">
+				<text class="cell-tit clamp">总金额</text>
+				<text class="cell-tip">￥{{totalMoney}}</text>
+			</view>
+		</view>
 
 		<view class="yt-list" v-if="isCustomizationFlag">
 			<view class="yt-list-cell b-b">
@@ -122,7 +186,7 @@
 			<view class="price-content">
 				<text>实付款</text>
 				<text class="price-tip">￥</text>
-				<text class="price">{{totalMoney}}</text>
+				<text class="price">{{totalDepositAmount}}</text>
 			</view>
 			<view class="footer-btn">
 				<button class="submit" :disabled='submitDisabled' @click="submit">提交订单</button>
@@ -134,6 +198,9 @@
 <script>
 	import {mapState} from 'vuex';
 	import {RESOURCE } from '@/api/resource.js'
+	
+	var Decimal = require('decimal.js');
+	
 	export default {
 		data() {
 			return {
@@ -146,7 +213,7 @@
 				},
 				showInvoice: '不开发票',
 				goodsList:[],
-				totalMoney:null,
+				//totalMoney:null,
 				groupProduct:undefined,//拼团信息
 				groupMember:undefined,//拼团团长信息
 				freightTemplate:undefined,//运费模板信息
@@ -161,47 +228,66 @@
 				remarks:'',
 				fare: 0,//运费
 				noDeliveryReason: null,//不配送原因
+				taxPointPrice: 0,//发票税点金额
+				productTotalPrice: 0,//商品总金额
+				installFeeTotal: 0,//安装费用
+				keelInstallationFeeTotal: 0,//龙骨安装费
+				totalDepositAmount: 0,//定金总金额
 			}
 		},
 		filters: {
-			getLogisticsType: function(value){
-				if(value === 'DIRECT'){
-					return '直达'
-				}else if(value === 'SECOND'){
-					return '二次物流'
+			getLogisticsType: function(product){
+				if(product.logisticsType === 'DIRECT'){
+					return product.chooseDeliveryMethod + '，直达'
+				}else if(product.logisticsType === 'SECOND'){
+					return product.chooseDeliveryMethod + '二次物流'
 				}else {
-					return value
+					return product.chooseDeliveryMethod + '，' + value
 				}
 			}
-		},
-		onLoad(option){
-			//商品数据
-			let data = JSON.parse(option.data);
-			console.log(data);
-			this.goodsList=data.goodsList
-			this.totalMoney=data.totalMoney
-			this.groupProduct=data.groupProduct
-			this.groupMember=data.groupMember
-			this.freightTemplate=data.freightTemplate
-			this.initData()
 		},
 		watch: {
 			invoice: {
 				handler: function (val, oldVal) { 
-					console.log(val)
+					//解决浮点精度丢失问题
+					let taxPointPrice = 0
+					this.goodsList.forEach(item=>{
+						item.productInfoList.forEach(e=>{
+							let salePrice = new Decimal(e.chooseProductColor.salePrice)
+							taxPointPrice = salePrice.mul(e.taxPoint).mul(e.productNum).div(100).plus(taxPointPrice)
+						})
+					})
+					
 					if(val.invoiceType === 1){
 						this.showInvoice = '电子发票'
+						this.taxPointPrice = taxPointPrice
 					}else if(val.invoiceType === 2){
 						this.showInvoice = '纸质发票'
+						this.taxPointPrice = taxPointPrice
 					}else {
 						this.showInvoice = '不开发票'
+						this.taxPointPrice = 0
 					}
 				},
 				deep: true
 			}
 		},
+		onLoad(option){
+			//商品数据
+			let data = JSON.parse(option.data);
+			this.goodsList=data.goodsList
+			this.groupProduct=data.groupProduct
+			this.groupMember=data.groupMember
+			this.freightTemplate=data.freightTemplate
+			this.initData()
+		},
 		computed: {
 			...mapState(['hasLogin','userInfo','weChat']),
+			totalMoney: function(){
+				let total = new Decimal(this.fare).plus(this.productTotalPrice).plus(this.taxPointPrice)
+				.plus(this.installFeeTotal).plus(this.keelInstallationFeeTotal)
+				return total
+			}
 		},
 		methods: {
 			initData(){
@@ -213,6 +299,19 @@
 						if(e.isCustomization==1){
 							this.isCustomizationFlag=true
 						}
+						let area = new Decimal(e.productNum).mul(e.chooseProductColor.colorSpecification).toNumber()
+						area = Math.ceil(area) //向上取整
+						if(e.chooseProductColor.installFee&&e.isInstall===1){
+							//安装费用  
+							this.installFeeTotal = new Decimal(area).mul(e.chooseProductColor.installFee).plus(this.installFeeTotal)
+						}
+						if(e.chooseProductColor.keelInstallationFee&&e.isKeelInstall===1){
+							//龙骨安装费  
+							this.keelInstallationFeeTotal = new Decimal(area).mul(e.chooseProductColor.installFee).plus(this.keelInstallationFeeTotal)
+						}
+						let productPrice = new Decimal(e.productNum).mul(e.chooseProductColor.colorSpecification).mul(e.chooseProductColor.salePrice).toNumber()
+						this.totalDepositAmount = new Decimal(productPrice).mul(e.deposit).div(100).plus(this.totalDepositAmount)
+						this.productTotalPrice = new Decimal(productPrice).plus(this.productTotalPrice)
 					})
 				})
 			},
@@ -377,7 +476,7 @@
 							productName:e.productName,//商品名称
 							productNum:e.productNum,//商品数量
 							unitPrice:e.chooseProductColor.salePrice,//单价
-							totalPrice:Number(e.chooseProductColor.salePrice*e.productNum),//总价
+							//totalPrice:Number(e.chooseProductColor.salePrice*e.productNum),//总价
 							productId:e.productId,//商品ID
 							factoryNo:e.factoryNo,
 							factoryName:e.factoryName,
@@ -389,7 +488,14 @@
 							raisePrice:e.chooseProductColor.raisePrice,
 							factoryPrice:e.chooseProductColor.price,
 							deliveryMethod: e.chooseDeliveryMethod,
-							logisticsType: e.logisticsTypeVal
+							logisticsType: e.logisticsTypeVal,
+							taxPoint: e.taxPoint,
+							colorSpecification: e.chooseProductColor.colorSpecification,
+							installFee: e.chooseProductColor.installFee,
+							isInstall: e.isInstall,
+							keelInstallationFee: e.chooseProductColor.keelInstallationFee,
+							isKeelInstall: e.isKeelInstall,
+							deposit: e.deposit,
 						}
 						orderChildInfoList.push(item)
 					})
@@ -399,7 +505,7 @@
 					linkMan:this.userInfo.linkMan,//联系人
 					phoneNumber:this.userInfo.phoneNumber,//手机号
 					productNum:productNum,//商品总数量
-					orderPrice:this.totalMoney,//订单金额
+					orderPrice:this.totalDepositAmount,//付定金
 					receiverProvince:this.addressData.province,//省
 					receiverCity:this.addressData.city,//市
 					receiverDistrict:this.addressData.district,//区
@@ -425,15 +531,20 @@
 					groupProduct:this.groupProduct,//拼团模板信息
 					groupMember: this.groupMember,//拼团团长信息
 					isCustomization: this.isCustomizationFlag?1:0,//是否定制
+					shippingFee: this.fare,
+					productTotalPrice: this.productTotalPrice,
+					installFeeTotal: this.installFeeTotal,
+					keelInstallationFeeTotal: this.keelInstallationFeeTotal,
+					taxPointAllPrice: this.taxPointPrice,
+					totalDepositAmount: this.totalDepositAmount,
 				}
 			},
 			getTotalPrice(productInfoList){
 				//解决浮点精度丢失问题
-				var Decimal = require('decimal.js');
 				let totalPrice = 0
 				for(let item of productInfoList){
 					let salePrice = new Decimal(item.chooseProductColor.salePrice)
-					totalPrice = salePrice.mul(item.productNum).plus(totalPrice)
+					totalPrice = salePrice.mul(item.productNum).mul(item.chooseProductColor.colorSpecification).plus(totalPrice)
 				}
 				return totalPrice.toString()
 			},
@@ -594,6 +705,19 @@
 				color: $font-color-light;
 			}
 
+			.subTitle-box {
+				display: flex;
+				align-items: center;
+				flex-wrap: wrap;
+				font-size: 20rpx;
+				color: rgba($color: #c3c3c3, $alpha: 1.0);
+				
+				.subTitle-box-item::after {
+					content: '';
+					margin-right: 20rpx;
+				}
+			}
+
 			.price-box {
 				display: flex;
 				align-items: center;
@@ -615,6 +739,12 @@
 					font-size: 26upx;
 					color: $font-color-light;
 				}
+			}
+
+			.install-box{
+				margin-top: 20rpx;
+				font-size: 26rpx;
+				font-weight: bolder;
 			}
 
 			.step-box {

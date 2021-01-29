@@ -41,23 +41,38 @@
 							
 							<view class="item-right">
 								<text class="clamp title">{{product.productName}}</text>
-								<text class="attr">{{product.chooseProductColor.color}}</text>
+								<view class="tag-box" @click="toggleSpec(product)">
+									<!-- <u-tag :text="product.chooseProductColor.color +'，'+ product.chooseProductColor.colorSpecification + 'm²/包' +'，'+ product.chooseDeliveryMethod" 
+									 border-color="#ffffff" iconName="arrow-down" closeable type="info" shape="circle" mode="light" /> -->
+									 <view class="my-tag">
+									 	<text>{{product.chooseProductColor.color +'，'+ product.chooseProductColor.colorSpecification + 'm²/包' +'，'+ product.chooseDeliveryMethod}}</text>
+										
+									 </view>
+									 <view class="tag-icon">
+									 	<u-icon size="22" name="arrow-down"></u-icon>
+									 </view>
+								</view>
+								<!-- <text class="attr">{{product.chooseProductColor.color}}</text>
 								<text class="attr" v-if="product.isCustomization===1">定制商品</text>
 								<view class="raido-box">
 									<u-section title="发货方式" :sub-title="product.chooseDeliveryMethod" :showLine="showLine" :bold="bold" @click="toggleSpec(product)"></u-section>
-								</view>
+								</view> -->
 								<view class="price-box">
-									<text class="price">¥{{product.chooseProductColor.salePrice}}</text>
+									<text class="price">{{product.chooseProductColor.salePrice}}￥/m²</text>
 									<view class="number-box">
 								
 										<u-number-box  v-model="product.productNum" :step="product.chooseProductColor.increaseNum||1" 
-										:min="product.chooseProductColor.increaseNum||1"
-										:disabled-input="product.chooseProductColor.increaseNum&&product.chooseProductColor.increaseNum>1"></u-number-box>
+										:min="product.limitNum||1" disabled-input @change="productNumChange(product)"></u-number-box>
 									</view>
 									
 									
 								</view>
-								
+								<view class="install-box" v-if="product.isInstall==1">
+									<text>安装费用 ￥{{product.installFeeTotal}}</text>
+								</view>
+								<view class="install-box" v-if="product.isKeelInstall==1">
+									<text>龙骨安装费 ￥{{product.keelInstallationFeeTotal}}</text>
+								</view>
 							</view>
 							<text class="del-btn yticon icon-fork" @click="deleteCartItem(product,m)"></text>
 						</view>
@@ -97,7 +112,34 @@
 			<view class="mask"></view>
 			<view class="layer attr-content" @click.stop="stopPrevent">
 				<scroll-view class="attr-list" scroll-y>
-					<text>发运方式</text>
+					<view class="line-box" v-if="tempProduct.chooseProductColor.installFee">
+						<u-line></u-line>
+					</view>
+					<view class="item-list-2" v-if="tempProduct.chooseProductColor.installFee">
+						<text class="text-box">安装费用</text>
+						<text class="text-box text-tooltip" >总费用：￥{{tempProduct.installFeeTotal}}</text>
+						<view class="select-box to-right" :class="{selected: tempProduct.isInstall===1?true:false}" @click="changeIsInstall(tempProduct)">
+							<text class="tit">{{tempProduct.chooseProductColor.installFee}}￥/m²</text>
+						</view>
+						
+					</view>
+					<view class="line-box" v-if="tempProduct.chooseProductColor.installFee">
+						<u-line></u-line>
+					</view>
+					<view class="item-list-2" v-if="tempProduct.chooseProductColor.keelInstallationFee">
+						<text class="text-box">龙骨安装费</text>
+						<text class="text-box text-tooltip" >总费用：￥{{tempProduct.keelInstallationFeeTotal}}</text>
+						<view class="select-box to-right" :class="{selected: tempProduct.isKeelInstall===1?true:false}" @click="changeIsKeelInstall(tempProduct)">
+							<text class="tit">{{tempProduct.chooseProductColor.keelInstallationFee}}￥/m²</text>
+						</view>
+						
+					</view>
+					<view class="line-box">
+						<u-line></u-line>
+					</view>
+					<view class="title">
+						<text>发运方式</text>
+					</view>
 					<view class="item-list-2">
 						
 						<block v-for="(item, index) in deliveryMethodList" :key="index">
@@ -121,12 +163,11 @@
 
 <script>
 	import {mapState} from 'vuex';
-	import uniNumberBox from '@/components/uni-number-box.vue'
+	
+	var Decimal = require('decimal.js');
+	
 	export default {
 		props:['tag'],
-		components: {
-			uniNumberBox
-		},
 		data() {
 			return {
 				specClass: 'none',
@@ -153,7 +194,40 @@
 		computed: {
 			...mapState(['hasLogin','userInfo','weChat'])
 		},
+		filters: {
+			getLogisticsType: function(product){
+				if(product.logisticsType === 'DIRECT'){
+					return product.chooseDeliveryMethod + '，直达'
+				}else if(product.logisticsType === 'SECOND'){
+					return product.chooseDeliveryMethod + '二次物流'
+				}else {
+					return product.chooseDeliveryMethod + '，' + value
+				}
+			}
+		},
 		methods: {
+			productNumChange(product){
+				let area = new Decimal(product.productNum).mul(product.chooseProductColor.colorSpecification).toNumber()
+				this.$set(product, 'area', area)
+				area = Math.ceil(area) //向上取整
+				//计算安装费用
+				let installFee = product.chooseProductColor.installFee
+				if(installFee){
+					let installFeeTotal = new Decimal(area).mul(installFee)
+					this.$set(product, 'installFeeTotal', installFeeTotal)
+				}else{
+					this.$set(product, 'installFeeTotal', 0)
+				}
+				
+				//计算龙骨安装费
+				let keelInstallationFee = product.chooseProductColor.keelInstallationFee
+				if(keelInstallationFee){
+					let keelInstallationFeeTotal = new Decimal(area).mul(keelInstallationFee)
+					this.$set(product, 'keelInstallationFeeTotal', keelInstallationFeeTotal)
+				}else{
+					this.$set(product, 'keelInstallationFeeTotal', 0)
+				}
+			},
 			initData(){
 				console.log('tag',this.tag)
 				this.initParams()
@@ -222,6 +296,7 @@
 						e.checked=true
 						e.productInfoList.forEach(x=>{
 							x.checked=true
+							this.productNumChange(x)
 						})
 					})
 					this.empty = this.cartList.length === 0 ? true: false;
@@ -378,7 +453,6 @@
 			//计算总价
 			calcTotal(){
 				//解决浮点精度丢失问题
-				var Decimal = require('decimal.js');
 				let list = this.cartList;
 				if(list.length === 0){
 					this.empty = true;
@@ -481,6 +555,9 @@
 						let arr = product.deliveryMethod.split(",")
 						for(let item of arr){
 							for(let obj of this.deliveryMethodList){
+								if(product.chooseDeliveryMethod = obj.name){
+									obj.active = true
+								}
 								if(obj.value == item){
 									obj.visible = true
 								}
@@ -495,6 +572,22 @@
 					obj.active =false
 				}
 				item.active = true
+				
+			},
+			changeIsInstall(product){
+				if(product.isInstall===1){
+					this.$set(product,'isInstall',0)
+				}else{
+					this.$set(product,'isInstall',1)
+				}
+				
+			},
+			changeIsKeelInstall(product){
+				if(product.isKeelInstall===1){
+					this.$set(product,'isKeelInstall',0)
+				}else{
+					this.$set(product,'isKeelInstall',1)
+				}
 				
 			},
 			stopPrevent(){}
@@ -580,8 +673,8 @@
 			padding: 20rpx;
 			display: flex;
 			.image-wrapper{
-				width: 230upx;
-				height: 230upx;
+				width: 200upx;
+				height: 200upx;
 				flex-shrink: 0;
 				position:relative;
 				image{
@@ -608,6 +701,48 @@
 				overflow: hidden;
 				position:relative;
 				padding-left: 30upx;
+				
+				.tag-box{
+					display: flex;
+					align-items: center;
+					/* flex-wrap: wrap; */
+					margin-top: 20rpx;
+					
+					.my-tag{
+						height: 55rpx;
+						line-height: 55rpx;
+						padding: 0 15rpx;
+						font-size: 24rpx;
+						color: rgba($color: #000000, $alpha: .7);
+						background-color: rgba($color: #EEEEEE, $alpha: .6);
+						border-radius: 16rpx 0 0 16rpx;
+						overflow: hidden;
+						text-overflow:ellipsis;
+						white-space: nowrap;
+						
+					}
+					
+					.tag-icon {
+						height: 55rpx;
+						line-height: 55rpx;
+						padding-right: 15rpx;
+						background-color: rgba($color: #EEEEEE, $alpha: .6);
+						border-radius: 0 16rpx 16rpx 0;
+					}
+						
+					
+					/deep/ .u-tag {
+						width: 100%;
+					}
+					
+					/deep/ text {
+						overflow: hidden;
+						text-overflow:ellipsis;
+						white-space: nowrap;
+					}
+				}
+				
+				
 				.title,.price{
 					font-size:$font-base + 2upx;
 					color: $font-color-dark;
@@ -631,13 +766,19 @@
 					.price{
 						height: 50upx;
 						line-height:50upx;
-						font-size: 26px;
+						font-size: 32rpx;
 						color: $uni-color-primary;
 					}
 					
 					.number-box{
 						margin-left: auto;
 					}
+				}
+				
+				.install-box{
+					margin-top: 20rpx;
+					font-size: 26rpx;
+					font-weight: bolder;
 				}
 				
 				
@@ -690,6 +831,13 @@
 			padding-left: 10upx;
 			max-height: 600rpx;
 			overflow-y: scroll;
+			
+			.title {
+				padding-left: 15rpx;
+				padding-top: 15rpx;
+				font-size: 32rpx;
+				font-weight: bolder;
+			}
 		}
 		
 		
@@ -699,22 +847,36 @@
 			align-items: center;
 			justify-content: left;
 			flex-wrap: wrap;
-			/* height: 550rpx; */
 			margin-bottom: 20upx;
 			
+			.text-box {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: 15rpx 20rpx;
+			}
 			
+			.text-tooltip {
+				color: rgba(#000000, .4);
+				font-size: 24rpx;
+			}
+			
+			image {
+				width: 50rpx;
+				height: 50rpx;
+			}
 			
 			.select-box{
 				display: flex;
 				flex-wrap: wrap;
 				align-items: center;
 				justify-content: center;
-				background: #eee;
-				margin-right: 20upx;
-				margin-bottom: 20upx;
-				border-radius: 10rpx;
-				min-width: 120rpx;
-				height: 60rpx;
+				background: rgba(#eee,.4);
+				padding: 15rpx 20rpx;
+				margin: 20rpx;
+				border-radius: 12rpx;
+				box-sizing: border-box;
+				border: 1rpx solid rgba(#eee,0);
 				/* border: 1upx solid $border-color-light; */
 				
 				.line-box {
@@ -731,17 +893,25 @@
 				text{
 					font-size: 20rpx;
 					/* color: $font-color-dark; */
-					margin: 20rpx;
+					margin-right: 20rpx;
+				}
+				
+				.tit {
+					margin-left: 20rpx;
 				}
 			}
 			
 			.selected{
-				background: #fbebee;
+				border: 1rpx solid rgba(#ff0000,.9);
+				background: rgba(#fbebee,.4);
 				text{
 					color: $uni-color-primary;
-					margin: 20rpx;
 		
 				}
+			}
+			
+			.to-right {
+				margin-left: auto;
 			}
 		}
 	}

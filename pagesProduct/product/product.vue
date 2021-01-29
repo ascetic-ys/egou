@@ -71,7 +71,11 @@
 				<text class="tit">已选购</text>
 				<view class="con">
 					<view class="selected-box" v-for="(item,index) in product.orderProductColorList" :key="index">
-						<template v-if="item.shoppingNum">
+						<!-- <template v-if="item.shoppingNum">
+							<image :src="item.imgPath||'/static/errorImage.jpg'" mode="aspectFit"></image>
+							<text class="selected-text">{{item.color}}</text>
+						</template> -->
+						<template v-if="item.selected">
 							<image :src="item.imgPath||'/static/errorImage.jpg'" mode="aspectFit"></image>
 							<text class="selected-text">{{item.color}}</text>
 						</template>
@@ -212,12 +216,13 @@
 			<view class="mask"></view>
 			<view class="layer attr-content" @click.stop="stopPrevent">
 				<view class="a-t" v-if="product.orderProductColorList.length>0">
-					<!-- <image :src="specSelected.imgPath||product.orderProductColorList[0].imgPath||'/static/errorImage.jpg'" mode="aspectFill"></image> -->
-					<image :src="product.imgPath||'/static/errorImage.jpg'" mode="aspectFill"></image>
+					<image :src="specSelected.imgPath||'/static/errorImage.jpg'" mode="aspectFill"></image>
+					<!-- <image :src="product.imgPath||'/static/errorImage.jpg'" mode="aspectFill"></image> -->
 					<view class="right">
-						<text>{{product.product}}</text>
-						<text>¥{{product.factoryPrice}}</text>
-						<!-- <text class="price">¥{{specSelected.price}}</text> -->
+						<!-- <text>{{product.product}}</text>
+						<text>¥{{product.factoryPrice}}</text> -->
+						<text class="price">¥{{specSelected.price}}</text>
+						<text class="selected">1平方米的价格</text>
 						<!-- <view class="selected">
 							已选：
 							<text class="selected-text">
@@ -228,7 +233,90 @@
 				</view>
 				
 				<scroll-view class="attr-list" v-if="product.orderProductColorList.length>0" scroll-y>
-					<text>发运方式</text>
+					<view class="line-box">
+						<u-line></u-line>
+					</view>
+					<view class="title">
+						<text>颜色分类</text>
+					</view>
+					<view class="item-list-2">
+						<view 
+							v-for="(item, index) in product.orderProductColorList " 
+							:key="index" class="select-box"
+							:class="{selected: item.selected}"
+							@click="selectColor(item)"
+						>
+							<image :src="item.imgPath||'/static/errorImage.jpg'" mode="aspectFill"></image>
+							<text class="tit">{{item.color}}</text>
+						</view>
+					</view>
+					<view class="line-box">
+						<u-line></u-line>
+					</view>
+					<view class="item-list-2">
+						<text class="text-box">规格</text>
+						<text class="text-box text-tooltip" >库存：{{specSelected.stockNum||'-'}}</text>
+						<view class="select-box selected to-right">
+							<text class="tit">{{specSelected.colorSpecification}}m²/包</text>
+						</view>
+					</view>
+					<view class="line-box">
+						<u-line></u-line>
+					</view>
+					<view class="item-list-2">
+						<text class="text-box">购买数量</text>
+						<!-- <text class="text-box text-tooltip" >总面积：{{specSelected.area}}m²</text> -->
+						<!-- <view class="to-right" style="text-align: right;">
+							<tui-numberbox :value="specSelected.shoppingNum" @change="shoppingNumChange" :width="120"></tui-numberbox>
+						</view> -->
+						<view class="to-right">
+							<u-number-box  @change="shoppingNumChange"  v-model="specSelected.shoppingNum" :long-press="false" min="1" 
+							 :bg-color="bgColor" :color="color" :input-width="100"
+							:step="specSelected.increaseNum||1" :disabled-input="specSelected.increaseNum&&specSelected.increaseNum>1"></u-number-box>
+						</view>
+					</view>
+					<view class="line-box">
+						<u-line></u-line>
+					</view>
+					<view class="item-list-2">
+						<text class="text-box">总面积（m²）</text>
+						<!-- <view class="to-right" style="text-align: right;">
+							<tui-numberbox :value="specSelected.area" @change="areaChange" :width="120"></tui-numberbox>
+						</view> -->
+						<view class="to-right">
+							<u-number-box  @change="areaChange"  v-model="specSelected.area" :long-press="false"  :bg-color="bgColor" :color="color" 
+							:positive-integer="false" :input-width="100"></u-number-box>
+						</view>
+					</view>
+					<view class="line-box" v-if="specSelected.installFee">
+						<u-line></u-line>
+					</view>
+					<view class="item-list-2" v-if="specSelected.installFee">
+						<text class="text-box">安装费用</text>
+						<text class="text-box text-tooltip" >总费用：￥{{specSelected.installFeeTotal}}</text>
+						<view class="select-box to-right" :class="{selected: specSelected.isInstall}" @click="specSelected.isInstall=!specSelected.isInstall">
+							<text class="tit">{{specSelected.installFee}}￥/m²</text>
+						</view>
+						
+					</view>
+					<view class="line-box" v-if="specSelected.keelInstallationFee">
+						<u-line></u-line>
+					</view>
+					<view class="item-list-2" v-if="specSelected.keelInstallationFee">
+						<text class="text-box">龙骨安装费</text>
+						<text class="text-box text-tooltip" >总费用：￥{{specSelected.keelInstallationFeeTotal}}</text>
+						<view class="select-box to-right" :class="{selected: specSelected.isKeelInstall}" @click="specSelected.isKeelInstall=!specSelected.isKeelInstall">
+							<text class="tit">{{specSelected.keelInstallationFee}}￥/m²</text>
+						</view>
+						
+					</view>
+					<view class="line-box">
+						<u-line></u-line>
+					</view>
+					<view class="title">
+						<text>发运方式</text>
+					</view>
+					
 					<view class="item-list-2">
 						<block v-for="(item, index) in deliveryMethodList" :key="index"> 
 							<template v-if="item.visible">
@@ -244,33 +332,7 @@
 						
 					</view>
 					
-					<text>颜色</text>
-					<view class="item-list">
-						<view 
-							v-for="(item, index) in product.orderProductColorList " 
-							:key="index" class="select-box"
-							@click="selectColor(item)"
-						>
-							<view class="line-box">
-								<u-line></u-line>
-							</view>
-							<image :src="item.imgPath||'/static/errorImage.jpg'" mode="aspectFit"></image>
-							<text class="tit color-text">{{item.color}}</text>
-							<view class="number-box" >
-								<view class="price-box">
-									<view class="price-box-item"><text>￥{{item.salePrice||'-'}}</text></view>
-									<view class="price-box-item"><text>库存：{{item.stockNum||'-'}}</text></view>
-									
-								</view>
-								<u-number-box  v-model="item.shoppingNum" :long-press="false"   :bg-color="bgColor" :color="color" 
-								:step="item.increaseNum||1" :disabled-input="item.increaseNum&&item.increaseNum>1"></u-number-box>
-							</view>
-							
-							<view class="line-box" v-if="index === product.orderProductColorList.length-1">
-								<u-line></u-line>
-							</view>
-						</view>
-					</view>
+					
 				</scroll-view>
 				<button v-if="cartBtnShow" class="btn" @click="batchAddCart">确定</button>
 				<button v-if="buyBtnShow" class="btn" @click="buy">确定</button>
@@ -289,6 +351,8 @@
 	import jyfParser from '@/components/jyf-parser/jyf-parser'; // HBuilderX 2.5.5 及以上可以不需要
 	import {mapState} from 'vuex';
 	import share from '@/components/share';
+	
+	var Decimal = require('decimal.js');
 	
 	export default{
 		components: {
@@ -343,7 +407,8 @@
 				limitNum: 0,//起始购买数量
 				colorAll: '',
 				stockNumAll: 0,
-				shoppingNumAll: 0
+				shoppingNumAll: 0,
+				changeIndex: -1,
 			};
 		},
 		watch:{
@@ -354,7 +419,25 @@
 					}
 				},
 				deep: true
-			}
+			},
+			/* "specSelected.shoppingNum": {
+				handler: function (val, oldVal) {
+					if(val){
+						let area = new Decimal(this.specSelected.shoppingNum).mul(this.specSelected.colorSpecification)
+						this.$set(this.specSelected, 'area', area)
+						//计算安装费用
+						if(this.specSelected.installFee){
+							let installFeeTotal = area.mul(this.specSelected.installFee)
+							this.$set(this.specSelected, 'installFeeTotal', installFeeTotal)
+						}else{
+							this.$set(this.specSelected, 'installFeeTotal', '-')
+						}
+					}else{
+						this.$set(this.specSelected, 'area', '-')
+					}
+				},
+				deep: true
+			} */
 		},
 		computed: {
 			...mapState(['hasLogin','userInfo','weChat'])
@@ -373,7 +456,70 @@
 			this.getGroupProduct()
 		},
 		methods:{
-			
+			areaChange(e){
+				
+				//debugger
+				//总价格：1平方米价格 * 包装面积 * 购买数量
+				//总面积：包装面积 * 购买数量
+				//安装费： （包装面积 * 购买数量） 向上取整 * 1平方米安装费
+				//龙骨安装费： （包装面积 * 购买数量） 向上取整 * 1平方米安装费
+				if(this.changeIndex!==1){
+					this.changeIndex=0
+				}else{
+					this.changeIndex=-1
+					return
+				}
+				/* console.log("area..."+e.value)
+				this.$set(this.specSelected, 'area', e.value) */
+				if(e.value){
+					let shoppingNum = new Decimal(e.value).div(this.specSelected.colorSpecification).toNumber()
+					shoppingNum = Math.ceil(shoppingNum) //购买数量 = 用户输入面积/包装面积 向上取整
+					let area = new Decimal(shoppingNum).mul(this.specSelected.colorSpecification).toNumber() //总面积
+					area = Math.ceil(area) //向上取整
+					
+					//计算安装费用
+					if(this.specSelected.installFee){
+						let installFeeTotal = new Decimal(area).mul(this.specSelected.installFee)
+						this.$set(this.specSelected, 'installFeeTotal', installFeeTotal)
+					}
+					
+					//计算龙骨安装费
+					if(this.specSelected.keelInstallationFee){
+						let keelInstallationFeeTotal = new Decimal(area).mul(this.specSelected.keelInstallationFee)
+						this.$set(this.specSelected, 'keelInstallationFeeTotal', keelInstallationFeeTotal)
+					}
+					
+					this.$set(this.specSelected, 'shoppingNum', shoppingNum)
+				}
+			},
+			shoppingNumChange(e){
+				//debugger
+				if(this.changeIndex!==0){
+					this.changeIndex=1
+				}else{
+					this.changeIndex=-1
+					return
+				}
+				/* console.log("num..."+e.value)
+				this.$set(this.specSelected, 'shoppingNum', e.value) */
+				if(e.value){
+					let area = new Decimal(this.specSelected.shoppingNum).mul(this.specSelected.colorSpecification).toNumber()
+					this.$set(this.specSelected, 'area', area)
+					area = Math.ceil(area) //向上取整
+					
+					//计算安装费用
+					if(this.specSelected.installFee){
+						let installFeeTotal = new Decimal(area).mul(this.specSelected.installFee)
+						this.$set(this.specSelected, 'installFeeTotal', installFeeTotal)
+					}
+					
+					//计算龙骨安装费
+					if(this.specSelected.keelInstallationFee){
+						let keelInstallationFeeTotal = new Decimal(area).mul(this.specSelected.keelInstallationFee)
+						this.$set(this.specSelected, 'keelInstallationFeeTotal', keelInstallationFeeTotal)
+					}
+				}
+			},
 			//获取运费模板
 			getFreightTemplate(){
 				let id = this.product.freightTemplateId
@@ -451,6 +597,11 @@
 						}
 						if(this.product.orderProductColorList&&this.product.orderProductColorList.length>0){
 							this.$set(this.product.orderProductColorList[0], 'selected', true);
+							this.$set(this.product.orderProductColorList[0], 'shoppingNum', 1);
+							this.$set(this.product.orderProductColorList[0], 'isInstall', false);
+							this.$set(this.product.orderProductColorList[0], 'isKeelInstall', false);
+							this.$set(this.product.orderProductColorList[0], 'installFeeTotal', 0);
+							this.$set(this.product.orderProductColorList[0], 'keelInstallationFeeTotal', 0);
 							this.specSelected=this.product.orderProductColorList[0];
 						}
 						for(let productColor of this.product.orderProductColorList){
@@ -666,43 +817,24 @@
 					this.selectShow = true
 				}
 			},
-			//选择尺寸
-			selectSize(item){
-				this.removeItemSpecSelected('size')
-				this.sizeList.forEach(e=>{
-					e.selected=false
-					if(e.id === item.id){
-						this.$set(e, 'selected', true);
-						this.specSelected.push(item); 
-					}
-				})
-			},
 			//选择颜色
 			selectColor(item){
-				// this.removeItemSpecSelected('color')
-				this.specSelected={}
 				this.product.orderProductColorList.forEach(e=>{
-					e.selected=false
-					if(e.id === item.id){
-						this.$set(e, 'selected', true);
-						this.specSelected=item; 
-					}
+					this.$set(e, 'selected', false)
+					this.$set(e, 'isInstall', false);
+					this.$set(e, 'isKeelInstall', false);
 				})
+				this.$set(item, 'selected', true)
+				this.$set(item, 'shoppingNum', 1)
+				this.$set(item, 'installFeeTotal', 0)
+				this.$set(item, 'keelInstallationFeeTotal', 0)
+				this.specSelected=item
 			},
 			selectDeliveryMethod(item){
 				for(let obj of this.deliveryMethodList){
 					obj.active =false
 				}
 				item.active = true
-			},
-			
-			removeItemSpecSelected(type){
-				this.specSelected.forEach(item=>{
-					if(item.type === type){ 
-						// this.specSelected.filter(i=>this.specSelected.indexOf(item)>-1)
-						this.delItem(item,this.specSelected)
-					} 
-				})
 			},
 			delItem(item,list){
 				const index=list.indexOf(item)
@@ -815,7 +947,6 @@
 				})
 			},
 			initGoodList(){
-				var Decimal = require('decimal.js');
 				if(this.userInfo.ifVip!=2||this.userInfo.vipState!=1){
 					//不是vip用户
 					if(this.product.ifVip==2||(this.userInfo.tag==1&&!this.product.isBuy)){
@@ -831,81 +962,47 @@
 					productInfoList:[]
 				}
 				let totalMoney = 0
-				let shoppingNumAll = 0
-				for(let item of this.product.orderProductColorList){
-					if(item.shoppingNum){
-						shoppingNumAll += item.shoppingNum
-						let newPro = {
-							productName:this.product.productName,//商品名称
-							factoryNo:this.product.factoryNo,
-							factoryName:this.product.factoryName,
-							factoryShortName:this.product.factoryShortName,
-							logisticsType:this.product.logisticsType,
-						}
-						newPro.productNum=item.shoppingNum
-						newPro.productId=this.product.id
-						newPro.chooseProductColor=item
-						newPro.color=item.color
-						newPro.imgPath=item.imgPath
-						newPro.parentImgPath=this.product.imgPath
-						for(let deliveryMethod of this.deliveryMethodList){
-							if(deliveryMethod.active){
-								newPro.chooseDeliveryMethod=deliveryMethod.name
-							}
-						}
-						
-						delete newPro.introductory
-						goods.productInfoList.push(newPro)
-						//浮点数精度丢失的问题
-						
-						let salePrice = new Decimal(item.salePrice)
-						totalMoney = salePrice.mul(item.shoppingNum).plus(totalMoney)
+				
+				let newPro = {
+					productName:this.product.productName,//商品名称
+					factoryNo:this.product.factoryNo,
+					factoryName:this.product.factoryName,
+					factoryShortName:this.product.factoryShortName,
+					logisticsType:this.product.logisticsType,
+				}
+				newPro.productNum=this.specSelected.shoppingNum
+				newPro.productId=this.product.id
+				newPro.chooseProductColor=this.specSelected
+				newPro.color=this.specSelected.color
+				newPro.imgPath=this.specSelected.imgPath
+				newPro.parentImgPath=this.product.imgPath
+				for(let deliveryMethod of this.deliveryMethodList){
+					if(deliveryMethod.active){
+						newPro.chooseDeliveryMethod=deliveryMethod.name
 					}
 				}
-				if(shoppingNumAll < this.limitNum){
+				newPro.taxPoint=this.product.taxPoint
+				newPro.deposit=this.product.deposit
+				newPro.isInstall = this.specSelected.isInstall?1:0
+				newPro.isKeelInstall = this.specSelected.isKeelInstall?1:0
+				newPro.installFeeTotal = this.specSelected.installFeeTotal
+				newPro.keelInstallationFeeTotal = this.specSelected.keelInstallationFeeTotal
+				delete newPro.introductory
+				goods.productInfoList.push(newPro)
+				//浮点数精度丢失的问题
+				
+				totalMoney = new Decimal(this.specSelected.salePrice).mul(this.specSelected.shoppingNum).plus(totalMoney)
+				
+				if(newPro.productNum < this.limitNum){
 					this.$api.msg('少于起购数量:'+ this.limitNum+'，请购买更多的商品')
 					return false
 				}
-				if(goods.productInfoList.length===0){
-					this.$api.msg('请先选择需要购买的商品数量')
-					return false
-				}
+				
 				goodsList.push(goods)
-				console.log("goodsList",goodsList)
 				this.toggleSpec()
 				return {goodsList: goodsList,totalMoney: totalMoney.toString()}
 			},
-			//加入购物车
-			addCart(){
-				if(this.userInfo.ifVip!=2||this.userInfo.vipState!=1){
-					//不是vip用户
-					if(this.product.ifVip==2||(this.userInfo.tag==1&&!this.product.isBuy)){
-						this.$api.msg('你没有权限购买该物品，需成为VIP会员后才可购买。')
-						return
-					}
-				}
-				this.$api.loading('请求中...')
-				this.$api.httpPost('shoppingCart/api/add',{
-					userId:this.userInfo.id,
-					productId:this.product.id,
-					productColorId:this.specSelected.id
-				}).then(r=>{
-					console.log('请求结果：',r)
-					uni.hideLoading()
-					if(r.code==0){
-						this.$api.msg(r.msg||'添加成功')
-						uni.switchTab({
-						  url: `/pages/cart/cart`
-						});
-					}else{
-						this.$api.msg(r.msg||'网络错误请重试')
-					}
-				}).catch(e=>{
-					console.log('请求错误：',e)
-					uni.hideLoading()
-					this.$api.msg(e.msg||'网络错误请重试')
-				})
-			},
+			
 			//批量加入购物车
 			batchAddCart(){
 				if(this.userInfo.ifVip!=2||this.userInfo.vipState!=1){
@@ -916,21 +1013,29 @@
 					}
 				}
 				let objList = []
-				for(let item of this.product.orderProductColorList){
-					if(item.shoppingNum){
-						let obj = {
-							userId: this.userInfo.id,
-							productId: this.product.id,
-							productColorId: item.id,
-							productNum: item.shoppingNum
-						}
-						objList.push(obj)
+				let obj = {
+					userId: this.userInfo.id,
+					productId: this.product.id,
+					productColorId: this.specSelected.id,
+					productNum: this.specSelected.shoppingNum,
+					isInstall: this.specSelected.isInstall?1:0,
+					isKeelInstall: this.specSelected.isKeelInstall?1:0
+				}
+				for(let deliveryMethod of this.deliveryMethodList){
+					if(deliveryMethod.active){
+						obj.chooseDeliveryMethod=deliveryMethod.name
 					}
 				}
-				if(objList.length===0){
+				objList.push(obj)
+				if(this.specSelected.shoppingNum&&this.specSelected.shoppingNum<1){
 					this.$api.msg('请先选择需要购买的商品数量')
 					return
 				}
+				if(this.specSelected.shoppingNum < this.limitNum){
+					this.$api.msg('少于起购数量:'+ this.limitNum+'，请购买更多的商品')
+					return false
+				}
+				
 				this.$api.loading('请求中...')
 				this.$api.httpPost('shoppingCart/api/batchAdd',objList).then(r=>{
 					console.log('请求结果：',r)
@@ -1420,8 +1525,15 @@
 			color: $font-color-base;
 			padding-top: 30upx;
 			padding-left: 10upx;
-			max-height: 600rpx;
+			max-height: 850rpx;
 			overflow-y: scroll;
+			
+			.title {
+				padding-left: 15rpx;
+				padding-top: 15rpx;
+				font-size: 32rpx;
+				font-weight: bolder;
+			}
 		}
 		.item-list{
 			margin: 20upx 0 0;
@@ -1456,23 +1568,7 @@
 					width: 180upx;
 				}
 				
-				.number-box {
-					margin-left: auto;
-					display: flex;
-					align-items: center;
-					
-					.price-box {
-						margin: 10rpx 0;
-						
-						.price-box-item {
-							display: flex;
-							
-							text {
-								margin-left: auto;
-							}
-						}
-					}
-				}
+				
 				
 				image{
 					width: 60rpx;
@@ -1482,6 +1578,24 @@
 					font-size: 20rpx;
 					/* color: $font-color-dark; */
 					margin-left: 20rpx;
+				}
+			}
+			
+			.number-box {
+				margin-left: auto;
+				display: flex;
+				align-items: center;
+				
+				.price-box {
+					margin: 10rpx 0;
+					
+					.price-box-item {
+						display: flex;
+						
+						text {
+							margin-left: auto;
+						}
+					}
 				}
 			}
 			
@@ -1501,22 +1615,36 @@
 			align-items: center;
 			justify-content: left;
 			flex-wrap: wrap;
-			/* height: 550rpx; */
 			margin-bottom: 20upx;
 			
+			.text-box {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: 15rpx 20rpx;
+			}
 			
+			.text-tooltip {
+				color: rgba(#000000, .4);
+				font-size: 24rpx;
+			}
+			
+			image {
+				width: 50rpx;
+				height: 50rpx;
+			}
 			
 			.select-box{
 				display: flex;
 				flex-wrap: wrap;
 				align-items: center;
 				justify-content: center;
-				background: #eee;
-				margin-right: 20upx;
-				margin-bottom: 20upx;
-				border-radius: 10rpx;
-				min-width: 120rpx;
-				height: 60rpx;
+				background: rgba(#eee,.4);
+				padding: 15rpx 20rpx;
+				margin: 20rpx;
+				border-radius: 12rpx;
+				box-sizing: border-box;
+				border: 1rpx solid rgba(#eee,0);
 				/* border: 1upx solid $border-color-light; */
 				
 				.line-box {
@@ -1535,15 +1663,23 @@
 					/* color: $font-color-dark; */
 					margin-right: 20rpx;
 				}
+				
+				.tit {
+					margin-left: 20rpx;
+				}
 			}
 			
 			.selected{
-				background: #fbebee;
+				border: 1rpx solid rgba(#ff0000,.9);
+				background: rgba(#fbebee,.4);
 				text{
 					color: $uni-color-primary;
-					margin: 20rpx;
 		
 				}
+			}
+			
+			.to-right {
+				margin-left: auto;
 			}
 		}
 	}

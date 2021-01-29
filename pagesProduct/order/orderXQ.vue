@@ -28,9 +28,10 @@
 						<text class="title clamp">{{product.productName}}</text>
 						<text class="spec">{{product.color}}</text>
 						<view class="price-box">
-							<text class="price">￥{{product.unitPrice}}</text>
+							<text class="price">{{product.unitPrice}}￥/m²</text>
+							<text class="number">x {{product.colorSpecification}}m²/包</text>
 							<text class="number">x {{product.productNum}}</text>
-							<text class="deliveryMethod">发货方式: {{product.deliveryMethod||'-'}}</text>
+							<!-- <text class="deliveryMethod">发货方式: {{product.deliveryMethod||'-'}}</text> -->
 						</view>
 					</view>
 				</view>
@@ -99,6 +100,26 @@
 				<text class="cell-tip red">{{orderInfo.stateTip}}</text>
 			</view>
 			<view class="yt-list-cell b-b">
+				<text class="cell-tit clamp">发票税点金额</text>
+				<text class="cell-tip red">￥{{orderInfo.taxPointAllPrice}}</text>
+			</view>
+			<view class="yt-list-cell b-b">
+				<text class="cell-tit clamp">安装费用</text>
+				<text class="cell-tip red">￥{{orderInfo.installFeeTotal}}</text>
+			</view>
+			<view class="yt-list-cell b-b">
+				<text class="cell-tit clamp">龙骨安装费</text>
+				<text class="cell-tip red">￥{{orderInfo.keelInstallationFeeTotal}}</text>
+			</view>
+			<view class="yt-list-cell b-b">
+				<text class="cell-tit clamp">定金总金额</text>
+				<text class="cell-tip red">￥{{orderInfo.totalDepositAmount}}</text>
+			</view>
+			<view class="yt-list-cell b-b">
+				<text class="cell-tit clamp">尾款</text>
+				<text class="cell-tip red">￥{{orderInfo.totalDepositAmount}}</text>
+			</view>
+			<view class="yt-list-cell b-b">
 				<text class="cell-tit clamp">订单金额</text>
 				<text class="cell-tip red">￥{{orderInfo.orderPrice}}</text>
 			</view>
@@ -155,6 +176,9 @@
 <script>
 	import {mapState} from 'vuex';
 	import {RESOURCE } from '@/api/resource.js'
+	
+	var Decimal = require('decimal.js');
+	
 	export default {
 		computed: {
 			...mapState(['hasLogin','userInfo','weChat'])
@@ -336,9 +360,9 @@
 			getTotalPrice(orderChildInfoList){
 				let totalPrice = 0
 				for(let item of orderChildInfoList){
-					totalPrice += item.unitPrice * item.productNum
+					totalPrice = new Decimal(item.unitPrice).mul(item.productNum).mul(item.colorSpecification).plus(totalPrice)
 				}
-				return totalPrice
+				return totalPrice.toString()
 			},
 			stopPrevent(){}
 		}

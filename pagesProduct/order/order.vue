@@ -51,8 +51,8 @@
 							<image class="goods-img" :src="goodsItem.imgPath||'/static/errorImage.jpg'" mode="aspectFill"></image>
 							<view class="right">
 								<text class="title clamp">{{goodsItem.productName}}</text>
-								<text class="attr-box">{{goodsItem.color}}  x {{goodsItem.productNum}}</text>
-								<text class="price">{{goodsItem.totalPrice}}</text>
+								<text class="attr-box">{{goodsItem.color}}  </text>
+								<text class="price">{{goodsItem.totalPrice}}￥/m² x {{goodsItem.colorSpecification}}m²/包 x {{goodsItem.productNum}}</text>
 							</view>
 						</view>
 						<view class="wuliu-box b-t" 
@@ -113,7 +113,7 @@
 						<!-- <button class="action-btn" v-if="item.orderState==4" :disabled="item.submitDisabled" @tap.stop="feedback(item)">售后反馈</button> -->
 						<button class="action-btn" v-if="item.orderState==4" :disabled="item.submitDisabled" @tap.stop="evaluate(item.id)">评价</button>
 						<button class="action-btn" v-if="item.orderState==4"  @tap.stop="downloadImage(item)">电子发票</button>
-						<button class="action-btn recom" v-if="item.orderState==1" @tap.stop="toPay(item)">立即支付</button>
+						<button class="action-btn recom" v-if="[1,8].indexOf(item.orderState)>-1" @tap.stop="toPay(item)">立即支付</button>
 					</view>
 				</view>
 			</mescroll-body>

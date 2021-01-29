@@ -110,7 +110,26 @@
 			"style": {
 				"navigationBarTitleText": "我的订单"
 			}
-		}]
+		}    ,{
+                    "path" : "article/articleDetail",
+                    "style" :                                                                                    
+                {
+                    "navigationBarTitleText": "查看文章",
+                    "enablePullDownRefresh": false
+                }
+                
+                }
+                
+                ,{
+                    "path" : "article/articleList",
+                    "style" :                                                                                    
+                {
+                    "navigationBarTitleText": "文章中心",
+                    "enablePullDownRefresh": false
+                }
+                
+                }
+            ]
 	},{
 		"root": "pagesProduct",
 		"pages": [{
