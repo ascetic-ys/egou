@@ -947,6 +947,7 @@
 				})
 			},
 			initGoodList(){
+				var Decimal = require('decimal.js');
 				if(this.userInfo.ifVip!=2||this.userInfo.vipState!=1){
 					//不是vip用户
 					if(this.product.ifVip==2||(this.userInfo.tag==1&&!this.product.isBuy)){
@@ -1567,7 +1568,6 @@
 				.color-text {
 					width: 180upx;
 				}
-				
 				
 				
 				image{

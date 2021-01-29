@@ -1,6 +1,6 @@
 <template>
 	<view>
-		
+
 		<view class="u-m-t-20" v-for="(child,index) in brandList" :key="index">
 			<!-- <u-cell-group>
 				<u-cell-item v-for="(item,index) in brandList" :key="index" :title="item.dictValue"></u-cell-item>
